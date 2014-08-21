@@ -14,6 +14,7 @@
 // static variables
 int Codetable;
 char *CodetableName[] = {"UTF","KOI","WIN","LAT"};
+char out[MAXUTF];
 
 // func. definitions
 void outhex(char *);
@@ -23,6 +24,7 @@ void help (void)
 {
 print("Command list:\n\
 koi, win, utf, lat - switch codetable\n\
+codetable - print current codetable\n\
 alf - print alfavit\n\
 ascii - print ascii table\n\
 help, помощь - help\n\
@@ -100,6 +102,60 @@ koi_to_utf8(str,buf);
 strcpy(str,buf);
 }
 
+void utf8_to_win(char *str_i, char *str_o)
+{
+	iconv_t cd;
+	size_t len_i, len_o = MAXUTF;
+	size_t i;
+
+	if ((cd = iconv_open("CP1251", "UTF-8")) == (iconv_t) - 1)
+	{
+		printf("utf8_to_win: iconv_open error\n");
+		return;
+	}
+	len_i = strlen(str_i);
+	if ((i=iconv(cd, &str_i, &len_i, &str_o, &len_o)) == (size_t) - 1)
+	{
+		printf("utf8_to_win: iconv error\n");
+		// return;
+	}
+	if (iconv_close(cd) == -1)
+	{
+		printf("utf8_to_win: iconv_close error\n");
+		return;
+	}
+}
+
+void win_to_utf8(char *str_i, char *str_o)
+{
+	iconv_t cd;
+	size_t len_i, len_o = MAXUTF;
+	size_t i;
+
+	if ((cd = iconv_open("UTF-8", "CP1251")) == (iconv_t) - 1)
+	{
+		printf("win_to_utf8: iconv_open error\n");
+		return;
+	}
+	len_i = strlen(str_i);
+	if ((i=iconv(cd, &str_i, &len_i, &str_o, &len_o)) == (size_t) - 1)
+	{
+		printf("win_to_utf8: iconv error\n");
+		// return;
+	}
+	if (iconv_close(cd) == -1)
+	{
+		printf("win_to_utf8: iconv_close error\n");
+		return;
+	}
+}
+
+void fromwin (char *str)
+{char buf [MAXUTF];
+win_to_utf8(str,buf);
+strcpy(str,buf);
+}
+
 void outhex(char *str)
 {
 while(*str)
@@ -110,15 +166,17 @@ printf("\n");
 }
 
 char *utf2koi (char *str)
-{
-char out[MAXUTF];
+{int i;
+for (i=0;i<MAXUTF;i++)out[i]=0;
 utf8_to_koi(str, out);
 return out;
 }
 
 char *utf2win (char *str)
-{
-return "win not implemented yet\n";
+{int i;
+for (i=0;i<MAXUTF;i++)out[i]=0;
+utf8_to_win(str, out);
+return out;
 }
 
 char *utf2lat (char *str)
@@ -164,10 +222,12 @@ while(1)
 	switch (Codetable)
 		{
 		case KOI: fromkoi(cmd); break;
+		case WIN: fromwin(cmd); break;
 		}
 	// printf("cmd=`%s'\n", cmd);
 	cc=strchr(cmd,'\n');
 	if (cc) *cc=0;
+	if (cmd[0]==0) continue;
 	if (!strcmp(cmd,"q")) break;
 	if (!strcmp(cmd,"quit")) break;
 	if (!strcmp(cmd,"exit")) break;
