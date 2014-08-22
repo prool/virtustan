@@ -45,7 +45,7 @@ for (i=0;i<256*2;i++) m[i]=' ';
 for (i=128;i<144;i++) {m[2*i]=0xD1U; m[2*i+1]=i&0xFF;}
 printf("'%s'\n", m);
 
-// АБВГДЕЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯабвгдежзийклмноп    рстуфхцчшщъыьэюя
+// АБВГДЕЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯабвгдежзийклмноп рстуфхцчшщъыьэюя
 }
 
 void utf8_to_koi(char *str_i, char *str_o)
@@ -240,7 +240,7 @@ while(1)
 	else if (!strcmp(cmd,"koi")) {Codetable=KOI; printf("Codetable switch to KOI\n");}
 	else if (!strcmp(cmd,"utf")) {Codetable=UTF; printf("Codetable switch to UTF\n");}
 	else if (!strcmp(cmd,"win")) {Codetable=WIN; printf("Codetable switch to WIN\n");}
-	else if (!strcmp(cmd,"lat")) {Codetable=LAT; printf("Codetable switch to LAT\n");}
+	else if (!strcmp(cmd,"lat")) {Codetable=LAT; printf("Codetable switch to LAT: yet not implemented!\n");}
 	else if (!strcmp(cmd,"codetable")) printf("Current codetable is %s\n",CodetableName[Codetable]);
 	else printf("Invalid command `%s'\n", cmd);
 	}
