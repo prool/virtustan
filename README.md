@@ -21,6 +21,6 @@ q, quit, exit, конец - exit
 
 Автор: Пруль (proolix собака gmail.com, [страницаПруля] (http://prool.kharkov.org "Пыщ"))
 
-
+[proolface] (http://prool.kharkov.org/cam/cam_1.jpg "Пруль")
 
 ~~ОКАЩЕНЕНО~~
