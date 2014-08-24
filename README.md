@@ -19,6 +19,8 @@ help, помощь - help
 test - test
 q, quit, exit, конец - exit
 
-Автор: Пруль (proolix собака gmail.com, [страницаПруля] (http://prool.kharkov.org пыщ))
+Автор: Пруль (proolix собака gmail.com, [страницаПруля] (http://prool.kharkov.org "Пыщ"))
+
+
 
 ~~ОКАЩЕНЕНО~~
