@@ -1,13 +1,24 @@
 virtustan
 =========
 
-Virtustan application
+*Virtustan application*
 
 Бессмысленное эзотерическое приложение, имеющее отношение
 к виртуальному королевству Виртустан (www.virtustan.net)
 
 Не качайте ЭТО! ;-)
 
-Автор: Пруль (proolix собака gmail.com, www.prool.kharkov.org)
+В настоящее время реализованы команды:
 
-ОКАЩЕНЕНО!
+Command list:
+koi, win, utf, lat - switch codetable
+codetable - print current codetable
+alf - print alfavit
+ascii - print ascii table
+help, помощь - help
+test - test
+q, quit, exit, конец - exit
+
+Автор: Пруль (proolix собака gmail.com, [prool.kharkov.org] (http://prool.kharkov.org))
+
+~~ОКАЩЕНЕНО~~
