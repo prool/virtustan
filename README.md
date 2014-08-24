@@ -3,10 +3,8 @@ virtustan
 
 *Virtustan application*
 
-Бессмысленное эзотерическое приложение, имеющее отношение
+Бессмысленное ~~эзотерическое~~ приложение, имеющее отношение
 к виртуальному королевству Виртустан (www.virtustan.net)
-
-Не качайте ЭТО! ;-)
 
 В настоящее время реализованы команды:
 
@@ -21,6 +19,4 @@ q, quit, exit, конец - exit
 
 Автор: Пруль (proolix собака gmail.com, [страницаПруля] (http://prool.kharkov.org "Пыщ"))
 
-![Prool!](http://prool.kharkov.org/cam/cam_1.jpg "Prool")
-
-~~ОКАЩЕНЕНО~~
+![Prool!](http://prool.kharkov.org/cam/cam_1.jpg "Prool!!")
