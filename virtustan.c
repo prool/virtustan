@@ -219,6 +219,8 @@ char cmd[MAXLEN];
 char *cc;
 
 printf("\nVirtustan 0.2\n\n");
+printf("Current codetable is %s. ",CodetableName[Codetable]);
+print("Ktulhu ФХТАГН!!\n\n");
 printf("Use `help' command for help and `quit' for quit.\n\n");
 
 Codetable=UTF;

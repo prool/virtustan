@@ -17,6 +17,8 @@ help, помощь - help
 test - test
 q, quit, exit, конец - exit
 
+А вот и первая польза от данного приложения: им я проверяю, какая установлена кодировка кириллицы
+
 Автор: Пруль (proolix собака gmail.com, [страницаПруля] (http://prool.kharkov.org "Пыщ"))
 
 ![Prool!](http://prool.kharkov.org/cam/cam_1.jpg "Prool!!")
