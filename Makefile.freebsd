@@ -1,0 +1,5 @@
+virtustan: virtustan.c
+	gcc virtustan.c -o virtustan -I /usr/local/include /usr/local/lib/libiconv.a
+	strip virtustan
+clean:
+	rm virtustan
