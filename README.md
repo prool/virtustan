@@ -19,7 +19,8 @@ q, quit, exit, конец - exit
 
 А вот и первая польза от данного приложения: им я проверяю, какая установлена кодировка кириллицы
 
-Приложение протестировано в средах Linux (Ubuntu, Debian, Centos) и Windows 7 (в среде cygwin)
+Приложение протестировано в средах Linux (Ubuntu, Debian, Centos), Windows 7 (в среде cygwin),
+FreeBSD 9
 
 Автор: Пруль (proolix собака gmail.com, [страницаПруля] (http://prool.kharkov.org "Пыщ"))
 
