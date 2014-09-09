@@ -252,7 +252,8 @@ while(1)
 	else if (!strcmp(cmd,"win")) {Codetable=WIN; printf("Codetable switch to WIN\n");}
 	else if (!strcmp(cmd,"lat")) {Codetable=LAT; printf("Codetable switch to LAT: yet not implemented!\n");}
 	else if (!strcmp(cmd,"codetable")) printf("Current codetable is %s\n",CodetableName[Codetable]);
-	else printf("Invalid command `%s'\n", cmd);
+	else if (!strcmp(cmd,"look")) look();
+	else printf("Unknown command `%s'\n", cmd);
 	}
 return 0;
 }
