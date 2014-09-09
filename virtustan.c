@@ -11,10 +11,21 @@
 #define LAT 3
 #define ALFAVIT "В ЧАЩАХ ЮГА ЖИЛ БЫ ЦИТРУС ДА НО ФАЛЬШИВЫЙ ЭКЗЕМПЛЯР в чащах юга жил бы цитрус да но фальшивый экземпляр Ёё Ъъ\n"
 
+#define MAX_X 100
+#define MAX_Y 100
+
 // static variables
 int Codetable;
 char *CodetableName[] = {"UTF","KOI","WIN","LAT"};
 char out[MAXUTF];
+struct
+	{
+	char *descr;
+	int room_type;
+	}
+	world[MAX_X][MAX_Y];
+
+int global_x, global_y;
 
 // func. definitions
 void outhex(char *);
@@ -29,8 +40,47 @@ alf - print alfavit\n\
 ascii - print ascii table\n\
 help, помощь - help\n\
 test - test\n\
+look - look\n\
+directions: n, s, w, e\n\
 q, quit, exit, конец - exit\n\
 \n");
+}
+
+void init_world(void)
+{
+world[50][50].descr="Вы находитесь перед воротами Виртустана (ворота на севере)";
+world[50][51].descr="Вы находитесь на пограничном посту Виртустана. Отсюда на север тянется Виртустан";
+world[50][52].descr="Вы находитесь на Виртустанской улице, идущей в меридиональном направлении";
+world[50][53].descr="Вы находитесь на Виртустанской площади";
+world[50][54].descr="Вы находитесь на Виртустанском проспекте";
+world[49][53].descr="Вы находитесь во Дворце Короля Виртустана. Вокруг лепота";
+world[49][52].descr="Вы находитесь в Виртустанской Библиотеке. ТИШИНА ДОЛЖНА БЫТЬ В БИБЛИОТЕКЕ!";
+world[51][52].descr="Вы находитесь в Виртустанской Гостинице";
+world[51][53].descr="Вы находитесь в Виртустанском Банке. Слышен звон пересчитываемых монет, шелест купюр и звяканье кассового аппарата";
+world[50][48].descr="Вы находитесь в неглубокой яме. На дне лежат чьи-то кости";
+}
+
+void look(void)
+{
+#define FOREST "Вы находитесь в светлом сосновом лесу, который охватывает Виртустан со всех сторон"
+printf("(%i,%i)\n",global_x,global_y);
+if (world[global_x][global_y].descr) print(world[global_x][global_y].descr);
+else print(FOREST);
+printf("\n");
+}
+
+void move(int dx, int dy)
+{
+global_x+=dx;
+global_y+=dy;
+print("Вы переместились ");
+if (dx==1) print("на восток");
+else if (dx==-1) print("на запад");
+else if (dy==1) print("на север");
+else if (dy==-1) print("на юг");
+else print("в неизвестном направлении");
+printf("\n");
+look();
 }
 
 void test (void)
@@ -217,13 +267,26 @@ int main(void)
 {
 char cmd[MAXLEN];
 char *cc;
+int i, j;
 
 printf("\nVirtustan 0.2\n\n");
 printf("Current codetable is %s. ",CodetableName[Codetable]);
 print("Ktulhu ФХТАГН!!\n\n");
 printf("Use `help' command for help and `quit' for quit.\n\n");
 
+
+printf("init stated\n");
 Codetable=UTF;
+
+for (i=0; i<MAX_X; i++) for (j=0; j<MAX_Y; j++) {world[i][j].descr=0; world[i][j].room_type=0;}
+
+global_x=50; global_y=50;
+
+init_world();
+
+printf("init ended\n\n");
+
+look();
 
 while(1)
 	{
@@ -253,6 +316,10 @@ while(1)
 	else if (!strcmp(cmd,"lat")) {Codetable=LAT; printf("Codetable switch to LAT: yet not implemented!\n");}
 	else if (!strcmp(cmd,"codetable")) printf("Current codetable is %s\n",CodetableName[Codetable]);
 	else if (!strcmp(cmd,"look")) look();
+	else if (!strcmp(cmd,"n")) move(0,+1);
+	else if (!strcmp(cmd,"s")) move(0,-1);
+	else if (!strcmp(cmd,"w")) move(-1,0);
+	else if (!strcmp(cmd,"e")) move(+1,0);
 	else printf("Unknown command `%s'\n", cmd);
 	}
 return 0;
