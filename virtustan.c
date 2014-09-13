@@ -43,7 +43,8 @@ test - test\n\
 look - look\n\
 directions: n, s, w, e\n\
 q, quit, exit, конец - exit\n\
-\n");
+\n\
+Sites: www.prool.kharkov.org github.com/prool/virtustan\n");
 }
 
 void init_world(void)

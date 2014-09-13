@@ -8,7 +8,7 @@ virtustan
 
 По сути простейшая игра, некая смесь рогалика
 ([roguelike](http://lurkmore.to/%D0%A0%D0%BE%D0%B3%D0%B0%D0%BB%D0%B8%D0%BA%D0%B8))
-и муда ([MUD](http://lurkmore.to/MUD))
+и муда ([MUD](http://lurkmore.to/MUD)), но с виртустанским контентом
 
 В настоящее время реализованы команды:
 
@@ -28,6 +28,8 @@ q, quit, exit, конец - exit
 Приложение протестировано в средах Linux (Ubuntu, Debian, Centos), Windows 7 (в среде cygwin),
 FreeBSD 9
 
-Автор: Пруль (proolix собака gmail.com, [страницаПруля] (http://prool.kharkov.org "Пыщ"))
+Новые версии можно найти здесь: https://github.com/prool/virtustan
 
-![Prool!](http://prool.kharkov.org/cam/cam_1.jpg "Prool!!")
+Автор: [Пруль] (http://prool.kharkov.org "Пыщ"), mail proolix собака gmail.com
+
+![Prool!](http://prool.kharkov.org/cam/cam_1.jpg "Prool")
