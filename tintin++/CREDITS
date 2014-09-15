@@ -1,0 +1,41 @@
+Special thanks to the following
+-------------------------------
+Peter Unold                                          The original TINTIN III
+Jeremy C. Jack                     see mods/1.5.mods
+Bill Reiss                         see mods/1.5.mods
+David A. Wagner                    see mods/1.5.mods
+Harald Evensen                                       Many bug insights
+David Hedbot                                         Original GNU autoconfig
+Andrew Chernov                                       FreeBSD bug fixes
+Jim Goddard                                          SOCKS #ifdefs
+Greg Jarman                                          Original #if code
+Peter Kjellerstedt                 see mods/pkj.mods
+Sean Butler                        see mods/xin.mods Original #chat code
+Robert Ellsworth                   see mods/rse.mods
+Sverre Norrman                     see mods/dsc.mods mods/svr.mods
+Davin Chan                         see mods/dsc.mods
+Chitchat                           see mods/dsc.mods
+Kuang-che Wu                       see mods/dsc.mods
+Yoon-Chan Jhi                      see mods/dsc.mods mods/ycj.mods
+Igor van den Hoven                 see mods/igr.mods
+Julia Longtin                      see mods/igr.mods Telnet enhancements
+Bryan Turner                       see mods/igr.mods Mapper enhancements
+David Champion                     see mods/igr.mods Solaris forkpty fix
+Ben Love                           see mods/igr.mods Tab enhancements
+
+Modification History
+--------------------
+ 1.5.mods jan 1994 jan 1995
+ pkj.mods apr 1997 may 1997
+ xin.mods dec 1998 jan 1998
+ rse.mods aug 1998 mar 1999
+ dsc.mods oct 1999 oct 2001
+ igr.mods feb 2004
+
+
+Current Tintin++ Development Team
+---------------------------------
+Igor van den Hoven - mudclient@gmail.com
+
+The email must contain either tintin, tintin++, mud, or client in the subject
+or message, otherwise it may not get forwarded to my main email account.
