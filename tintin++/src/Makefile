@@ -37,7 +37,9 @@ LDFLAGS =
 
 INCS = 
 
-LIBS = -lpcre -lutil -lnsl -lpthread -lz 
+# by prool:
+#LIBS = -lpcre -lutil -lnsl -lpthread -lz 
+LIBS = -lpcre -lutil -lpthread -lz 
 
 # If you prefer to be able to enter ISO latin-1 characters instead
 # of being able to use the meta key for special emacs-like commands
