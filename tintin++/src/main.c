@@ -163,7 +163,7 @@ int main(int argc, char **argv)
 		SOCKSinit(argv[0]);
 	#endif
 
-printf("--------------------\nMod by Prool. Year 2014. https://github.com/prool/virtustan http://prool.kharkov.org proolix@gmail.com\n"); // prool
+printf("--------------------\nMod by Prool. 2014-2015. https://github.com/prool/virtustan http://prool.kharkov.org proolix@gmail.com\n"); // prool
 
 	if (signal(SIGTERM, trap_handler) == BADSIG)
 	{

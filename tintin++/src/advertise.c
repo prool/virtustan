@@ -35,11 +35,13 @@ struct advertisement_type
 	char                  * desc;
 };
 
+#define YEAR2030	1893456000	/*  1 Jan 2030 */
+
 struct advertisement_type advertisement_table[] =
 {
 	{
 		1388166000, /* 27 Dec 2013 */
-		1420072000, /* 31 Dec 2014 */
+		YEAR2030,
 		100,
 		"\n"
 		"<138>                     VMUD  -  http://mud.kharkov.org\n"
@@ -53,7 +55,7 @@ struct advertisement_type advertisement_table[] =
 
 	{
 		1388166000, /* 27 Dec 2013 */
-		1420072000, /* 31 Dec 2014 */
+		YEAR2030,
 		100,
 		"\n"
 		"<138>                   Zerkalo  -  http://zerkalo.kharkov.org\n"
@@ -66,14 +68,14 @@ struct advertisement_type advertisement_table[] =
 
 	{
 		1388166000, /* 27 Dec 2013 */
-		1420072000, /* 31 Dec 2014 */
+		YEAR2030,
 		100,
 		"\n"
 		"<138>                Byliny  -  http://mud.ru\n"
 		"\n"
 		"<078>Byliny rulez\n"
 		"\n"
-		"<178>To connect to Byliny enter: #ses s1 byliny.kharkov.ru 4000\n"
+		"<178>To connect to Byliny enter: #ses s1 byliny.kharkov.ru 4000 or bylins.su\n"
 		"\n"
 	},
 

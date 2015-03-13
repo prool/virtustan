@@ -1554,7 +1554,9 @@ struct help_type help_table[] =
 
 DO_COMMAND(do_prool) // prool
 {
-printf("prool command\n\n");
+printf("prool's remarks:\n\n\
+Command for MSSP:\n#config {debug telnet} on\n\
+");
 
 return ses;
 }
