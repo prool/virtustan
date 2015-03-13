@@ -10,7 +10,9 @@ virtustan
 ([roguelike](http://lurkmore.to/%D0%A0%D0%BE%D0%B3%D0%B0%D0%BB%D0%B8%D0%BA%D0%B8))
 и муда ([MUD](http://lurkmore.to/MUD)), но с виртустанским контентом
 
-В настоящее время реализованы команды:
+Сюда же отдельным подкаталогом вставлен мой мод мад-клиента tintin++
+
+В Virtustan application в настоящее время реализованы команды:
 
 Command list:
 koi, win, utf, lat - switch codetable
