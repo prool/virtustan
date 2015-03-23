@@ -13,8 +13,8 @@
 #define LAT 3
 #define ALFAVIT "В ЧАЩАХ ЮГА ЖИЛ БЫ ЦИТРУС ДА НО ФАЛЬШИВЫЙ ЭКЗЕМПЛЯР в чащах юга жил бы цитрус да но фальшивый экземпляр Ёё Ъъ\n"
 
-#define MAX_X 100
-#define MAX_Y 100
+#define MAX_X 60
+#define MAX_Y 60
 
 #define LINES w.ws_row
 #define COLUMNS w.ws_col
@@ -30,11 +30,15 @@ struct
 	}
 	world[MAX_X][MAX_Y];
 
+int max_x, max_y;
+int min_x, min_y;
+
 int global_x, global_y;
 
 // func. definitions
 void outhex(char *);
 void print (char *);
+void map(void);
 
 void help (void)
 {
@@ -47,28 +51,51 @@ help, помощь, ? - help\n\
 test - test\n\
 look - look\n\
 directions: n, s, w, e\n\
+map - map\n\n\
 q, quit, exit, конец - exit\n\
 \n\
 Sites: www.prool.kharkov.org github.com/prool/virtustan\n");
 }
 
 void init_world(void)
-{
+{int x,y;
+
 world[50][50].descr="Вы находитесь перед воротами Виртустана (ворота на севере)";
 world[50][51].descr="Вы находитесь на пограничном посту Виртустана. Отсюда на север тянется Виртустан";
 world[50][52].descr="Вы находитесь на Виртустанской улице, идущей в меридиональном направлении";
 world[50][53].descr="Вы находитесь на Виртустанской площади";
 world[50][54].descr="Вы находитесь на Виртустанском проспекте";
 world[49][53].descr="Вы находитесь во Дворце Короля Виртустана. Вокруг лепота";
-world[49][52].descr="Вы находитесь в Виртустанской Библиотеке. ПОТОМУ ЧТО ТИШИНА ДОЛЖНА БЫТЬ В БИБЛИОТЕКЕ!!";
+world[49][52].descr="Вы находитесь в Виртустанской Библиотеке. ТИШИНА ДОЛЖНА БЫТЬ В БИБЛИОТЕКЕ!!";
 world[51][52].descr="Вы находитесь в Виртустанской Гостинице";
 world[51][53].descr="Вы находитесь в Виртустанском Банке. Слышен звон пересчитываемых монет, шелест купюр и звяканье кассового аппарата";
 world[50][48].descr="Вы находитесь в неглубокой яме. На дне лежат чьи-то кости";
+
+// computation of boundaries
+max_x=-1;
+max_y=-1;
+min_x=MAX_X;
+min_y=MAX_Y;
+for (y=0;y<MAX_Y;y++)
+    for (x=0;x<MAX_X;x++)
+	{
+	if (world[x][y].descr)
+	    {
+	    if (x>max_x) max_x=x;
+	    if (y>max_y) max_y=y;
+	    if (x<min_x) min_x=x;
+	    if (y<min_y) min_y=y;
+	    }
+	}
+
+printf("Boundaries of map: x %i %i, y %i %i\n", min_x, max_x, min_y, max_y);
+
 }
 
 void look(void)
 {
 #define FOREST "Вы находитесь в светлом сосновом лесу, который охватывает Виртустан со всех сторон"
+map();
 printf("(%i,%i)\n",global_x,global_y);
 if (world[global_x][global_y].descr) print(world[global_x][global_y].descr);
 else print(FOREST);
@@ -76,7 +103,17 @@ printf("\n");
 }
 
 void move(int dx, int dy)
-{
+{int try_x, try_y;
+
+try_x=global_x+dx;
+try_y=global_y+dy;
+
+if ((try_x>MAX_X-1)||(try_y>MAX_Y-1)||(try_x<0)||(try_y<0))
+    {
+    printf("В этом направлении переместиться невозможно. Там край мира\n");
+    return;
+    }
+
 global_x+=dx;
 global_y+=dy;
 print("Вы переместились ");
@@ -269,6 +306,27 @@ for (i=32; i<256; i++)
 printf("\n");
 }
 
+void map(void)
+{
+int x, y;
+
+// write of map
+
+for (y=max_y; y>=min_y; y--)
+    {
+    for (x=min_x; x<=max_x; x++)
+	{
+	if ((x==global_x)&&(y==global_y)) printf("@");
+	else if (world[x][y].descr)
+	    printf("*");
+	else
+	    printf(".");
+	printf(" ");
+	}
+    printf("\n");
+    }
+}
+
 int main(void)
 {
 char cmd[MAXLEN];
@@ -337,6 +395,7 @@ while(1)
 	else if (!strcmp(cmd,"s")) move(0,-1);
 	else if (!strcmp(cmd,"w")) move(-1,0);
 	else if (!strcmp(cmd,"e")) move(+1,0);
+	else if (!strcmp(cmd,"map")) map();
 	else printf("Unknown command `%s'\n", cmd);
 	}
 return 0;
