@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <string.h>
 #include <iconv.h>
+#include <sys/ioctl.h>
+#include <unistd.h>
 
 #define MAXLEN 255
 #define MAXUTF 1024
@@ -13,6 +15,9 @@
 
 #define MAX_X 100
 #define MAX_Y 100
+
+#define LINES w.ws_row
+#define COLUMNS w.ws_col
 
 // static variables
 int Codetable;
@@ -38,7 +43,7 @@ koi, win, utf, lat - switch codetable\n\
 codetable - print current codetable\n\
 alf - print alfavit\n\
 ascii - print ascii table\n\
-help, помощь - help\n\
+help, помощь, ? - help\n\
 test - test\n\
 look - look\n\
 directions: n, s, w, e\n\
@@ -269,14 +274,23 @@ int main(void)
 char cmd[MAXLEN];
 char *cc;
 int i, j;
+struct winsize w;
+
+ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
+
+for (i=0;i<LINES;i++) printf("\n");
 
 printf("\nVirtustan 0.2\n\n");
 printf("Current codetable is %s. ",CodetableName[Codetable]);
 print("Ktulhu ФХТАГН!!\n\n");
+
+printf ("lines %d\n", LINES);
+printf ("columns %d\n\n", COLUMNS);
+
 printf("Use `help' command for help and `quit' for quit.\n\n");
 
 
-printf("init stated\n");
+printf("init started\n");
 Codetable=UTF;
 
 for (i=0; i<MAX_X; i++) for (j=0; j<MAX_Y; j++) {world[i][j].descr=0; world[i][j].room_type=0;}
@@ -307,6 +321,8 @@ while(1)
 	if (!strcmp(cmd,"exit")) break;
 	if (!strcmp(cmd,"конец")) break;
 	if (!strcmp(cmd,"help")) help();
+	else if (!strcmp(cmd,"h")) help();
+	else if (!strcmp(cmd,"?")) help();
 	else if (!strcmp(cmd,"помощь")) help();
 	else if (!strcmp(cmd,"test")) test();
 	else if (!strcmp(cmd,"alf")) print(ALFAVIT);
