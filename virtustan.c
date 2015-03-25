@@ -35,6 +35,8 @@ int min_x, min_y;
 
 int global_x, global_y;
 
+struct winsize w;
+
 // func. definitions
 void outhex(char *);
 void print (char *);
@@ -52,6 +54,7 @@ test - test\n\
 look - look\n\
 directions: n, s, w, e\n\
 map - map\n\n\
+env - print environment\n\n\
 q, quit, exit, конец - exit\n\
 \n\
 Sites: www.prool.kharkov.org github.com/prool/virtustan\n");
@@ -90,6 +93,18 @@ for (y=0;y<MAX_Y;y++)
 
 printf("Boundaries of map: x %i %i, y %i %i\n", min_x, max_x, min_y, max_y);
 
+}
+
+int min (int x, int y)
+{
+if (x<y) return x;
+return y;
+}
+
+int max (int x, int y)
+{
+if (x>y) return x;
+return y;
 }
 
 void look(void)
@@ -327,12 +342,23 @@ for (y=max_y; y>=min_y; y--)
     }
 }
 
-int main(void)
+void env(char *envp[])
+{int i;
+i=0;
+while(*envp)
+	{
+	printf("%s\n",*envp++);
+	//if (++i>LINES-4) {i=0; printf("press any key"); getchar();}
+	}
+}
+
+///////////////////////////////////////////////////////////////////////////////////
+int main (int argc, char *argv[], char *envp[])
 {
 char cmd[MAXLEN];
 char *cc;
 int i, j;
-struct winsize w;
+char terminal [MAXLEN];
 
 ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
 
@@ -345,8 +371,19 @@ print("Ktulhu ФХТАГН!!\n\n");
 printf ("lines %d\n", LINES);
 printf ("columns %d\n\n", COLUMNS);
 
-printf("Use `help' command for help and `quit' for quit.\n\n");
+#define S_TERM "TERM="
+while (*envp)
+    {
+	if (!memcmp(*envp,S_TERM,min(strlen(*envp),strlen(S_TERM))))
+		{
+		strcpy(terminal,*envp+strlen(S_TERM));
+		//printf("%s\n", *envp);
+		printf("terminal = %s\n", terminal);
+		}
+	envp++;
+    }
 
+printf("Use `help' command for help and `quit' for quit.\n\n");
 
 printf("init started\n");
 Codetable=UTF;
@@ -396,6 +433,7 @@ while(1)
 	else if (!strcmp(cmd,"w")) move(-1,0);
 	else if (!strcmp(cmd,"e")) move(+1,0);
 	else if (!strcmp(cmd,"map")) map();
+	else if (!strcmp(cmd,"env")) env(envp);
 	else printf("Unknown command `%s'\n", cmd);
 	}
 return 0;
