@@ -19,6 +19,24 @@
 #define LINES w.ws_row
 #define COLUMNS w.ws_col
 
+#define NORM_COLOR "\033[0m"
+
+#define KRASN "\033[31m"
+#define ZELEN "\033[32m"
+#define ZHELT "\033[33m"
+#define SIN "\033[34m"
+#define FIOL "\033[35m"
+#define GOLUB "\033[36m"
+#define BEL "\033[37m"
+
+#define KRASN1 "\033[1;31m"
+#define ZELEN1 "\033[1;32m"
+#define ZHELT1 "\033[1;33m"
+#define SIN1 "\033[1;34m"
+#define FIOL1 "\033[1;35m"
+#define GOLUB1 "\033[1;36m"
+#define BEL1 "\033[1;37m"
+
 // static variables
 int Codetable;
 char *CodetableName[] = {"UTF","KOI","WIN","LAT"};
@@ -60,10 +78,26 @@ q, quit, exit, конец - exit\n\
 Sites: www.prool.kharkov.org github.com/prool/virtustan\n");
 }
 
+void printfile(char *filename)
+{FILE *fp; char str[MAXLEN];
+
+fp = fopen (filename,"r");
+
+if (fp==NULL) {printf("Can't open file `%s'\n", filename); return;}
+
+while(!feof(fp))
+	{
+	str[0]=0;
+	fgets(str,MAXLEN,fp);
+	if (str[0]) print(str);
+	}
+}
+
 void init_world(void)
 {int x,y;
 
-world[50][50].descr="Вы находитесь перед воротами Виртустана (ворота на севере)";
+world[50][50].descr="Вы находитесь перед воротами Виртустана (ворота на севере, идти на север надо командой n)\n\
+На воротах висит объявление. Для просмотра объявления наберите vorotaob";
 world[50][51].descr="Вы находитесь на пограничном посту Виртустана. Отсюда на север тянется Виртустан";
 world[50][52].descr="Вы находитесь на Виртустанской улице, идущей в меридиональном направлении";
 world[50][53].descr="Вы находитесь на Виртустанской площади";
@@ -111,7 +145,7 @@ void look(void)
 {
 #define FOREST "Вы находитесь в светлом сосновом лесу, который охватывает Виртустан со всех сторон"
 map();
-printf("(%i,%i)\n",global_x,global_y);
+printf("%s(%i,%i)%s\n",GOLUB1,global_x,global_y,NORM_COLOR);
 if (world[global_x][global_y].descr) print(world[global_x][global_y].descr);
 else print(FOREST);
 printf("\n");
@@ -149,24 +183,6 @@ printf("\
 -----------------------------------------------------------------------------\n\
 [0m\n\
 ");
-
-#define NORM_COLOR "\033[0m"
-
-#define KRASN "\033[31m"
-#define ZELEN "\033[32m"
-#define ZHELT "\033[33m"
-#define SIN "\033[34m"
-#define FIOL "\033[35m"
-#define GOLUB "\033[36m"
-#define BEL "\033[37m"
-
-#define KRASN1 "\033[1;31m"
-#define ZELEN1 "\033[1;32m"
-#define ZHELT1 "\033[1;33m"
-#define SIN1 "\033[1;34m"
-#define FIOL1 "\033[1;35m"
-#define GOLUB1 "\033[1;36m"
-#define BEL1 "\033[1;37m"
 
 for (i=31;i<38;i++)
 	{
@@ -355,7 +371,7 @@ int x, y;
 
 // write of map
 
-printf(BEL1);
+printf(ZELEN1);
 
 for (y=max_y; y>=min_y; y--)
     {
@@ -376,6 +392,7 @@ printf(NORM_COLOR);
 void env(char *envp[])
 {int i;
 i=0;
+printf("env\n");
 while(*envp)
 	{
 	printf("%s\n",*envp++);
@@ -390,19 +407,24 @@ char cmd[MAXLEN];
 char *cc;
 int i, j;
 char terminal [MAXLEN];
+char **envpp;
 
 ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
 
 for (i=0;i<LINES;i++) printf("\n");
 
-printf("\n%sVirtustan 0.2%s\n\n",BEL1,NORM_COLOR);
+printf("\n%sVirtustan application 0.2\nCopyleft by Prool, 2015\nThis program comes with ABSOLUTELY NO WARRANTY; for details type `gpl3'.\n\
+This is free software, and you are welcome to redistribute it\n\
+under certain conditions; type `gpl3' for details.\n\
+Compile %s %s\n\nhttp://virtustan.net\nhttp://prool.kharkov.org\n<proolix@gmail.com>%s\n\n",BEL1,__DATE__,__TIME__,NORM_COLOR);
 printf("Current codetable is %s. ",CodetableName[Codetable]);
 print("Ktulhu ФХТАГН!!\n\n");
 
 printf ("lines %d\n", LINES);
-printf ("columns %d\n\n", COLUMNS);
+printf ("columns %d\n", COLUMNS);
 
 #define S_TERM "TERM="
+envpp=envp;
 while (*envp)
     {
 	if (!memcmp(*envp,S_TERM,min(strlen(*envp),strlen(S_TERM))))
@@ -413,8 +435,9 @@ while (*envp)
 		}
 	envp++;
     }
+envp=envpp;
 
-printf("Use `help' command for help and `quit' for quit.\n\n");
+printf("\n%sUse `help' command for help and `quit' for quit.%s\n\n", BEL1, NORM_COLOR);
 
 printf("init started\n");
 Codetable=UTF;
@@ -464,6 +487,8 @@ while(1)
 	else if (!strcmp(cmd,"w")) move(-1,0);
 	else if (!strcmp(cmd,"e")) move(+1,0);
 	else if (!strcmp(cmd,"map")) map();
+	else if (!strcmp(cmd,"vorotaob")) printfile("texts/vorotaob.txt");
+	else if (!strcmp(cmd,"gpl3")) printfile("LICENSE");
 	else if (!strcmp(cmd,"env")) env(envp);
 	else printf("Unknown command `%s'\n", cmd);
 	}
