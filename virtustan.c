@@ -142,13 +142,41 @@ look();
 }
 
 void test (void)
-{
+{int i;
 printf("\
 -----------------------------------------------------------------------------\n\
 [0;40;37;1m\
 -----------------------------------------------------------------------------\n\
 [0m\n\
 ");
+
+#define NORM_COLOR "\033[0m"
+
+#define KRASN "\033[31m"
+#define ZELEN "\033[32m"
+#define ZHELT "\033[33m"
+#define SIN "\033[34m"
+#define FIOL "\033[35m"
+#define GOLUB "\033[36m"
+#define BEL "\033[37m"
+
+#define KRASN1 "\033[1;31m"
+#define ZELEN1 "\033[1;32m"
+#define ZHELT1 "\033[1;33m"
+#define SIN1 "\033[1;34m"
+#define FIOL1 "\033[1;35m"
+#define GOLUB1 "\033[1;36m"
+#define BEL1 "\033[1;37m"
+
+for (i=31;i<38;i++)
+	{
+	printf("\033[%im *** ", i);
+	}
+for (i=31;i<38;i++)
+	{
+	printf("\033[1;%im *** ", i);
+	}
+printf("\033[0m\n");
 #if 0
 unsigned char m [256*2]; int i;
 //print("test --- ТЕСТ тест \n\n");
@@ -304,7 +332,7 @@ void print (char *str)
 {
 switch (Codetable)
 	{
-	case UTF: printf(str); break;
+	case UTF: printf((const char *)str); break;
 	case KOI: printf(utf2koi(str)); break;
 	case WIN: printf(utf2win(str)); break;
 	case LAT: printf(utf2lat(str)); break;
@@ -327,6 +355,8 @@ int x, y;
 
 // write of map
 
+printf(BEL1);
+
 for (y=max_y; y>=min_y; y--)
     {
     for (x=min_x; x<=max_x; x++)
@@ -340,6 +370,7 @@ for (y=max_y; y>=min_y; y--)
 	}
     printf("\n");
     }
+printf(NORM_COLOR);
 }
 
 void env(char *envp[])
@@ -364,7 +395,7 @@ ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
 
 for (i=0;i<LINES;i++) printf("\n");
 
-printf("\nVirtustan 0.2\n\n");
+printf("\n%sVirtustan 0.2%s\n\n",BEL1,NORM_COLOR);
 printf("Current codetable is %s. ",CodetableName[Codetable]);
 print("Ktulhu ФХТАГН!!\n\n");
 
