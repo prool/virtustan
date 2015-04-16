@@ -3,6 +3,7 @@
 #include <iconv.h>
 #include <sys/ioctl.h>
 #include <unistd.h>
+#include <time.h>
 
 #define MAXLEN 255
 #define MAXUTF 1024
@@ -59,6 +60,7 @@ struct winsize w;
 void outhex(char *);
 void print (char *);
 void map(void);
+char *ptime(void);
 
 void help (void)
 {
@@ -371,7 +373,7 @@ int x, y;
 
 // write of map
 
-printf(ZELEN1);
+printf("%s\n%s",ptime(),ZELEN1);
 
 for (y=max_y; y>=min_y; y--)
     {
@@ -400,7 +402,31 @@ while(*envp)
 	}
 }
 
-///////////////////////////////////////////////////////////////////////////////////
+char *ptime(void)
+	{
+	char *tmstr;
+	time_t mytime;
+
+	mytime = time(0);
+
+	tmstr = asctime(localtime(&mytime));
+	*(tmstr + strlen(tmstr) - 1) = '\0';
+
+	return tmstr;
+
+	}
+void log(char *str)
+{
+FILE *fp;
+
+#define LOGFILE "virtustan-app.log"
+fp=fopen(LOGFILE,"a");
+if (!fp) {printf("Can't open logfile `%s'\n",LOGFILE); return;}
+fprintf(fp,"%s %s\n",ptime(), str);
+fflush(0);
+fclose(fp);
+}
+/************************************************************************************************************************/
 int main (int argc, char *argv[], char *envp[])
 {
 char cmd[MAXLEN];
@@ -438,6 +464,8 @@ while (*envp)
 envp=envpp;
 
 printf("\n%sUse `help' command for help and `quit' for quit.%s\n\n", BEL1, NORM_COLOR);
+
+log("Virtustan application started");
 
 printf("init started\n");
 Codetable=UTF;
@@ -489,8 +517,10 @@ while(1)
 	else if (!strcmp(cmd,"map")) map();
 	else if (!strcmp(cmd,"vorotaob")) printfile("texts/vorotaob.txt");
 	else if (!strcmp(cmd,"gpl3")) printfile("LICENSE");
+	else if (!strcmp(cmd,"constitution")) printfile("texts/constitution.txt");
 	else if (!strcmp(cmd,"env")) env(envp);
 	else printf("Unknown command `%s'\n", cmd);
 	}
+log("Virtustan application finished");
 return 0;
 }
