@@ -73,8 +73,10 @@ help, помощь, ? - help\n\
 test - test\n\
 look - look\n\
 directions: n, s, w, e\n\
-map - map\n\n\
-env - print environment\n\n\
+map - map\n\
+env - print environment\n\
+vorotaob - объявление на воротах\n\
+constitution - print Virtustan constitution\n\
 q, quit, exit, конец - exit\n\
 \n\
 Sites: www.prool.kharkov.org github.com/prool/virtustan\n");
