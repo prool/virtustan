@@ -430,11 +430,13 @@ fclose(fp);
 }
 
 void keyboard(void)
-{
+{char c;
+initscr();
 while(1)
 	{
-	int c=getch();
-	printf("%i ",c);
+	c=getch();
+	if (c!=-1) printf ("code=%i\r\n",(int)c);
+	fflush(0);
 	}
 }
 /************************************************************************************************************************/
@@ -532,7 +534,7 @@ while(1)
 	else if (!strcmp(cmd,"gpl3")) printfile("LICENSE");
 	else if (!strcmp(cmd,"constitution")) printfile("texts/constitution.txt");
 	else if (!strcmp(cmd,"env")) env(envp);
-	else if (!strcmp(cmd,"keyboard")) keyboard();
+	else if (!strcmp(cmd,"kbd")) keyboard();
 	else printf("Unknown command `%s'\n", cmd);
 	}
 log("Virtustan application finished");
