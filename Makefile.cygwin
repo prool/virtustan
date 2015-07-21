@@ -1,5 +1,6 @@
+# makefile for cygwin
 virtustan: virtustan.c
-	gcc virtustan.c -o virtustan -l iconv
+	gcc virtustan.c -o virtustan -l iconv -l curses
 	strip virtustan
 clean:
 	rm virtustan
