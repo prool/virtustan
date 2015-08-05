@@ -4,6 +4,8 @@
 #include <sys/ioctl.h>
 #include <unistd.h>
 #include <time.h>
+#include <ncurses.h>
+#include <locale.h> // for UTF-8 under ncurses
 
 #define MAXLEN 255
 #define MAXUTF 1024
@@ -17,7 +19,7 @@
 #define MAX_X 60
 #define MAX_Y 60
 
-#define LINES w.ws_row
+#define lines w.ws_row
 #define COLUMNS w.ws_col
 
 #define NORM_COLOR "\033[0m"
@@ -59,8 +61,10 @@ struct winsize w;
 // func. definitions
 void outhex(char *);
 void print (char *);
+void print2 (char *);
 void map(void);
 char *ptime(void);
+void log_(char *str);
 
 void help (void)
 {
@@ -80,6 +84,74 @@ constitution - print Virtustan constitution\n\
 q, quit, exit, конец - exit\n\
 \n\
 Sites: www.prool.kharkov.org github.com/prool/virtustan\n");
+}
+
+void test2 (void)
+{char c; int i;
+initscr();
+//for (i=0;i<max_y;i++) printw("\n");
+refresh();
+printw("LINE #1\n");
+printw("PRESS ANY KEY\n");
+refresh();
+c=getch();
+endwin();
+}
+
+char pressanykey()
+{char c;
+printf("---press any key---");
+
+while(1)
+	{
+	c=getchar();
+	if (c!=-1) return c;
+	}
+}
+
+void clrscr(void)
+{int i;
+
+clear();
+
+#if 0
+for (i=0;i<COLUMNS;i++) printw("\n");
+#endif
+
+refresh();
+}
+
+void printfile2(char *filename)
+{
+FILE *fp;
+char str[MAXLEN];
+char c;
+int i;
+
+setlocale(LC_CTYPE, ""); // for UTF-8 under ncurses
+initscr();
+refresh();
+
+fp = fopen (filename,"r");
+                                 
+if (fp==NULL) {printf("Can't open file `%s'\n", filename); return;}
+
+clrscr();
+
+while(!feof(fp))
+	{
+	str[0]=0;
+	fgets(str,MAXLEN,fp);
+	if (str[0])
+		{
+		print2(str); refresh();
+		if (++i>=LINES-2) {i=0;c=pressanykey(); if (c=='q') {printw("QUIT\n");fclose(fp);endwin();return;} clrscr(); }
+		}
+	}
+fclose(fp);
+refresh();
+pressanykey();
+endwin();
 }
 
 void printfile(char *filename)
@@ -155,7 +227,7 @@ else print(FOREST);
 printf("\n");
 }
 
-void move(int dx, int dy)
+void move_(int dx, int dy)
 {int try_x, try_y;
 
 try_x=global_x+dx;
@@ -360,6 +432,18 @@ switch (Codetable)
 	}
 }
 
+void print2 (char *str)
+{
+switch (Codetable)
+	{
+	case UTF: printw((const char *)str); break;
+	case KOI: printw(utf2koi(str)); break;
+	case WIN: printw(utf2win(str)); break;
+	case LAT: printw(utf2lat(str)); break;
+	default: ;
+	}
+}
+
 void ascii (void)
 {int i;
 for (i=32; i<256; i++)
@@ -400,7 +484,7 @@ printf("env\n");
 while(*envp)
 	{
 	printf("%s\n",*envp++);
-	//if (++i>LINES-4) {i=0; printf("press any key"); getchar();}
+	//if (++i>lines-4) {i=0; printf("press any key"); getchar();}
 	}
 }
 
@@ -417,7 +501,7 @@ char *ptime(void)
 	return tmstr;
 
 	}
-void log(char *str)
+void log_(char *str)
 {
 FILE *fp;
 
@@ -452,7 +536,7 @@ char **envpp;
 
 ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
 
-for (i=0;i<LINES;i++) printf("\n");
+for (i=0;i<lines;i++) printf("\n");
 
 printf("\n%sVirtustan application 0.2\nCopyleft by Prool, 2015\nThis program comes with ABSOLUTELY NO WARRANTY; for details type `gpl3'.\n\
 This is free software, and you are welcome to redistribute it\n\
@@ -461,7 +545,7 @@ Compile %s %s\n\nhttp://virtustan.net\nhttp://prool.kharkov.org\n<proolix@gmail.
 printf("Current codetable is %s. ",CodetableName[Codetable]);
 print("Ktulhu ФХТАГН!!\n\n");
 
-printf ("lines %d\n", LINES);
+printf ("lines %d\n", lines);
 printf ("columns %d\n", COLUMNS);
 
 #define S_TERM "TERM="
@@ -480,7 +564,7 @@ envp=envpp;
 
 printf("\n%sUse `help' command for help and `quit' for quit.%s\n\n", BEL1, NORM_COLOR);
 
-log("Virtustan application started");
+log_("Virtustan application started");
 
 printf("init started\n");
 Codetable=UTF;
@@ -516,7 +600,6 @@ while(1)
 	else if (!strcmp(cmd,"h")) help();
 	else if (!strcmp(cmd,"?")) help();
 	else if (!strcmp(cmd,"помощь")) help();
-	else if (!strcmp(cmd,"test")) test();
 	else if (!strcmp(cmd,"alf")) print(ALFAVIT);
 	else if (!strcmp(cmd,"ascii")) ascii();
 	else if (!strcmp(cmd,"koi")) {Codetable=KOI; printf("Codetable switch to KOI\n");}
@@ -525,18 +608,20 @@ while(1)
 	else if (!strcmp(cmd,"lat")) {Codetable=LAT; printf("Codetable switch to LAT: yet not implemented!\n");}
 	else if (!strcmp(cmd,"codetable")) printf("Current codetable is %s\n",CodetableName[Codetable]);
 	else if (!strcmp(cmd,"look")) look();
-	else if (!strcmp(cmd,"n")) move(0,+1);
-	else if (!strcmp(cmd,"s")) move(0,-1);
-	else if (!strcmp(cmd,"w")) move(-1,0);
-	else if (!strcmp(cmd,"e")) move(+1,0);
+	else if (!strcmp(cmd,"n")) move_(0,+1);
+	else if (!strcmp(cmd,"s")) move_(0,-1);
+	else if (!strcmp(cmd,"w")) move_(-1,0);
+	else if (!strcmp(cmd,"e")) move_(+1,0);
 	else if (!strcmp(cmd,"map")) map();
 	else if (!strcmp(cmd,"vorotaob")) printfile("texts/vorotaob.txt");
-	else if (!strcmp(cmd,"gpl3")) printfile("LICENSE");
-	else if (!strcmp(cmd,"constitution")) printfile("texts/constitution.txt");
+	else if (!strcmp(cmd,"gpl3")) printfile2("LICENSE");
+	else if (!strcmp(cmd,"constitution")) printfile2("texts/constitution.txt");
 	else if (!strcmp(cmd,"env")) env(envp);
 	else if (!strcmp(cmd,"kbd")) keyboard();
+	else if (!strcmp(cmd,"test")) test();
+	else if (!strcmp(cmd,"test2")) test2();
 	else printf("Unknown command `%s'\n", cmd);
 	}
-log("Virtustan application finished");
+log_("Virtustan application finished");
 return 0;
 }
