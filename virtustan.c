@@ -41,6 +41,7 @@
 #define BEL1 "\033[1;37m"
 
 // static variables
+
 int Codetable;
 char *CodetableName[] = {"UTF","KOI","WIN","LAT"};
 char out[MAXUTF];
@@ -57,8 +58,10 @@ int min_x, min_y;
 int global_x, global_y;
 
 struct winsize w;
+struct termio tstdin;
 
-// func. definitions
+// function definitions (prototypes)
+
 void outhex(char *);
 void print (char *);
 void print2 (char *);
@@ -86,16 +89,51 @@ q, quit, exit, конец - exit\n\
 Sites: www.prool.kharkov.org github.com/prool/virtustan\n");
 }
 
+void set_terminal_raw(void)
+{
+/*  Set stdin (file descriptor=0) to raw mode, no echo */
+    ioctl(0, TCGETA, &tstdin);
+    tstdin.c_lflag &= ~(ICANON|ECHO);
+    ioctl(0, TCSETA, &tstdin);
+}
+
+void set_terminal_no_raw(void)
+{
+/*  Set stdin (file descriptor=0) to NOraw mode and echo */
+		ioctl(0, TCGETA, &tstdin);
+    		tstdin.c_lflag |= (ICANON|ECHO);
+    		ioctl(0, TCSETA, &tstdin);
+}
+
 void test2 (void)
 {char c; int i;
-initscr();
-//for (i=0;i<max_y;i++) printw("\n");
-refresh();
-printw("LINE #1\n");
-printw("PRESS ANY KEY\n");
-refresh();
-c=getch();
-endwin();
+struct termio tstdin;
+
+/*  Set stdin (file descriptor=0) to NOraw mode and echo */
+    ioctl(0, TCGETA, &tstdin);
+	printf("tstdin.c_lflag=%X\n", tstdin.c_lflag);
+    tstdin.c_lflag &= ~(ICANON|ECHO);
+	printf("tstdin.c_lflag=%X\n", tstdin.c_lflag);
+    ioctl(0, TCSETA, &tstdin);
+
+printf("Q - quit\n");
+
+while(1)
+	{
+	c=getchar();
+	if (c!=-1) printf ("test2. Code=%i\r\n",(int)c);
+	fflush(0);
+	if (c=='Q')
+		{
+		ioctl(0, TCGETA, &tstdin);
+	printf("tstdin.c_lflag=%X\n", tstdin.c_lflag);
+    		tstdin.c_lflag |= (ICANON|ECHO);
+	printf("tstdin.c_lflag=%X\n", tstdin.c_lflag);
+    		ioctl(0, TCSETA, &tstdin);
+		return;
+		}
+	}
+
 }
 
 char pressanykey()
@@ -145,13 +183,41 @@ while(!feof(fp))
 	if (str[0])
 		{
 		print2(str); refresh();
-		if (++i>=LINES-2) {i=0;c=pressanykey(); if (c=='q') {printw("QUIT\n");fclose(fp);endwin();return;} clrscr(); }
+		if (++i>=lines-2) {i=0;c=pressanykey(); if (c=='q') {printw("QUIT\n");fclose(fp);endwin();return;} clrscr(); }
 		}
 	}
 fclose(fp);
 refresh();
 pressanykey();
 endwin();
+}
+
+void printfile3(char *filename)
+{
+FILE *fp;
+char str[MAXLEN];
+char c;
+int i;
+
+fp = fopen (filename,"r");
+                                 
+if (fp==NULL) {printf("Can't open file `%s'\n", filename); return;}
+
+i=0;
+set_terminal_raw();
+while(!feof(fp))
+	{
+	str[0]=0;
+	fgets(str,MAXLEN,fp);
+	if (str[0])
+		{
+		print(str);
+		if (++i>=(lines-1)) {i=0;c=pressanykey(); if (c=='q') {printf("QUIT\n");fclose(fp);set_terminal_no_raw();return;} }
+		printf("\r                                    \r");
+		}
+	}
+fclose(fp);
+set_terminal_no_raw();
 }
 
 void printfile(char *filename)
@@ -614,8 +680,8 @@ while(1)
 	else if (!strcmp(cmd,"e")) move_(+1,0);
 	else if (!strcmp(cmd,"map")) map();
 	else if (!strcmp(cmd,"vorotaob")) printfile("texts/vorotaob.txt");
-	else if (!strcmp(cmd,"gpl3")) printfile2("LICENSE");
-	else if (!strcmp(cmd,"constitution")) printfile2("texts/constitution.txt");
+	else if (!strcmp(cmd,"gpl3")) printfile3("LICENSE");
+	else if (!strcmp(cmd,"constitution")) printfile3("texts/constitution.txt");
 	else if (!strcmp(cmd,"env")) env(envp);
 	else if (!strcmp(cmd,"kbd")) keyboard();
 	else if (!strcmp(cmd,"test")) test();
