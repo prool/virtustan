@@ -5,6 +5,7 @@
 #include <unistd.h>
 #include <time.h>
 #include <ncurses.h>
+#include <termios.h>
 #include <locale.h> // for UTF-8 under ncurses
 
 #define MAXLEN 255
