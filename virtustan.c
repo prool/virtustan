@@ -4,7 +4,7 @@
 #include <sys/ioctl.h>
 #include <unistd.h>
 #include <time.h>
-#include <ncurses.h>
+//#include <ncurses.h>
 #include <termios.h>
 #include <locale.h> // for UTF-8 under ncurses
 
@@ -146,51 +146,6 @@ while(1)
 	c=getchar();
 	if (c!=-1) return c;
 	}
-}
-
-void clrscr(void)
-{int i;
-
-clear();
-
-#if 0
-for (i=0;i<COLUMNS;i++) printw("\n");
-#endif
-
-refresh();
-}
-
-void printfile2(char *filename)
-{
-FILE *fp;
-char str[MAXLEN];
-char c;
-int i;
-
-setlocale(LC_CTYPE, ""); // for UTF-8 under ncurses
-initscr();
-refresh();
-
-fp = fopen (filename,"r");
-                                 
-if (fp==NULL) {printf("Can't open file `%s'\n", filename); return;}
-
-clrscr();
-
-while(!feof(fp))
-	{
-	str[0]=0;
-	fgets(str,MAXLEN,fp);
-	if (str[0])
-		{
-		print2(str); refresh();
-		if (++i>=lines-2) {i=0;c=pressanykey(); if (c=='q') {printw("QUIT\n");fclose(fp);endwin();return;} clrscr(); }
-		}
-	}
-fclose(fp);
-refresh();
-pressanykey();
-endwin();
 }
 
 void printfile3(char *filename)
@@ -499,18 +454,6 @@ switch (Codetable)
 	}
 }
 
-void print2 (char *str)
-{
-switch (Codetable)
-	{
-	case UTF: printw((const char *)str); break;
-	case KOI: printw(utf2koi(str)); break;
-	case WIN: printw(utf2win(str)); break;
-	case LAT: printw(utf2lat(str)); break;
-	default: ;
-	}
-}
-
 void ascii (void)
 {int i;
 for (i=32; i<256; i++)
@@ -580,16 +523,6 @@ fflush(0);
 fclose(fp);
 }
 
-void keyboard(void)
-{char c;
-initscr();
-while(1)
-	{
-	c=getch();
-	if (c!=-1) printf ("code=%i\r\n",(int)c);
-	fflush(0);
-	}
-}
 /************************************************************************************************************************/
 /************************************************************************************************************************/
 /************************************************************************************************************************/
@@ -684,7 +617,6 @@ while(1)
 	else if (!strcmp(cmd,"gpl3")) printfile3("LICENSE");
 	else if (!strcmp(cmd,"constitution")) printfile3("texts/constitution.txt");
 	else if (!strcmp(cmd,"env")) env(envp);
-	else if (!strcmp(cmd,"kbd")) keyboard();
 	else if (!strcmp(cmd,"test")) test();
 	else if (!strcmp(cmd,"test2")) test2();
 	else printf("Unknown command `%s'\n", cmd);
