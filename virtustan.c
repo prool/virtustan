@@ -75,6 +75,7 @@ void help (void)
 print("Command list:\n\
 koi, win, utf, lat - switch codetable\n\
 codetable - print current codetable\n\
+sysinfo - print sysinfo\n\
 alf - print alfavit\n\
 ascii - print ascii table\n\
 help, помощь, ? - help\n\
@@ -523,31 +524,14 @@ fflush(0);
 fclose(fp);
 }
 
-/************************************************************************************************************************/
-/************************************************************************************************************************/
-/************************************************************************************************************************/
-int main (int argc, char *argv[], char *envp[])
+void sysinfo(char *envp[])
 {
-char cmd[MAXLEN];
-char *cc;
-int i, j;
 char terminal [MAXLEN];
 char **envpp;
 
 ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
-
-for (i=0;i<lines;i++) printf("\n");
-
-printf("\n%sVirtustan application 0.2\nCopyleft by Prool, 2015\nThis program comes with ABSOLUTELY NO WARRANTY; for details type `gpl3'.\n\
-This is free software, and you are welcome to redistribute it\n\
-under certain conditions; type `gpl3' for details.\n\
-Compile %s %s\n\nhttp://virtustan.net\nhttp://prool.kharkov.org\n<proolix@gmail.com>%s\n\n",BEL1,__DATE__,__TIME__,NORM_COLOR);
-printf("Current codetable is %s. ",CodetableName[Codetable]);
-print("Ktulhu ФХТАГН!!\n\n");
-
 printf ("lines %d\n", lines);
 printf ("columns %d\n", COLUMNS);
-
 #define S_TERM "TERM="
 envpp=envp;
 while (*envp)
@@ -561,6 +545,27 @@ while (*envp)
 	envp++;
     }
 envp=envpp;
+}
+
+/************************************************************************************************************************/
+/************************************************************************************************************************/
+/************************************************************************************************************************/
+int main (int argc, char *argv[], char *envp[])
+{
+char cmd[MAXLEN];
+char *cc;
+int i, j;
+
+for (i=0;i<lines;i++) printf("\n");
+
+printf("\n%sVirtustan application 0.2\nCopyleft by Prool, 2015\nThis program comes with ABSOLUTELY NO WARRANTY; for details type `gpl3'.\n\
+This is free software, and you are welcome to redistribute it\n\
+under certain conditions; type `gpl3' for details.\n\
+Compile %s %s\n\nhttp://virtustan.net\nhttp://prool.kharkov.org\n<proolix@gmail.com>%s\n\n",BEL1,__DATE__,__TIME__,NORM_COLOR);
+printf("Current codetable is %s. ",CodetableName[Codetable]);
+print("Ktulhu ФХТАГН!!\n\n");
+
+sysinfo(envp);
 
 printf("\n%sUse `help' command for help and `quit' for quit.%s\n\n", BEL1, NORM_COLOR);
 
@@ -619,6 +624,7 @@ while(1)
 	else if (!strcmp(cmd,"env")) env(envp);
 	else if (!strcmp(cmd,"test")) test();
 	else if (!strcmp(cmd,"test2")) test2();
+	else if (!strcmp(cmd,"sysinfo")) sysinfo(envp);
 	else printf("Unknown command `%s'\n", cmd);
 	}
 log_("Virtustan application finished");
