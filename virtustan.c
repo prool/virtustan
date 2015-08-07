@@ -625,7 +625,7 @@ while(1)
 	else if (!strcmp(cmd,"test")) test();
 	else if (!strcmp(cmd,"test2")) test2();
 	else if (!strcmp(cmd,"sysinfo")) sysinfo(envp);
-	else printf("  Unknown command `%s'\n", cmd);
+	else printf("   Unknown command `%s'\n", cmd);
 	}
 log_("Virtustan application finished");
 return 0;
