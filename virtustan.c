@@ -69,6 +69,7 @@ void print2 (char *);
 void map(void);
 char *ptime(void);
 void log_(char *str);
+void computation_boundaries(void);
 
 void help (void)
 {
@@ -79,7 +80,8 @@ sysinfo - print sysinfo\n\
 alf - print alfavit\n\
 ascii - print ascii table\n\
 help, помощь, ? - help\n\
-test - test\n\
+test - test color\n\
+test2 - test of keyboard\n\
 look - look\n\
 directions: n, s, w, e\n\
 map - map\n\
@@ -207,6 +209,14 @@ world[51][52].descr="Вы находитесь в Виртустанской Г�
 world[51][53].descr="Вы находитесь в Виртустанском Банке. Слышен звон пересчитываемых монет, шелест купюр и звяканье кассового аппарата";
 world[50][48].descr="Вы находитесь в неглубокой яме. На дне лежат чьи-то кости";
 
+computation_boundaries();
+
+//printf("Boundaries of map: x %i %i, y %i %i\n", min_x, max_x, min_y, max_y);
+
+}
+
+void computation_boundaries(void)
+{ int x, y;
 // computation of boundaries
 max_x=-1;
 max_y=-1;
@@ -224,8 +234,6 @@ for (y=0;y<MAX_Y;y++)
 	    }
 	}
 
-printf("Boundaries of map: x %i %i, y %i %i\n", min_x, max_x, min_y, max_y);
-
 }
 
 int min (int x, int y)
@@ -242,11 +250,15 @@ return y;
 
 void look(void)
 {
-#define FOREST "Вы находитесь в светлом сосновом лесу, который охватывает Виртустан со всех сторон"
+#define EMPTY "Вы находитесь в пустоте"
 map();
 printf("%s(%i,%i)%s\n",GOLUB1,global_x,global_y,NORM_COLOR);
 if (world[global_x][global_y].descr) print(world[global_x][global_y].descr);
-else print(FOREST);
+else
+	{
+	print(EMPTY);
+	//world[global_x][global_y].descr="Тут был Пруль";
+	}
 printf("\n");
 }
 
@@ -467,14 +479,26 @@ printf("\n");
 void map(void)
 {
 int x, y;
+int local_max_y, local_max_x, local_min_y, local_min_x;
+
+//computation_boundaries();
+
+#define HALF_X 10 // полуразмеры карты от центра карты по измерениям
+#define HALF_Y 10
+
+local_min_x=global_x-HALF_X; if (local_min_x<0) local_min_x=0;
+local_min_y=global_y-HALF_Y; if (local_min_y<0) local_min_y=0;
+
+local_max_x=global_x+HALF_X; if (local_max_x>=MAX_X) local_max_x=MAX_X-1;
+local_max_y=global_y+HALF_Y; if (local_max_y>=MAX_Y) local_max_y=MAX_Y-1;
 
 // write of map
 
 printf("%s\n%s",ptime(),ZELEN1);
 
-for (y=max_y; y>=min_y; y--)
+for (y=local_max_y; y>=local_min_y; y--)
     {
-    for (x=min_x; x<=max_x; x++)
+    for (x=local_min_x; x<=local_max_x; x++)
 	{
 	if ((x==global_x)&&(y==global_y)) printf("@");
 	else if (world[x][y].descr)
@@ -558,7 +582,7 @@ int i, j;
 
 for (i=0;i<lines;i++) printf("\n");
 
-printf("\n%sVirtustan application 0.2\nCopyleft by Prool, 2015\nThis program comes with ABSOLUTELY NO WARRANTY; for details type `gpl3'.\n\
+printf("\n%sVirtustan application\nCopyleft by Prool, 2015\nThis program comes with ABSOLUTELY NO WARRANTY; for details type `gpl3'.\n\
 This is free software, and you are welcome to redistribute it\n\
 under certain conditions; type `gpl3' for details.\n\
 Compile %s %s\n\nhttp://virtustan.net\nhttp://prool.kharkov.org\n<proolix@gmail.com>%s\n\n",BEL1,__DATE__,__TIME__,NORM_COLOR);
@@ -580,7 +604,9 @@ global_x=50; global_y=50;
 
 init_world();
 
-printf("init ended\n\n");
+printf("init ended\n\npress any key\n");
+
+getchar();
 
 look();
 
