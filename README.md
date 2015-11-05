@@ -33,5 +33,3 @@ FreeBSD 9
 Новые версии можно найти здесь: https://github.com/prool/virtustan
 
 Автор: [Пруль] (http://prool.kharkov.org "Пыщ"), mail proolix собака gmail.com
-
-![Prool!](http://prool.kharkov.org/cam/cam_1.jpg "Prool")

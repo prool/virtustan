@@ -9,6 +9,7 @@
 #include <locale.h> // for UTF-8 under ncurses
 
 #define MAXLEN 255
+#define MAXLEN_CMD 4096
 #define MAXUTF 1024
 
 #define UTF 0
@@ -23,6 +24,7 @@
 #define lines w.ws_row
 #define COLUMNS w.ws_col
 
+#define ESC 033
 #define NORM_COLOR "\033[0m"
 
 #define KRASN "\033[31m"
@@ -70,6 +72,7 @@ void map(void);
 char *ptime(void);
 void log_(char *str);
 void computation_boundaries(void);
+void rogalik(void);
 
 void help (void)
 {
@@ -88,9 +91,21 @@ map - map\n\
 env - print environment\n\
 vorotaob - объявление на воротах\n\
 constitution - print Virtustan constitution\n\
+rog - rogalik\n\
 q, quit, exit, конец - exit\n\
 \n\
-Sites: www.prool.kharkov.org github.com/prool/virtustan\n");
+Sites: virtustan.net prool.kharkov.org github.com/prool/virtustan\n");
+}
+
+void setpos(int line, int col)
+{
+printf("\033[%i;%iH", line, col);
+}
+
+void clearscreen(void)
+{
+printf("\033[2J");
+setpos(1,1);
 }
 
 void set_terminal_raw(void)
@@ -576,16 +591,14 @@ envp=envpp;
 /************************************************************************************************************************/
 int main (int argc, char *argv[], char *envp[])
 {
-char cmd[MAXLEN];
+char cmd[MAXLEN_CMD];
 char *cc;
 int i, j;
 
 for (i=0;i<lines;i++) printf("\n");
 
 printf("\n%sVirtustan application\nCopyleft by Prool, 2015\nThis program comes with ABSOLUTELY NO WARRANTY; for details type `gpl3'.\n\
-This is free software, and you are welcome to redistribute it\n\
-under certain conditions; type `gpl3' for details.\n\
-Compile %s %s\n\nhttp://virtustan.net\nhttp://prool.kharkov.org\n<proolix@gmail.com>%s\n\n",BEL1,__DATE__,__TIME__,NORM_COLOR);
+Compile %s %s%s\n\n",BEL1,__DATE__,__TIME__,NORM_COLOR);
 printf("Current codetable is %s. ",CodetableName[Codetable]);
 print("Ktulhu ФХТАГН!!\n\n");
 
@@ -612,8 +625,8 @@ look();
 
 while(1)
 	{
-	printf("> ");
-	fgets(cmd,MAXLEN,stdin);
+	printf("virtustan app> ");
+	fgets(cmd,MAXLEN_CMD,stdin); // и нафига я тут использовал fgets, а не gets ? :) prool
 	switch (Codetable)
 		{
 		case KOI: fromkoi(cmd); break;
@@ -650,9 +663,63 @@ while(1)
 	else if (!strcmp(cmd,"env")) env(envp);
 	else if (!strcmp(cmd,"test")) test();
 	else if (!strcmp(cmd,"test2")) test2();
+	else if (!strcmp(cmd,"rog")) rogalik();
 	else if (!strcmp(cmd,"sysinfo")) sysinfo(envp);
 	else printf("   Unknown command `%s'\n", cmd);
 	}
 log_("Virtustan application finished");
 return 0;
+}
+
+#define ROG_X 10
+#define ROG_Y 10
+
+void rogalik(void)
+{
+int quit=0;
+int i, j, c, c2, c3, me_x=0, me_y=0;
+
+set_terminal_raw();
+clearscreen();
+
+printf("Rogalik!\n\nQ - quit\n\n");
+
+while(!quit)
+	{// refresh screen
+	clearscreen();
+	for (j=0; j<ROG_Y; j++)
+		{
+		for (i=0; i<ROG_X; i++)
+			{
+			if ((i==me_x)&&(j==me_y)) putchar('@');
+			else putchar('.');
+			}
+		puts("");
+		}
+	c=getchar();
+	switch(c)
+		{
+		case 27:
+			c2=getchar();
+			if (c2!=91) break;
+			c3=getchar();
+			switch (c3)
+				{
+				case 65: goto l_up;
+				case 66: goto l_down;
+				case 68: goto l_left;
+				case 67: goto l_right;
+				default: c=600;
+				}
+		case 'l': l_right: if ((me_x+1) < ROG_X) me_x++; break;
+		case 'h': l_left: if ((me_x-1) >= 0   ) me_x--; break;
+		case 'j': l_down: if ((me_y+1) < ROG_Y) me_y++; break;
+		case 'k': l_up: if ((me_y-1) >= 0   ) me_y--; break;
+		case 'Q': quit=1; break;
+		default: ;
+		}
+	}
+//printf("set terminal noraw:\n");
+set_terminal_no_raw();
+printf("Exit from rogalik to virtustan appication!\n");
 }
