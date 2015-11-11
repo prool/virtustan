@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <iconv.h>
 #include <sys/ioctl.h>
@@ -43,6 +44,12 @@
 #define GOLUB1 "\033[1;36m"
 #define BEL1 "\033[1;37m"
 
+void setcolor(int color)
+{
+if (color==0) printf("%s",NORM_COLOR);
+else printf("\033[3%im", color);
+}
+
 // static variables
 
 int Codetable;
@@ -52,6 +59,8 @@ struct
 	{
 	char *descr;
 	int room_type;
+	char symbol;
+	char color;
 	}
 	world[MAX_X][MAX_Y];
 
@@ -73,6 +82,7 @@ char *ptime(void);
 void log_(char *str);
 void computation_boundaries(void);
 void rogalik(void);
+void rogalik_help(void);
 
 void help (void)
 {
@@ -85,13 +95,13 @@ ascii - print ascii table\n\
 help, помощь, ? - help\n\
 test - test color\n\
 test2 - test of keyboard\n\
+cls - clearscreen\n\
 look - look\n\
-directions: n, s, w, e\n\
-map - map\n\
+directions: n, s, w, e (от слов north, south, etc)\n\
 env - print environment\n\
 vorotaob - объявление на воротах\n\
 constitution - print Virtustan constitution\n\
-rog - rogalik\n\
+rog - rogalik (use arrows; Q - quit from rogalik)\n\
 q, quit, exit, конец - exit\n\
 \n\
 Sites: virtustan.net prool.kharkov.org github.com/prool/virtustan\n");
@@ -100,6 +110,11 @@ Sites: virtustan.net prool.kharkov.org github.com/prool/virtustan\n");
 void setpos(int line, int col)
 {
 printf("\033[%i;%iH", line, col);
+}
+
+void gotoxy(int x, int y)
+{
+setpos(y,x);
 }
 
 void clearscreen(void)
@@ -210,11 +225,19 @@ while(!feof(fp))
 }
 
 void init_world(void)
-{int x,y;
+{int i,j;
 
-world[50][50].descr="Вы находитесь перед воротами Виртустана (ворота на севере, идти на север надо командой n)\n\
+for (i=0; i<MAX_X; i++) for (j=0; j<MAX_Y; j++)
+{
+world[i][j].descr=0;
+world[i][j].room_type=0;
+world[i][j].symbol='"';
+world[i][j].color=2;
+}
+
+world[50][50].descr="Вы находитесь перед воротами Виртустана (ворота на севере, идти на север надо командой n от слова north)\n\
 На воротах висит объявление. Для просмотра объявления наберите vorotaob";
-world[50][51].descr="Вы находитесь на пограничном посту Виртустана. Отсюда на север тянется Виртустан";
+world[50][51].descr="Вы находитесь на пограничном посту Виртустана. Отсюда на север тянется Виртустан"; world[50][51].symbol='!';
 world[50][52].descr="Вы находитесь на Виртустанской улице, идущей в меридиональном направлении";
 world[50][53].descr="Вы находитесь на Виртустанской площади";
 world[50][54].descr="Вы находитесь на Виртустанском проспекте";
@@ -223,6 +246,23 @@ world[49][52].descr="Вы находитесь в Виртустанской Б�
 world[51][52].descr="Вы находитесь в Виртустанской Гостинице";
 world[51][53].descr="Вы находитесь в Виртустанском Банке. Слышен звон пересчитываемых монет, шелест купюр и звяканье кассового аппарата";
 world[50][48].descr="Вы находитесь в неглубокой яме. На дне лежат чьи-то кости";
+
+for (i=0; i<MAX_X; i++) for (j=0; j<MAX_Y; j++)
+{
+if ((world[i][j].descr) && (world[i][j].symbol=='"')) world[i][j].symbol='W';
+}
+
+for(i=0;i<MAX_X;i++)
+{
+world[i][0].color=3;
+world[i][MAX_Y-1].color=3;
+}
+
+for(j=0;j<MAX_Y;j++)
+{
+world[0][j].color=3;
+world[MAX_X-1][j].color=3;
+}
 
 computation_boundaries();
 
@@ -310,13 +350,15 @@ printf("\
 [0m\n\
 ");
 
+printf("%s normcolor ",NORM_COLOR);
+
 for (i=31;i<38;i++)
 	{
-	printf("\033[%im *** ", i);
+	printf("\033[%im www ", i);
 	}
 for (i=31;i<38;i++)
 	{
-	printf("\033[1;%im *** ", i);
+	printf("\033[1;%im WWW ", i);
 	}
 printf("\033[0m\n");
 #if 0
@@ -484,9 +526,9 @@ switch (Codetable)
 
 void ascii (void)
 {int i;
-for (i=32; i<256; i++)
+for (i=33; i<128; i++)
 	{
-	printf ("%i=`%c' ", i, i);
+	printf ("%c ", i);
 	}
 printf("\n");
 }
@@ -509,18 +551,18 @@ local_max_y=global_y+HALF_Y; if (local_max_y>=MAX_Y) local_max_y=MAX_Y-1;
 
 // write of map
 
-printf("%s\n%s",ptime(),ZELEN1);
+setcolor(0);
 
 for (y=local_max_y; y>=local_min_y; y--)
     {
     for (x=local_min_x; x<=local_max_x; x++)
 	{
+	setcolor(world[x][y].color);
 	if ((x==global_x)&&(y==global_y)) printf("@");
-	else if (world[x][y].descr)
-	    printf("*");
 	else
-	    printf(".");
+	    putchar(world[x][y].symbol);
 	printf(" ");
+	setcolor(0);
 	}
     printf("\n");
     }
@@ -584,6 +626,7 @@ while (*envp)
 	envp++;
     }
 envp=envpp;
+printf("Current codetable is %s. ",CodetableName[Codetable]);print("Ktulhu ФХТАГН!!\n");
 }
 
 /************************************************************************************************************************/
@@ -595,31 +638,26 @@ char cmd[MAXLEN_CMD];
 char *cc;
 int i, j;
 
-for (i=0;i<lines;i++) printf("\n");
+clearscreen();
 
-printf("\n%sVirtustan application\nCopyleft by Prool, 2015\nThis program comes with ABSOLUTELY NO WARRANTY; for details type `gpl3'.\n\
-Compile %s %s%s\n\n",BEL1,__DATE__,__TIME__,NORM_COLOR);
-printf("Current codetable is %s. ",CodetableName[Codetable]);
-print("Ktulhu ФХТАГН!!\n\n");
+printf("Virtustan application\nCopyleft by Prool, 2015\nThis program comes with ABSOLUTELY NO WARRANTY; for details type `gpl3'.\
+ Compile %s %s\n",__DATE__,__TIME__);
 
-sysinfo(envp);
+//sysinfo(envp);
 
-printf("\n%sUse `help' command for help and `quit' for quit.%s\n\n", BEL1, NORM_COLOR);
+printf("%sUse `help' command for help and `quit' for quit.%s\n", BEL1, NORM_COLOR);
 
 log_("Virtustan application started");
 
-printf("init started\n");
+//printf("init started\n");
 Codetable=UTF;
 
-for (i=0; i<MAX_X; i++) for (j=0; j<MAX_Y; j++) {world[i][j].descr=0; world[i][j].room_type=0;}
 
 global_x=50; global_y=50;
 
 init_world();
 
-printf("init ended\n\npress any key\n");
-
-getchar();
+//printf("init ended\n\n");
 
 look();
 
@@ -664,6 +702,7 @@ while(1)
 	else if (!strcmp(cmd,"test")) test();
 	else if (!strcmp(cmd,"test2")) test2();
 	else if (!strcmp(cmd,"rog")) rogalik();
+	else if (!strcmp(cmd,"cls")) clearscreen();
 	else if (!strcmp(cmd,"sysinfo")) sysinfo(envp);
 	else printf("   Unknown command `%s'\n", cmd);
 	}
@@ -715,11 +754,24 @@ while(!quit)
 		case 'h': l_left: if ((me_x-1) >= 0   ) me_x--; break;
 		case 'j': l_down: if ((me_y+1) < ROG_Y) me_y++; break;
 		case 'k': l_up: if ((me_y-1) >= 0   ) me_y--; break;
-		case 'Q': quit=1; break;
+		case 'q': quit=1; break;
+		case 'Q': set_terminal_no_raw(); exit(2);
+		case '?': rogalik_help(); break;
 		default: ;
 		}
 	}
 //printf("set terminal noraw:\n");
 set_terminal_no_raw();
 printf("Exit from rogalik to virtustan appication!\n");
+}
+
+void rogalik_help(void)
+{int line=1;
+gotoxy (ROG_X+2,line++); printf ("rogalik help. помошч");
+gotoxy (ROG_X+2,line++); printf ("? - this help");
+gotoxy (ROG_X+2,line++); printf ("arrows, j, k, h, l - move");
+gotoxy (ROG_X+2,line++); printf ("q - quit to virtustan");
+gotoxy (ROG_X+2,line++); printf ("Q - quit from virtustan");
+gotoxy (ROG_X+2,line++); printf ("--Press any key--");
+getchar();
 }
