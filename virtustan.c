@@ -104,6 +104,7 @@ env - print environment\n\
 date - print date & time\n\
 vorotaob - объявление на воротах\n\
 constitution - print Virtustan constitution\n\
+pledge - print Virtustan pledge\n\
 rog - rogalik (use arrows; q, Q - quit from rogalik)\n\
 rt - realtime rogalik (Q - quit from rogalik)\n\
 q, quit, exit, конец - exit\n\
@@ -713,6 +714,7 @@ while(1)
 	else if (!strcmp(cmd,"vorotaob")) printfile("texts/vorotaob.txt");
 	else if (!strcmp(cmd,"gpl3")) printfile3("LICENSE");
 	else if (!strcmp(cmd,"constitution")) printfile3("texts/constitution.txt");
+	else if (!strcmp(cmd,"pledge")) printfile3("texts/pledge.txt");
 	else if (!strcmp(cmd,"env")) env(envp);
 	else if (!strcmp(cmd,"test")) test();
 	else if (!strcmp(cmd,"test2")) test2();
