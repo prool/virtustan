@@ -4,6 +4,7 @@
 #include <iconv.h>
 #include <sys/ioctl.h>
 #include <unistd.h>
+#include <fcntl.h>
 #include <time.h>
 //#include <ncurses.h>
 #include <termios.h>
@@ -83,6 +84,7 @@ void log_(char *str);
 void computation_boundaries(void);
 void rogalik(void);
 void rogalik_help(void);
+void realtime (void);
 
 void help (void)
 {
@@ -99,12 +101,19 @@ cls - clearscreen\n\
 look - look\n\
 directions: n, s, w, e (от слов north, south, etc)\n\
 env - print environment\n\
+date - print date & time\n\
 vorotaob - объявление на воротах\n\
 constitution - print Virtustan constitution\n\
-rog - rogalik (use arrows; Q - quit from rogalik)\n\
+rog - rogalik (use arrows; q, Q - quit from rogalik)\n\
+rt - realtime rogalik (Q - quit from rogalik)\n\
 q, quit, exit, конец - exit\n\
 \n\
 Sites: virtustan.net prool.kharkov.org github.com/prool/virtustan\n");
+}
+
+void date(void)
+{
+puts(ptime());
 }
 
 void setpos(int line, int col)
@@ -142,28 +151,34 @@ void set_terminal_no_raw(void)
 void test2 (void)
 {char c; int i;
 struct termio tstdin;
+int oldf;
 
 /*  Set stdin (file descriptor=0) to NOraw mode and echo */
-    ioctl(0, TCGETA, &tstdin);
-	printf("tstdin.c_lflag=%X\n", tstdin.c_lflag);
-    tstdin.c_lflag &= ~(ICANON|ECHO);
-	printf("tstdin.c_lflag=%X\n", tstdin.c_lflag);
-    ioctl(0, TCSETA, &tstdin);
+ioctl(0, TCGETA, &tstdin);
+printf("tstdin.c_lflag=%X\n", tstdin.c_lflag);
+tstdin.c_lflag &= ~(ICANON|ECHO);
+printf("tstdin.c_lflag=%X\n", tstdin.c_lflag);
+ioctl(0, TCSETA, &tstdin);
+
+oldf = fcntl(STDIN_FILENO, F_GETFL, 0);
+fcntl(STDIN_FILENO, F_SETFL, oldf | O_NONBLOCK);
 
 printf("Q - quit\n");
 
 while(1)
 	{
-	c=getchar();
+	usleep(100000);
+	c=getchar(); putchar('.');
 	if (c!=-1) printf ("test2. Code=%i\r\n",(int)c);
 	fflush(0);
 	if (c=='Q')
 		{
 		ioctl(0, TCGETA, &tstdin);
-	printf("tstdin.c_lflag=%X\n", tstdin.c_lflag);
+		printf("tstdin.c_lflag=%X\n", tstdin.c_lflag);
     		tstdin.c_lflag |= (ICANON|ECHO);
-	printf("tstdin.c_lflag=%X\n", tstdin.c_lflag);
+		printf("tstdin.c_lflag=%X\n", tstdin.c_lflag);
     		ioctl(0, TCSETA, &tstdin);
+		fcntl(STDIN_FILENO, F_SETFL, oldf);
 		return;
 		}
 	}
@@ -703,11 +718,49 @@ while(1)
 	else if (!strcmp(cmd,"test2")) test2();
 	else if (!strcmp(cmd,"rog")) rogalik();
 	else if (!strcmp(cmd,"cls")) clearscreen();
+	else if (!strcmp(cmd,"date")) date();
+	else if (!strcmp(cmd,"rt")) realtime();
 	else if (!strcmp(cmd,"sysinfo")) sysinfo(envp);
 	else printf("   Unknown command `%s'\n", cmd);
 	}
 log_("Virtustan application finished");
 return 0;
+}
+
+void realtime (void)
+{char c; int i;
+struct termio tstdin;
+int oldf;
+
+/*  Set stdin (file descriptor=0) to NOraw mode and echo */
+ioctl(0, TCGETA, &tstdin);
+tstdin.c_lflag &= ~(ICANON|ECHO);
+ioctl(0, TCSETA, &tstdin);
+
+oldf = fcntl(STDIN_FILENO, F_GETFL, 0);
+fcntl(STDIN_FILENO, F_SETFL, oldf | O_NONBLOCK);
+
+while(1)
+	{
+	clearscreen();
+	gotoxy(0,0);
+	printf("Q - quit");
+	gotoxy(30,0);
+	printf("%s", ptime());
+	usleep(100000);
+	c=getchar();
+	if (c!=-1) {}
+	fflush(0);
+	if (c=='Q')
+		{
+		ioctl(0, TCGETA, &tstdin);
+    		tstdin.c_lflag |= (ICANON|ECHO);
+    		ioctl(0, TCSETA, &tstdin);
+		fcntl(STDIN_FILENO, F_SETFL, oldf);
+		printf("\n\nexit from realtime\n");
+		return;
+		}
+	}
 }
 
 #define ROG_X 10
@@ -755,7 +808,7 @@ while(!quit)
 		case 'j': l_down: if ((me_y+1) < ROG_Y) me_y++; break;
 		case 'k': l_up: if ((me_y-1) >= 0   ) me_y--; break;
 		case 'q': quit=1; break;
-		case 'Q': set_terminal_no_raw(); exit(2);
+		case 'Q': set_terminal_no_raw(); printf("\nExit from rogalik to OS shell\n\n"); exit(2);
 		case '?': rogalik_help(); break;
 		default: ;
 		}
