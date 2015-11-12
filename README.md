@@ -1,7 +1,7 @@
-virtustan
-=========
+Virtustan application
+=====================
 
-*Virtustan application*
+[Screenshots. Скриншоты](http://blog.mud.kharkov.org/screenshots#virtustan-app)
 
 ~~эзотерическое~~ приложение, имеющее отношение
 к виртуальному королевству Виртустан (www.virtustan.net)
