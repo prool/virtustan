@@ -204,6 +204,8 @@ char str[MAXLEN];
 char c;
 int i;
 
+//printf("lines=%i\n", lines);
+
 fp = fopen (filename,"r");
                                  
 if (fp==NULL) {printf("Can't open file `%s'\n", filename); return;}
@@ -626,7 +628,6 @@ void sysinfo(char *envp[])
 char terminal [MAXLEN];
 char **envpp;
 
-ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
 printf ("lines %d\n", lines);
 printf ("columns %d\n", COLUMNS);
 #define S_TERM "TERM="
@@ -653,6 +654,8 @@ int main (int argc, char *argv[], char *envp[])
 char cmd[MAXLEN_CMD];
 char *cc;
 int i, j;
+
+ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
 
 clearscreen();
 
