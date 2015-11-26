@@ -45,12 +45,6 @@
 #define GOLUB1 "\033[1;36m"
 #define BEL1 "\033[1;37m"
 
-void setcolor(int color)
-{
-if (color==0) printf("%s",NORM_COLOR);
-else printf("\033[3%im", color);
-}
-
 // static variables
 
 int Codetable;
@@ -86,6 +80,18 @@ void rogalik(void);
 void rogalik_help(void);
 void realtime (void);
 
+// functions bodyes
+
+int mod(int x)
+{if (x<0) return -x;
+else return x;}
+
+void setcolor(int color)
+{
+if (color==0) printf("%s",NORM_COLOR);
+else printf("\033[3%im", color);
+}
+
 void help (void)
 {
 print("Command list:\n\
@@ -99,7 +105,8 @@ test - test color\n\
 test2 - test of keyboard\n\
 cls - clearscreen\n\
 look - look\n\
-directions: n, s, w, e (от слов north, south, etc)\n\
+directions: 1 step: n, s, w, e (от слов north, south, etc)\n\
+many steps: N, S, W, E\n\
 env - print environment\n\
 date - print date & time\n\
 vorotaob - объявление на воротах\n\
@@ -350,11 +357,13 @@ if ((try_x>MAX_X-1)||(try_y>MAX_Y-1)||(try_x<0)||(try_y<0))
 global_x+=dx;
 global_y+=dy;
 print("Вы переместились ");
-if (dx==1) print("на восток");
-else if (dx==-1) print("на запад");
-else if (dy==1) print("на север");
-else if (dy==-1) print("на юг");
-else print("в неизвестном направлении");
+if (dx>0) print("на восток");
+else if (dx<0) print("на запад");
+else if (dy>0) print("на север");
+else if (dy<0) print("на юг");
+else print("хер знает куда");
+
+if ((mod(dx)>1)||(mod(dy)>1)) print(" до упора");
 printf("\n");
 look();
 }
@@ -710,9 +719,13 @@ while(1)
 	else if (!strcmp(cmd,"codetable")) printf("Current codetable is %s\n",CodetableName[Codetable]);
 	else if (!strcmp(cmd,"look")) look();
 	else if (!strcmp(cmd,"n")) move_(0,+1);
+	else if (!strcmp(cmd,"N")) move_(0,MAX_Y-1-global_y);
 	else if (!strcmp(cmd,"s")) move_(0,-1);
+	else if (!strcmp(cmd,"S")) move_(0,-global_y);
 	else if (!strcmp(cmd,"w")) move_(-1,0);
+	else if (!strcmp(cmd,"W")) move_(-global_x,0);
 	else if (!strcmp(cmd,"e")) move_(+1,0);
+	else if (!strcmp(cmd,"E")) move_(MAX_X-1-global_x,0);
 	else if (!strcmp(cmd,"map")) map();
 	else if (!strcmp(cmd,"vorotaob")) printfile("texts/vorotaob.txt");
 	else if (!strcmp(cmd,"gpl3")) printfile3("LICENSE");
