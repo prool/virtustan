@@ -1,3 +1,7 @@
+// Virtustan application (small rogue-like game)
+// by Prool
+// www.prool.kharkov.org www.virtustan.net
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -44,6 +48,10 @@
 #define FIOL1 "\033[1;35m"
 #define GOLUB1 "\033[1;36m"
 #define BEL1 "\033[1;37m"
+
+#define DEFAULT_COLOR	2
+#define DEFAULT_SYMBOL	'"'
+#define CREATED_OBJECT	777
 
 // static variables
 
@@ -94,7 +102,8 @@ else return x;}
 void setcolor(int color)
 {
 if (color==0) printf("%s",NORM_COLOR);
-else printf("\033[3%im", color);
+else if (color<=7) printf("\033[3%im", color);
+else printf("\033[1;3%im", color-7);
 }
 
 void help (void)
@@ -115,6 +124,10 @@ many steps: N, S, W, E\n\
 inv - print inventory\n\
 get - get object\n\
 put - put object\n\
+create - create object\n\
+destroy - destroy object\n\
+room edit commands: roomcolor, roomsymbol, roomtype\n\
+save - save world\n\
 env - print environment\n\
 date - print date & time\n\
 vorotaob - объявление на воротах\n\
@@ -255,6 +268,28 @@ while(!feof(fp))
 	fgets(str,MAXLEN,fp);
 	if (str[0]) print(str);
 	}
+fclose(fp);
+}
+
+void save_world(void)
+{int i,j,ii; char *cc;
+FILE *fp;
+
+fp=fopen("world.h", "w");
+if (fp==NULL) {printf("Can't open world file\n"); return;}
+fprintf(fp,"// world file for Virtustan application. created %s\n", ptime());
+fprintf(fp,"// www.prool.kharkov.org www.virtustan.net\n");
+for (i=0; i<MAX_X; i++) for (j=0; j<MAX_Y; j++)
+	{
+	if (cc=world[i][j].descr) fprintf(fp, "world[%i][%i].descr=\"%s\";\n", i, j, cc);
+	if (ii=world[i][j].room_type) fprintf(fp, "world[%i][%i].room_type=%i;\n", i, j, ii);
+	if (ii=world[i][j].object) fprintf(fp, "world[%i][%i].object=%i;\n", i, j, ii);
+	if (ii=world[i][j].mob) fprintf(fp, "world[%i][%i].mob=%i;\n", i, j, ii);
+	if ((ii=world[i][j].color)!=DEFAULT_COLOR) fprintf(fp, "world[%i][%i].color=%i;\n", i, j, ii);
+	if ((ii=world[i][j].symbol)!=DEFAULT_SYMBOL) fprintf(fp, "world[%i][%i].symbol=%i;\n", i, j, ii);
+	}
+fprintf(fp,"// end of world file\n");
+fclose(fp);
 }
 
 void init_world(void)
@@ -264,14 +299,19 @@ for (i=0; i<MAX_X; i++) for (j=0; j<MAX_Y; j++)
 {
 world[i][j].descr=0;
 world[i][j].room_type=0;
-world[i][j].symbol='"';
-world[i][j].color=2;
+world[i][j].symbol=DEFAULT_SYMBOL;
+world[i][j].color=DEFAULT_COLOR;
 world[i][j].object=0;
 world[i][j].mob=0;
 }
 
-world[50][50].descr="Вы находитесь перед воротами Виртустана (ворота на севере, идти на север надо командой n от слова north)\n\
-На воротах висит объявление. Для просмотра объявления наберите vorotaob"; world[50][50].object=1;
+#include "world.h"
+
+#if 0
+
+world[50][50].descr="Вы находитесь перед воротами Виртустана (ворота на севере, идти на север надо командой n от слова north). На воротах висит объявление. Для просмотра объявления наберите vorotaob";
+world[50][50].object=1;
+world[50][50].room_type=1;
 world[50][51].descr="Вы находитесь на пограничном посту Виртустана. Отсюда на север тянется Виртустан"; world[50][51].symbol='!';
 world[50][52].descr="Вы находитесь на Виртустанской улице, идущей в меридиональном направлении";
 world[50][53].descr="Вы находитесь на Виртустанской площади";
@@ -283,21 +323,22 @@ world[51][53].descr="Вы находитесь в Виртустанском Б�
 world[50][48].descr="Вы находитесь в неглубокой яме"; world[50][48].object=2;
 
 for (i=0; i<MAX_X; i++) for (j=0; j<MAX_Y; j++)
-{
-if ((world[i][j].descr) && (world[i][j].symbol=='"')) world[i][j].symbol='W';
-}
+	{
+	if ((world[i][j].descr) && (world[i][j].symbol=='"')) world[i][j].symbol='W';
+	}
 
 for(i=0;i<MAX_X;i++)
-{
-world[i][0].color=3;
-world[i][MAX_Y-1].color=3;
-}
+	{
+	world[i][0].color=3;
+	world[i][MAX_Y-1].color=3;
+	}
 
 for(j=0;j<MAX_Y;j++)
-{
-world[0][j].color=3;
-world[MAX_X-1][j].color=3;
-}
+	{
+	world[0][j].color=3;
+	world[MAX_X-1][j].color=3;
+	}
+#endif
 
 computation_boundaries();
 
@@ -386,6 +427,50 @@ else
 		}
 }
 
+void roomcolor(void)
+{int i;
+char str[MAXLEN];
+
+for (i=0;i<15;i++)
+	{
+	setcolor(i);
+	printf("[%i] ",i);
+	}
+setcolor(0);
+
+printf("\nColor number (1-)? ");
+str[0]=0;i=0;
+fgets(str,MAXLEN,stdin); // и нафига я тут использовал fgets, а не gets ? :) prool
+i=atoi(str);
+if (i)	{
+	world[global_x][global_y].color=i;
+	setcolor(i);
+	printf("set color %i\n", i);
+	setcolor(0);
+	}
+}
+
+void create(void)
+{
+if (inv_o) printf("Вы не можете создать объект, у вас заполнен инвентарь\n");
+else 	{
+	inv_o=CREATED_OBJECT;
+	printf("Вы создали объект: ");
+	print_object(inv_o);
+	}	
+}
+
+void destroy (void)
+{int i;
+if (!inv_o) printf("Вы ничего не можете уничтожить, у вас же ничего нет\n");
+else	{
+	i=inv_o;
+	inv_o=0;
+	printf("Объект уничтожен: ");
+	print_object(i);
+	}
+}
+
 void look(void)
 {int i;
 #define EMPTY "Вы находитесь в пустоте"
@@ -402,17 +487,27 @@ printf("\n");
 if (i=world[global_x][global_y].object) print_object(i);
 }
 
+int try_move_to(int x, int y)
+{
+if ((x>MAX_X-1)||(y>MAX_Y-1)||(x<0)||(y<0)) return 1;
+return 0;
+}
+
 void move_(int dx, int dy)
 {int try_x, try_y;
+int i;
 
 try_x=global_x+dx;
 try_y=global_y+dy;
 
-if ((try_x>MAX_X-1)||(try_y>MAX_Y-1)||(try_x<0)||(try_y<0))
-    {
-    printf("В этом направлении переместиться невозможно. Там край мира\n");
-    return;
-    }
+i=try_move_to(try_x, try_y);
+
+switch (i)
+	{
+	case 0: break;
+	case 1: printf("В этом направлении переместиться невозможно. Там край мира\n"); return;
+	default: printf("В этом направлении переместиться невозможно\n"); return;
+	}
 
 global_x+=dx;
 global_y+=dy;
@@ -645,7 +740,7 @@ for (y=local_max_y; y>=local_min_y; y--)
     for (x=local_min_x; x<=local_max_x; x++)
 	{
 	setcolor(world[x][y].color);
-	if ((x==global_x)&&(y==global_y)) printf("@");
+	if ((x==global_x)&&(y==global_y)) {setcolor(0); printf("@");}
 	else
 	    putchar(world[x][y].symbol);
 	printf(" ");
@@ -801,6 +896,10 @@ while(1)
 	else if (!strcmp(cmd,"inv")) inv();
 	else if (!strcmp(cmd,"get")) get();
 	else if (!strcmp(cmd,"put")) put();
+	else if (!strcmp(cmd,"create")) create();
+	else if (!strcmp(cmd,"destroy")) destroy();
+	else if (!strcmp(cmd,"roomcolor")) roomcolor();
+	else if (!strcmp(cmd,"save")) save_world();
 	else if (!strcmp(cmd,"sysinfo")) sysinfo(envp);
 	else printf("   Unknown command `%s'\n", cmd);
 	}
