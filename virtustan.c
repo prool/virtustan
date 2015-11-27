@@ -56,8 +56,13 @@ struct
 	int room_type;
 	char symbol;
 	char color;
+	int object;
+	int mob;
 	}
 	world[MAX_X][MAX_Y];
+
+// inventory
+int inv_o=0;
 
 int max_x, max_y;
 int min_x, min_y;
@@ -107,6 +112,9 @@ cls - clearscreen\n\
 look - look\n\
 directions: 1 step: n, s, w, e (от слов north, south, etc)\n\
 many steps: N, S, W, E\n\
+inv - print inventory\n\
+get - get object\n\
+put - put object\n\
 env - print environment\n\
 date - print date & time\n\
 vorotaob - объявление на воротах\n\
@@ -258,10 +266,12 @@ world[i][j].descr=0;
 world[i][j].room_type=0;
 world[i][j].symbol='"';
 world[i][j].color=2;
+world[i][j].object=0;
+world[i][j].mob=0;
 }
 
 world[50][50].descr="Вы находитесь перед воротами Виртустана (ворота на севере, идти на север надо командой n от слова north)\n\
-На воротах висит объявление. Для просмотра объявления наберите vorotaob";
+На воротах висит объявление. Для просмотра объявления наберите vorotaob"; world[50][50].object=1;
 world[50][51].descr="Вы находитесь на пограничном посту Виртустана. Отсюда на север тянется Виртустан"; world[50][51].symbol='!';
 world[50][52].descr="Вы находитесь на Виртустанской улице, идущей в меридиональном направлении";
 world[50][53].descr="Вы находитесь на Виртустанской площади";
@@ -270,7 +280,7 @@ world[49][53].descr="Вы находитесь во Дворце Короля В
 world[49][52].descr="Вы находитесь в Виртустанской Библиотеке. ТИШИНА ДОЛЖНА БЫТЬ В БИБЛИОТЕКЕ!!";
 world[51][52].descr="Вы находитесь в Виртустанской Гостинице";
 world[51][53].descr="Вы находитесь в Виртустанском Банке. Слышен звон пересчитываемых монет, шелест купюр и звяканье кассового аппарата";
-world[50][48].descr="Вы находитесь в неглубокой яме. На дне лежат чьи-то кости";
+world[50][48].descr="Вы находитесь в неглубокой яме"; world[50][48].object=2;
 
 for (i=0; i<MAX_X; i++) for (j=0; j<MAX_Y; j++)
 {
@@ -328,8 +338,56 @@ if (x>y) return x;
 return y;
 }
 
-void look(void)
+void print_object(int o)
 {
+if (o==0) return;
+printf("%s",ZHELT1);
+switch (o)
+	{
+	case 1: printf("Маленький камешек"); break;
+	case 2: printf("Кости"); break;
+	default: printf("Черт знает что");
+	}
+printf("%s\n",NORM_COLOR);
+}
+
+void inv(void)
+{
+if (inv_o) {printf("У вас в инвентаре находится:\n"); print_object(inv_o);}
+else printf("Ваш инвентарь пуст\n");
+}
+
+void get(void)
+{int i;
+if ((i=world[global_x][global_y].object)==0) printf("Что вы хотите взять? Тут ничего нет\n");
+else
+	if (inv_o) printf("Ваш инвентарь заполнен, вы не можете ничего взять\n");
+	else 
+		{
+		inv_o=i;
+		world[global_x][global_y].object=0;
+		printf("Вы взяли предмет: ");
+		print_object(inv_o);
+		}
+}
+
+void put(void)
+{int i;
+if ((i=world[global_x][global_y].object)) printf("Сюда ничего нельзя положить, тут нет места\n");
+else
+	if (!inv_o) printf("Вы ничего не можете положить, у вас же ничего нет\n");
+	else 
+		{
+		world[global_x][global_y].object=inv_o;
+		i=inv_o;
+		inv_o=0;
+		printf("Вы положили предмет: ");
+		print_object(i);
+		}
+}
+
+void look(void)
+{int i;
 #define EMPTY "Вы находитесь в пустоте"
 map();
 printf("%s(%i,%i)%s\n",GOLUB1,global_x,global_y,NORM_COLOR);
@@ -340,6 +398,8 @@ else
 	//world[global_x][global_y].descr="Тут был Пруль";
 	}
 printf("\n");
+
+if (i=world[global_x][global_y].object) print_object(i);
 }
 
 void move_(int dx, int dy)
@@ -738,6 +798,9 @@ while(1)
 	else if (!strcmp(cmd,"cls")) clearscreen();
 	else if (!strcmp(cmd,"date")) date();
 	else if (!strcmp(cmd,"rt")) realtime();
+	else if (!strcmp(cmd,"inv")) inv();
+	else if (!strcmp(cmd,"get")) get();
+	else if (!strcmp(cmd,"put")) put();
 	else if (!strcmp(cmd,"sysinfo")) sysinfo(envp);
 	else printf("   Unknown command `%s'\n", cmd);
 	}
