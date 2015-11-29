@@ -5,7 +5,9 @@ sysinfo - print sysinfo
 alf - print alfavit
 ascii - print ascii table
 help, помощь, ? - help
-test - test color
+ls - ls
+blog - Prool's blog
+testesc - test of ESC codes
 test2 - test of keyboard
 test3 - test of UTF-8
 cls - clearscreen
@@ -17,7 +19,7 @@ get - get object
 put - put object
 create - create object
 destroy - destroy object
-room edit commands: roomcolor, roomsymbol, roomsymbolcode, roomtype
+room edit commands: roomcolor, roombg, roomsymbol, roomsymbolcode, roomtype, roomdescr
 save - save world
 env - print environment
 date - print date & time

@@ -51,7 +51,13 @@
 #define GOLUB1 "\033[1;36m"
 #define BEL1 "\033[1;37m"
 
+#define HALF "\033[2m"
+#define UNDERSCORE "\033[4m"
+#define BLINK "\033[5m"
+#define REVERSE "\033[7m"
+
 #define DEFAULT_COLOR	2
+#define DEFAULT_BG	40	
 #define DEFAULT_SYMBOL	'.'
 #define CREATED_OBJECT	777
 
@@ -65,9 +71,10 @@ struct
 	char *descr;
 	int room_type;
 	char symbol;
-	char color;
-	int object;
-	int mob;
+	char color; // color of foreground
+	char bg; // color of background
+	int object; // object in room
+	int mob; // mob in room
 	}
 	world[MAX_X][MAX_Y];
 
@@ -96,6 +103,11 @@ void rogalik_help(void);
 void realtime (void);
 
 // functions bodyes
+
+void esc(int code)
+{
+printf("\033[%im", code);
+}
 
 int mod(int x)
 {if (x<0) return -x;
@@ -272,6 +284,7 @@ for (i=0; i<MAX_X; i++) for (j=0; j<MAX_Y; j++)
 	if (ii=world[i][j].object) fprintf(fp, "world[%i][%i].object=%i;\n", i, j, ii);
 	if (ii=world[i][j].mob) fprintf(fp, "world[%i][%i].mob=%i;\n", i, j, ii);
 	if ((ii=world[i][j].color)!=DEFAULT_COLOR) fprintf(fp, "world[%i][%i].color=%i;\n", i, j, ii);
+	if ((ii=world[i][j].bg)!=DEFAULT_BG) fprintf(fp, "world[%i][%i].bg=%i;\n", i, j, ii);
 	if ((ii=world[i][j].symbol)!=DEFAULT_SYMBOL) fprintf(fp, "world[%i][%i].symbol=%i;\n", i, j, ii);
 	}
 fprintf(fp,"// end of world file\n");
@@ -287,6 +300,7 @@ world[i][j].descr=0;
 world[i][j].room_type=0;
 world[i][j].symbol=DEFAULT_SYMBOL;
 world[i][j].color=DEFAULT_COLOR;
+world[i][j].bg=DEFAULT_BG;
 world[i][j].object=0;
 world[i][j].mob=0;
 }
@@ -436,6 +450,31 @@ if (i)	{
 	}
 }
 
+void roombg(void)
+{int i;
+char str[MAXLEN];
+
+for (i=40;i<47;i++)
+	{
+	esc(i);
+	printf("[bg %i] ",i);
+	}
+setcolor(0);
+
+printf("\nBackground number (40-47)? ");
+str[0]=0;i=0;
+fgets(str,MAXLEN,stdin); // и нафига я тут использовал fgets, а не gets ? :) prool
+i=atoi(str);
+if (i)	{
+	world[global_x][global_y].bg=i;
+	setcolor(0);
+	printf("set bg %i ", i);
+	esc(i);
+	printf("set bg %i\n", i);
+	setcolor(0);
+	}
+}
+
 void roomsymbolcode(void)
 {int i;
 char str[MAXLEN];
@@ -450,13 +489,34 @@ if (1)	{
 	}
 }
 
+void roomdescr(void)
+{int i;
+char str[MAXLEN];
+char *c, *mm;
+
+printf("\nRoom description? ");
+str[0]=0;i=0;
+fgets(str,MAXLEN,stdin); // и нафига я тут использовал fgets, а не gets ? :) prool
+
+c=strchr(str,'\n');
+if (c) *c=0;
+
+mm=malloc(MAXLEN);
+if (!mm) {printf("All your memory is belong to us\n"); return;}
+strcpy(mm,str);
+if (1)	{
+	world[global_x][global_y].descr=mm;
+	printf("set descr '%s'\n", mm);
+	}
+}
+
 void roomsymbol(void)
 {
 char c;
 
 printf("\nSymbol? ");
 c=getchar();
-if (1)	{
+if (c!=10)	{
 	world[global_x][global_y].symbol=c;
 	printf("set symbol '%c'\n", c);
 	}
@@ -535,10 +595,25 @@ printf("\n");
 look();
 }
 
-void test (void)
+void testesc (void)
 {int i;
+char str[MAXLEN];
+
+printf("\nESC code? ");
+str[0]=0;i=0;
+fgets(str,MAXLEN,stdin); // и нафига я тут использовал fgets, а не gets ? :) prool
+i=atoi(str);
+printf("entered ESC code %i\n", i);
+
+esc(i);
+
+printf("test text test text test text\n");
+
+#if 0 // old test
 printf("\
------------------------------------------------------------------------------\n\
+-------------------------------------\
+[7m\
+---------------------------------------\n\
 [0;40;37;1m\
 -----------------------------------------------------------------------------\n\
 [0m\n\
@@ -555,6 +630,10 @@ for (i=31;i<38;i++)
 	printf("\033[1;%im WWW ", i);
 	}
 printf("\033[0m\n");
+
+esc(21); printf("xxxxxxxxxxxxxxxxxxxxxxxx\n");
+#endif
+
 #if 0
 unsigned char m [256*2]; int i;
 //print("test --- ТЕСТ тест \n\n");
@@ -753,7 +832,8 @@ for (y=local_max_y; y>=local_min_y; y--)
     for (x=local_min_x; x<=local_max_x; x++)
 	{
 	setcolor(world[x][y].color);
-	if ((x==global_x)&&(y==global_y)) {setcolor(0); printf("@");}
+	esc(world[x][y].bg); // background
+	if ((x==global_x)&&(y==global_y)) {setcolor(7); printf("@");}
 	else
 	    putchar(world[x][y].symbol);
 	printf(" ");
@@ -917,7 +997,7 @@ while(1)
 	else if (!strcmp(cmd,"constitution")) printfile("texts/constitution.txt");
 	else if (!strcmp(cmd,"pledge")) printfile("texts/pledge.txt");
 	else if (!strcmp(cmd,"env")) env(envp);
-	else if (!strcmp(cmd,"test")) test();
+	else if (!strcmp(cmd,"testesc")) testesc();
 	else if (!strcmp(cmd,"test2")) test2();
 	else if (!strcmp(cmd,"test3")) test3();
 	else if (!strcmp(cmd,"rog")) rogalik();
@@ -930,10 +1010,13 @@ while(1)
 	else if (!strcmp(cmd,"create")) create();
 	else if (!strcmp(cmd,"destroy")) destroy();
 	else if (!strcmp(cmd,"roomcolor")) roomcolor();
+	else if (!strcmp(cmd,"roombg")) roombg();
 	else if (!strcmp(cmd,"roomsymbol")) roomsymbol();
 	else if (!strcmp(cmd,"roomsymbolcode")) roomsymbolcode();
+	else if (!strcmp(cmd,"roomdescr")) roomdescr();
 	else if (!strcmp(cmd,"save")) save_world();
 	else if (!strcmp(cmd,"ls")) ls();
+	else if (!strcmp(cmd,"blog")) printfile("texts/blog.txt");
 	else if (!strcmp(cmd,"sysinfo")) sysinfo(envp);
 	else printf("   Unknown command `%s'\n", cmd);
 	}
