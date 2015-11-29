@@ -50,7 +50,7 @@
 #define BEL1 "\033[1;37m"
 
 #define DEFAULT_COLOR	2
-#define DEFAULT_SYMBOL	'"'
+#define DEFAULT_SYMBOL	'.'
 #define CREATED_OBJECT	777
 
 // static variables
@@ -117,6 +117,7 @@ ascii - print ascii table\n\
 help, помощь, ? - help\n\
 test - test color\n\
 test2 - test of keyboard\n\
+test3 - test of UTF-8\n\
 cls - clearscreen\n\
 look - look\n\
 directions: 1 step: n, s, w, e (от слов north, south, etc)\n\
@@ -126,7 +127,7 @@ get - get object\n\
 put - put object\n\
 create - create object\n\
 destroy - destroy object\n\
-room edit commands: roomcolor, roomsymbol, roomtype\n\
+room edit commands: roomcolor, roomsymbol, roomsymbolcode, roomtype\n\
 save - save world\n\
 env - print environment\n\
 date - print date & time\n\
@@ -175,6 +176,22 @@ void set_terminal_no_raw(void)
 		ioctl(0, TCGETA, &tstdin);
     		tstdin.c_lflag |= (ICANON|ECHO);
     		ioctl(0, TCSETA, &tstdin);
+}
+
+void test3(void)
+{
+putchar(0xc2); putchar(0xa6);
+putchar(0xc2); putchar(0xa8);
+putchar(0xc2); putchar(0xac);
+putchar(0xc2); putchar(0xaf);
+putchar(0xc2); putchar(0xb1);
+putchar(0xcb); putchar(0xa5);
+putchar(0xd6); putchar(0x8d);
+putchar(0xe1); putchar(0x9a); putchar(0xa0);
+putchar(0xe2); putchar(0x9b); putchar(0xa7);
+putchar(0xe2); putchar(0x8c); putchar(0x82);
+putchar(0xe2); putchar(0x98); putchar(0xad);
+printf("\n");
 }
 
 void test2 (void)
@@ -450,6 +467,32 @@ if (i)	{
 	}
 }
 
+void roomsymbolcode(void)
+{int i;
+char str[MAXLEN];
+
+printf("\nRoom symbol code? ");
+str[0]=0;i=0;
+fgets(str,MAXLEN,stdin); // и нафига я тут использовал fgets, а не gets ? :) prool
+i=atoi(str);
+if (1)	{
+	world[global_x][global_y].symbol=i;
+	printf("set symbol '%c'\n", i);
+	}
+}
+
+void roomsymbol(void)
+{
+char c;
+
+printf("\nSymbol? ");
+c=getchar();
+if (1)	{
+	world[global_x][global_y].symbol=c;
+	printf("set symbol '%c'\n", c);
+	}
+}
+
 void create(void)
 {
 if (inv_o) printf("Вы не можете создать объект, у вас заполнен инвентарь\n");
@@ -708,9 +751,10 @@ switch (Codetable)
 
 void ascii (void)
 {int i;
-for (i=33; i<128; i++)
+for (i=22/*33*/; i<128; i++)
 	{
 	printf ("%c ", i);
+	if (!(i%16)) printf("\n");
 	}
 printf("\n");
 }
@@ -889,6 +933,7 @@ while(1)
 	else if (!strcmp(cmd,"env")) env(envp);
 	else if (!strcmp(cmd,"test")) test();
 	else if (!strcmp(cmd,"test2")) test2();
+	else if (!strcmp(cmd,"test3")) test3();
 	else if (!strcmp(cmd,"rog")) rogalik();
 	else if (!strcmp(cmd,"cls")) clearscreen();
 	else if (!strcmp(cmd,"date")) date();
@@ -899,6 +944,8 @@ while(1)
 	else if (!strcmp(cmd,"create")) create();
 	else if (!strcmp(cmd,"destroy")) destroy();
 	else if (!strcmp(cmd,"roomcolor")) roomcolor();
+	else if (!strcmp(cmd,"roomsymbol")) roomsymbol();
+	else if (!strcmp(cmd,"roomsymbolcode")) roomsymbolcode();
 	else if (!strcmp(cmd,"save")) save_world();
 	else if (!strcmp(cmd,"sysinfo")) sysinfo(envp);
 	else printf("   Unknown command `%s'\n", cmd);
