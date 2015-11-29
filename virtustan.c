@@ -7,6 +7,8 @@
 #include <string.h>
 #include <iconv.h>
 #include <sys/ioctl.h>
+#include <sys/types.h>
+#include <dirent.h>
 #include <unistd.h>
 #include <fcntl.h>
 #include <time.h>
@@ -104,41 +106,6 @@ void setcolor(int color)
 if (color==0) printf("%s",NORM_COLOR);
 else if (color<=7) printf("\033[3%im", color);
 else printf("\033[1;3%im", color-7);
-}
-
-void help (void)
-{
-print("Command list:\n\
-koi, win, utf, lat - switch codetable\n\
-codetable - print current codetable\n\
-sysinfo - print sysinfo\n\
-alf - print alfavit\n\
-ascii - print ascii table\n\
-help, помощь, ? - help\n\
-test - test color\n\
-test2 - test of keyboard\n\
-test3 - test of UTF-8\n\
-cls - clearscreen\n\
-look - look\n\
-directions: 1 step: n, s, w, e (от слов north, south, etc)\n\
-many steps: N, S, W, E\n\
-inv - print inventory\n\
-get - get object\n\
-put - put object\n\
-create - create object\n\
-destroy - destroy object\n\
-room edit commands: roomcolor, roomsymbol, roomsymbolcode, roomtype\n\
-save - save world\n\
-env - print environment\n\
-date - print date & time\n\
-vorotaob - объявление на воротах\n\
-constitution - print Virtustan constitution\n\
-pledge - print Virtustan pledge\n\
-rog - rogalik (use arrows; q, Q - quit from rogalik)\n\
-rt - realtime rogalik (Q - quit from rogalik)\n\
-q, quit, exit, конец - exit\n\
-\n\
-Sites: virtustan.net prool.kharkov.org github.com/prool/virtustan\n");
 }
 
 void date(void)
@@ -242,7 +209,7 @@ while(1)
 	}
 }
 
-void printfile3(char *filename)
+void printfile(char *filename)
 {
 FILE *fp;
 char str[MAXLEN];
@@ -272,6 +239,7 @@ fclose(fp);
 set_terminal_no_raw();
 }
 
+#if 0
 void printfile(char *filename)
 {FILE *fp; char str[MAXLEN];
 
@@ -287,6 +255,7 @@ while(!feof(fp))
 	}
 fclose(fp);
 }
+#endif
 
 void save_world(void)
 {int i,j,ii; char *cc;
@@ -854,6 +823,23 @@ envp=envpp;
 printf("Current codetable is %s. ",CodetableName[Codetable]);print("Ktulhu ФХТАГН!!\n");
 }
 
+void ls(void)
+{DIR *dir;
+struct dirent *entry;
+
+dir = opendir(".");
+
+if (dir==0) {printf("Can't open current directory\n"); return;}
+
+while(1)
+	{
+	entry=readdir(dir);
+	if (entry==0) break;
+	printf("%s\n", entry->d_name);
+	}
+
+}
+
 /************************************************************************************************************************/
 /************************************************************************************************************************/
 /************************************************************************************************************************/
@@ -905,10 +891,10 @@ while(1)
 	if (!strcmp(cmd,"quit")) break;
 	if (!strcmp(cmd,"exit")) break;
 	if (!strcmp(cmd,"конец")) break;
-	if (!strcmp(cmd,"help")) help();
-	else if (!strcmp(cmd,"h")) help();
-	else if (!strcmp(cmd,"?")) help();
-	else if (!strcmp(cmd,"помощь")) help();
+	else if (!strcmp(cmd,"help")) printfile("texts/help.txt");
+	else if (!strcmp(cmd,"h"))  printfile("texts/help.txt");
+	else if (!strcmp(cmd,"?"))  printfile("texts/help.txt");
+	else if (!strcmp(cmd,"помощь"))  printfile("texts/help.txt");
 	else if (!strcmp(cmd,"alf")) print(ALFAVIT);
 	else if (!strcmp(cmd,"ascii")) ascii();
 	else if (!strcmp(cmd,"koi")) {Codetable=KOI; printf("Codetable switch to KOI\n");}
@@ -927,9 +913,9 @@ while(1)
 	else if (!strcmp(cmd,"E")) move_(MAX_X-1-global_x,0);
 	else if (!strcmp(cmd,"map")) map();
 	else if (!strcmp(cmd,"vorotaob")) printfile("texts/vorotaob.txt");
-	else if (!strcmp(cmd,"gpl3")) printfile3("LICENSE");
-	else if (!strcmp(cmd,"constitution")) printfile3("texts/constitution.txt");
-	else if (!strcmp(cmd,"pledge")) printfile3("texts/pledge.txt");
+	else if (!strcmp(cmd,"gpl3")) printfile("LICENSE");
+	else if (!strcmp(cmd,"constitution")) printfile("texts/constitution.txt");
+	else if (!strcmp(cmd,"pledge")) printfile("texts/pledge.txt");
 	else if (!strcmp(cmd,"env")) env(envp);
 	else if (!strcmp(cmd,"test")) test();
 	else if (!strcmp(cmd,"test2")) test2();
@@ -947,6 +933,7 @@ while(1)
 	else if (!strcmp(cmd,"roomsymbol")) roomsymbol();
 	else if (!strcmp(cmd,"roomsymbolcode")) roomsymbolcode();
 	else if (!strcmp(cmd,"save")) save_world();
+	else if (!strcmp(cmd,"ls")) ls();
 	else if (!strcmp(cmd,"sysinfo")) sysinfo(envp);
 	else printf("   Unknown command `%s'\n", cmd);
 	}

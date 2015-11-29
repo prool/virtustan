@@ -1,0 +1,32 @@
+Command list:
+koi, win, utf, lat - switch codetable
+codetable - print current codetable
+sysinfo - print sysinfo
+alf - print alfavit
+ascii - print ascii table
+help, помощь, ? - help
+test - test color
+test2 - test of keyboard
+test3 - test of UTF-8
+cls - clearscreen
+look - look
+directions: 1 step: n, s, w, e (от слов north, south, etc)
+many steps: N, S, W, E
+inv - print inventory
+get - get object
+put - put object
+create - create object
+destroy - destroy object
+room edit commands: roomcolor, roomsymbol, roomsymbolcode, roomtype
+save - save world
+env - print environment
+date - print date & time
+vorotaob - объявление на воротах
+constitution - print Virtustan constitution
+pledge - print Virtustan pledge
+rog - rogalik (use arrows; q, Q - quit from rogalik)
+rt - realtime rogalik (Q - quit from rogalik)
+q, quit, exit, конец - exit
+
+Sites: virtustan.net prool.kharkov.org github.com/prool/virtustan
+
