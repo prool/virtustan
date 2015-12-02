@@ -5,12 +5,16 @@ sysinfo - print sysinfo
 alf - print alfavit
 ascii - print ascii table
 help, помощь, ? - help
+source - print source
 ls - ls
+dir-up, dir-down - смена выделенного файла
+cat - вывод выделенного файла на экран
 blog - Prool's blog
 testesc - test of ESC codes
 test2 - test of keyboard
 test3 - test of UTF-8
 cls - clearscreen
+reset - reset terminal
 look - look
 directions: 1 step: n, s, w, e (от слов north, south, etc)
 many steps: N, S, W, E
@@ -23,6 +27,7 @@ room edit commands: roomcolor, roombg, roomsymbol, roomsymbolcode, roomtype, roo
 save - save world
 env - print environment
 date - print date & time
+holyday - print holyday
 vorotaob - объявление на воротах
 constitution - print Virtustan constitution
 pledge - print Virtustan pledge
@@ -31,4 +36,6 @@ rt - realtime rogalik (Q - quit from rogalik)
 q, quit, exit, конец - exit
 
 Sites: virtustan.net prool.kharkov.org github.com/prool/virtustan
+Prool's email proolix dog gmail.com
+Prool's phone +380 (066) 297-7515
 

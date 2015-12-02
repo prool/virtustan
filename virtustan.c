@@ -454,7 +454,7 @@ void roombg(void)
 {int i;
 char str[MAXLEN];
 
-for (i=40;i<47;i++)
+for (i=40;i<=47;i++)
 	{
 	esc(i);
 	printf("[bg %i] ",i);
@@ -855,6 +855,61 @@ while(*envp)
 	}
 }
 
+#define MAX_HOLYDAY 10
+void print_holyday(void)
+{
+int i, day, month;
+time_t mytime;
+struct tm *timestruct;
+struct holyday_stru
+	{
+	int day;
+	int month;
+	char *text;
+	}
+	holyday[MAX_HOLYDAY];
+
+for (i=0;i<MAX_HOLYDAY;i++) holyday[i].text=0;
+
+holyday[0].day=1;
+holyday[0].month=12;
+holyday[0].text="Первый день зимы";
+
+holyday[1].day=2;
+holyday[1].month=12;
+holyday[1].text="Второй день зимы";
+
+holyday[2].day=31;
+holyday[2].month=12;
+holyday[2].text="Новый Год";
+
+holyday[3].day=1;
+holyday[3].month=2;
+holyday[3].text="Новый Год";
+
+holyday[4].day=7;
+holyday[4].month=4;
+holyday[4].text="Prool's Birthday";
+
+	mytime = time(0);
+	timestruct=localtime(&mytime);
+	day=timestruct->tm_mday;
+	month=timestruct->tm_mon+1;
+	//printf("day = %i\n", day);
+	//printf("month = %i\n", month);
+
+for (i=0;i<MAX_HOLYDAY;i++)
+	{
+	if (holyday[i].text==0) break;
+	if (holyday[i].day==day)
+		if (holyday[i].month==month)
+			{
+			printf ("Сегодня праздник: %s\n", holyday[i].text);
+			break;
+			}
+	}
+}
+
 char *ptime(void)
 	{
 	char *tmstr;
@@ -903,9 +958,33 @@ envp=envpp;
 printf("Current codetable is %s. ",CodetableName[Codetable]);print("Ktulhu ФХТАГН!!\n");
 }
 
+int file_no=0;
+
 void ls(void)
 {DIR *dir;
 struct dirent *entry;
+int i=0;
+
+dir = opendir(".");
+
+if (dir==0) {printf("Can't open current directory\n"); return;}
+
+printf("\n");
+
+while(1)
+	{
+	entry=readdir(dir);
+	if (entry==0) break;
+	if (i++ == file_no) printf("%s%s%s\n", REVERSE, entry->d_name, NORM_COLOR);
+	else printf("%s\n", entry->d_name);
+	}
+
+}
+
+void cat(void)
+{DIR *dir;
+struct dirent *entry;
+int i=0;
 
 dir = opendir(".");
 
@@ -915,9 +994,26 @@ while(1)
 	{
 	entry=readdir(dir);
 	if (entry==0) break;
-	printf("%s\n", entry->d_name);
+	if (i++ == file_no) {printfile(entry->d_name); return;}
 	}
 
+}
+
+void dir_up(void)
+{
+file_no--;
+ls();
+}
+
+void dir_down(void)
+{
+file_no++;
+ls();
+}
+
+void reset(void) // reset terminal
+{
+printf("%cc",ESC); // ESC c - reset terminal
 }
 
 /************************************************************************************************************************/
@@ -939,6 +1035,8 @@ printf("Virtustan application\nCopyleft by Prool, 2015\nThis program comes with 
 //sysinfo(envp);
 
 printf("%sUse `help' command for help and `quit' for quit.%s\n", BEL1, NORM_COLOR);
+
+print_holyday();
 
 log_("Virtustan application started");
 
@@ -1016,8 +1114,14 @@ while(1)
 	else if (!strcmp(cmd,"roomdescr")) roomdescr();
 	else if (!strcmp(cmd,"save")) save_world();
 	else if (!strcmp(cmd,"ls")) ls();
+	else if (!strcmp(cmd,"holyday")) print_holyday();
 	else if (!strcmp(cmd,"blog")) printfile("texts/blog.txt");
+	else if (!strcmp(cmd,"source")) printfile("virtustan.c");
 	else if (!strcmp(cmd,"sysinfo")) sysinfo(envp);
+	else if (!strcmp(cmd,"reset")) reset();
+	else if (!strcmp(cmd,"dir-up")) dir_up();
+	else if (!strcmp(cmd,"dir-down")) dir_down();
+	else if (!strcmp(cmd,"cat")) cat();
 	else printf("   Unknown command `%s'\n", cmd);
 	}
 log_("Virtustan application finished");
