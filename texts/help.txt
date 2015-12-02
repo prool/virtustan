@@ -21,6 +21,8 @@ many steps: N, S, W, E
 inv - print inventory
 get - get object
 put - put object
+swap - swap objects in inventory and in room
+dup - duplicate object
 create - create object
 destroy - destroy object
 room edit commands: roomcolor, roombg, roomsymbol, roomsymbolcode, roomtype, roomdescr

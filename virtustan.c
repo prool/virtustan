@@ -2,107 +2,7 @@
 // by Prool
 // www.prool.kharkov.org www.virtustan.net
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <iconv.h>
-#include <sys/ioctl.h>
-#include <sys/types.h>
-#include <dirent.h>
-#include <unistd.h>
-#include <fcntl.h>
-#include <time.h>
-//#include <ncurses.h>
-#include <termios.h>
-#include <locale.h> // for UTF-8 under ncurses
-
-#define MAXLEN 255
-#define MAXLEN_CMD 4096
-#define MAXUTF 1024
-
-#define UTF 0
-#define KOI 1
-#define WIN 2
-#define LAT 3
-#define ALFAVIT "В ЧАЩАХ ЮГА ЖИЛ БЫ ЦИТРУС ДА НО ФАЛЬШИВЫЙ ЭКЗЕМПЛЯР в чащах юга жил бы цитрус да но фальшивый экземпляр Ёё Ъъ\n"
-
-#define MAX_X 60
-#define MAX_Y 60
-
-#define lines w.ws_row
-#define COLUMNS w.ws_col
-
-#define ESC 033
-#define NORM_COLOR "\033[0m"
-
-#define KRASN "\033[31m"
-#define ZELEN "\033[32m"
-#define ZHELT "\033[33m"
-#define SIN "\033[34m"
-#define FIOL "\033[35m"
-#define GOLUB "\033[36m"
-#define BEL "\033[37m"
-
-#define KRASN1 "\033[1;31m"
-#define ZELEN1 "\033[1;32m"
-#define ZHELT1 "\033[1;33m"
-#define SIN1 "\033[1;34m"
-#define FIOL1 "\033[1;35m"
-#define GOLUB1 "\033[1;36m"
-#define BEL1 "\033[1;37m"
-
-#define HALF "\033[2m"
-#define UNDERSCORE "\033[4m"
-#define BLINK "\033[5m"
-#define REVERSE "\033[7m"
-
-#define DEFAULT_COLOR	2
-#define DEFAULT_BG	40	
-#define DEFAULT_SYMBOL	'.'
-#define CREATED_OBJECT	777
-
-// static variables
-
-int Codetable;
-char *CodetableName[] = {"UTF","KOI","WIN","LAT"};
-char out[MAXUTF];
-struct
-	{
-	char *descr;
-	int room_type;
-	char symbol;
-	char color; // color of foreground
-	char bg; // color of background
-	int object; // object in room
-	int mob; // mob in room
-	}
-	world[MAX_X][MAX_Y];
-
-// inventory
-int inv_o=0;
-
-int max_x, max_y;
-int min_x, min_y;
-
-int global_x, global_y;
-
-struct winsize w;
-struct termio tstdin;
-
-// function definitions (prototypes)
-
-void outhex(char *);
-void print (char *);
-void print2 (char *);
-void map(void);
-char *ptime(void);
-void log_(char *str);
-void computation_boundaries(void);
-void rogalik(void);
-void rogalik_help(void);
-void realtime (void);
-
-// functions bodyes
+#include "virtustan.h"
 
 void esc(int code)
 {
@@ -123,6 +23,17 @@ else printf("\033[1;3%im", color-7);
 void date(void)
 {
 puts(ptime());
+print_holyday();
+printf("Время года: ");
+switch(sezon)
+	{
+	case WINTER: printf("Зима"); break;
+	case SPRING: printf("Весна"); break;
+	case SUMMER: printf("Лето"); break;
+	case AUTUMN: printf("Осень"); break;
+	default: printf("Пиздец");
+	}
+printf("\n");
 }
 
 void setpos(int line, int col)
@@ -427,6 +338,40 @@ else
 		}
 }
 
+void dup_(void)
+{int i, j;
+if ((i=world[global_x][global_y].object)==0)
+	if (inv_o)	{
+			world[global_x][global_y].object=inv_o;
+			printf("Вы дуплицировали и бросили на землю: "); print_object(inv_o);
+			}
+	else		printf("У вас ничего нет. На земле ничего нет. Ничего не делаем\n");
+else
+	if (inv_o)	{
+			printf("Инвентарь и комната заполнены, вы ничего не можете дуплицировать\n");
+			}
+	else		{
+			inv_o=i;
+			printf("Вы создали себе дубликат того, что лежало на земле: "); print_object(i);
+			}
+}
+
+void swap(void)
+{int i, j;
+if ((i=world[global_x][global_y].object)==0)
+	if (inv_o)	put();
+	else		printf("У вас ничего нет. На земле ничего нет. Ничего не делаем\n");
+else
+	if (inv_o)	{
+			j=inv_o;
+			world[global_x][global_y].object=j;
+			inv_o=i;
+			printf("Вы бросили: "); print_object(j);
+			printf("А взамен вы подняли: "); print_object(i);
+			}
+	else		get();
+}
+
 void roomcolor(void)
 {int i;
 char str[MAXLEN];
@@ -551,7 +496,14 @@ printf("%s(%i,%i)%s\n",GOLUB1,global_x,global_y,NORM_COLOR);
 if (world[global_x][global_y].descr) print(world[global_x][global_y].descr);
 else
 	{
-	print(EMPTY);
+	switch(sezon)
+	{
+	case WINTER: printf("Зимняя снежная равнина"); break;
+	case SPRING: printf("Грязюка"); break;
+	case SUMMER: printf("Луг"); break;
+	case AUTUMN: printf("Грязюка. Опавшие листья"); break;
+	default: printf("Вокруг пиздец");
+	}
 	//world[global_x][global_y].descr="Тут был Пруль";
 	}
 printf("\n");
@@ -898,6 +850,11 @@ holyday[4].text="Prool's Birthday";
 	//printf("day = %i\n", day);
 	//printf("month = %i\n", month);
 
+if ((month>=3) && (month<=5)) sezon=SPRING;
+else if ((month>=6) && (month<=8)) sezon=SUMMER;
+else if ((month>=9) && (month<=11)) sezon=AUTUMN;
+else sezon=WINTER;
+
 for (i=0;i<MAX_HOLYDAY;i++)
 	{
 	if (holyday[i].text==0) break;
@@ -1105,6 +1062,8 @@ while(1)
 	else if (!strcmp(cmd,"inv")) inv();
 	else if (!strcmp(cmd,"get")) get();
 	else if (!strcmp(cmd,"put")) put();
+	else if (!strcmp(cmd,"swap")) swap();
+	else if (!strcmp(cmd,"dup")) dup_();
 	else if (!strcmp(cmd,"create")) create();
 	else if (!strcmp(cmd,"destroy")) destroy();
 	else if (!strcmp(cmd,"roomcolor")) roomcolor();
