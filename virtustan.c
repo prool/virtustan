@@ -921,6 +921,7 @@ void ls(void)
 {DIR *dir;
 struct dirent *entry;
 int i=0;
+int counter=1;
 
 dir = opendir(".");
 
@@ -932,8 +933,8 @@ while(1)
 	{
 	entry=readdir(dir);
 	if (entry==0) break;
-	if (i++ == file_no) printf("%s%s%s\n", REVERSE, entry->d_name, NORM_COLOR);
-	else printf("%s\n", entry->d_name);
+	if (i++ == file_no) printf("%2i. %s%s%s\n", counter++, REVERSE, entry->d_name, NORM_COLOR);
+	else printf("%2i. %s\n", counter++, entry->d_name);
 	}
 
 }
@@ -965,6 +966,16 @@ ls();
 void dir_down(void)
 {
 file_no++;
+ls();
+}
+
+void dir_move(void)
+{char str[MAXLEN]; int i;
+printf("Move directory cursor by lines ? ");
+str[0]=0;i=0;
+fgets(str,MAXLEN,stdin); // и нафига я тут использовал fgets, а не gets ? :) prool
+i=atoi(str);
+file_no+=i;
 ls();
 }
 
@@ -1080,6 +1091,7 @@ while(1)
 	else if (!strcmp(cmd,"reset")) reset();
 	else if (!strcmp(cmd,"dir-up")) dir_up();
 	else if (!strcmp(cmd,"dir-down")) dir_down();
+	else if (!strcmp(cmd,"dir-move")) dir_move();
 	else if (!strcmp(cmd,"cat")) cat();
 	else printf("   Unknown command `%s'\n", cmd);
 	}

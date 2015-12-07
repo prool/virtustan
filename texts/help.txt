@@ -7,7 +7,7 @@ ascii - print ascii table
 help, помощь, ? - help
 source - print source
 ls - ls
-dir-up, dir-down - смена выделенного файла
+dir-up, dir-down, dir-move - смена выделенного файла
 cat - вывод выделенного файла на экран
 blog - Prool's blog
 testesc - test of ESC codes
