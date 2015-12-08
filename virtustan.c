@@ -1050,12 +1050,16 @@ while(1)
 	else if (!strcmp(cmd,"codetable")) printf("Current codetable is %s\n",CodetableName[Codetable]);
 	else if (!strcmp(cmd,"look")) look();
 	else if (!strcmp(cmd,"n")) move_(0,+1);
+	else if (!strcmp(cmd,UP_ARROW)) move_(0,+1);
 	else if (!strcmp(cmd,"N")) move_(0,MAX_Y-1-global_y);
+	else if (!strcmp(cmd,DOWN_ARROW)) move_(0,-1);
 	else if (!strcmp(cmd,"s")) move_(0,-1);
 	else if (!strcmp(cmd,"S")) move_(0,-global_y);
 	else if (!strcmp(cmd,"w")) move_(-1,0);
+	else if (!strcmp(cmd,LEFT_ARROW)) move_(-1,0);
 	else if (!strcmp(cmd,"W")) move_(-global_x,0);
 	else if (!strcmp(cmd,"e")) move_(+1,0);
+	else if (!strcmp(cmd,RIGHT_ARROW)) move_(+1,0);
 	else if (!strcmp(cmd,"E")) move_(MAX_X-1-global_x,0);
 	else if (!strcmp(cmd,"map")) map();
 	else if (!strcmp(cmd,"vorotaob")) printfile("texts/vorotaob.txt");
@@ -1093,7 +1097,15 @@ while(1)
 	else if (!strcmp(cmd,"dir-down")) dir_down();
 	else if (!strcmp(cmd,"dir-move")) dir_move();
 	else if (!strcmp(cmd,"cat")) cat();
-	else printf("   Unknown command `%s'\n", cmd);
+	else 	{int i;
+		printf("\nUnknown command `%s'\n\n(", cmd);
+		i=0;
+		while(cmd[i])
+			{
+			printf("%X ", cmd[i++]);
+			}
+		printf(")\n");
+		}
 	}
 log_("Virtustan application finished");
 return 0;

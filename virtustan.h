@@ -66,6 +66,11 @@
 #define SUMMER 2
 #define AUTUMN 3
 
+#define UP_ARROW "\x1b\x5b\x41"
+#define DOWN_ARROW "\x1b\x5b\x42"
+#define RIGHT_ARROW "\x1b\x5b\x43"
+#define LEFT_ARROW "\x1b\x5b\x44"
+
 // static variables
 
 int Codetable;
