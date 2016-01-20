@@ -13,6 +13,7 @@
 #include <fcntl.h>
 #include <time.h>
 //#include <ncurses.h>
+#include <ctype.h>
 #include <termios.h>
 #include <locale.h> // for UTF-8 under ncurses
 
@@ -114,3 +115,4 @@ void rogalik(void);
 void rogalik_help(void);
 void realtime (void);
 void print_holyday(void);
+void skript(void);

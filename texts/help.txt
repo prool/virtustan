@@ -35,6 +35,7 @@ constitution - print Virtustan constitution
 pledge - print Virtustan pledge
 rog - rogalik (use arrows; q, Q - quit from rogalik)
 rt - realtime rogalik (Q - quit from rogalik)
+skript - run proolskript interpreter
 q, quit, exit, конец - exit
 
 Sites: virtustan.net prool.kharkov.org github.com/prool/virtustan

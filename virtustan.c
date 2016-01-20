@@ -139,7 +139,7 @@ char str[MAXLEN];
 char c;
 int i;
 
-//printf("lines=%i\n", lines);
+//printf("printfile() filename=%s\n", filename);
 
 fp = fopen (filename,"r");
                                  
@@ -148,9 +148,10 @@ if (fp==NULL) {printf("Can't open file `%s'\n", filename); return;}
 i=0;
 set_terminal_raw();
 while(!feof(fp))
-	{
+	{char *cc;
 	str[0]=0;
-	fgets(str,MAXLEN,fp);
+	cc=fgets(str,MAXLEN,fp);
+	if (cc==NULL) break;
 	if (str[0])
 		{
 		print(str);
@@ -1097,6 +1098,7 @@ while(1)
 	else if (!strcmp(cmd,"dir-down")) dir_down();
 	else if (!strcmp(cmd,"dir-move")) dir_move();
 	else if (!strcmp(cmd,"cat")) cat();
+	else if (!strcmp(cmd,"skript")) skript();
 	else 	{int i;
 		printf("\nUnknown command `%s'\n\n(", cmd);
 		i=0;
@@ -1212,3 +1214,52 @@ gotoxy (ROG_X+2,line++); printf ("Q - quit from virtustan");
 gotoxy (ROG_X+2,line++); printf ("--Press any key--");
 getchar();
 }
+
+#define puts0(STR) printf("%s",STR)
+#define putdec(DIGIT) printf("%i", DIGIT)
+#define puthex(DIGIT) printf("%04X", DIGIT)
+#define puthex_l(DIGIT) printf("%08X", DIGIT)
+#define puthex_b(DIGIT) printf("%02X", DIGIT)
+#define peek(ADR) 0
+#define peek2(SEG,OFFSET) 0
+#define putch(a) putchar(a)
+
+#include "readw.c"
+
+char *getsn(char *buf, int len)
+{char *c;
+fgets(buf, len, stdin);
+c=strchr(buf,'\n');
+if (c) *c=0;
+}
+
+int reads(int fd, char *buf, int count) // read string from file
+{
+int i, j; char c;
+
+for (i=0;i<(count-1);i++)
+	{
+	j=read(fd,&c,1);
+	if ((j==0)||(c=='\r')||(c=='\n')) {*buf=0; return 1;}
+	*buf++=c;
+	}
+*buf=0;
+return 0;
+}
+
+int htoi(const char  *s)
+{
+int i; char c;
+i=0;
+while (*s)
+  {
+  i<<=4;
+  c=toupper(*s++);
+  if ((c>='0')&&(c<='9')) i+=c-'0';
+  else if ((c>='A')&&(c<='F')) i+=c+10-'A';
+  else return 0;
+  }
+return i;
+}
+
+#include "proolskript.c"
