@@ -57,8 +57,9 @@
 #define REVERSE "\033[7m"
 
 #define DEFAULT_COLOR	2
-#define DEFAULT_BG	40	
+#define DEFAULT_BG	40 // 40	
 #define DEFAULT_SYMBOL	'.'
+#define PLAYER_COLOR	0
 #define CREATED_OBJECT	777
 
 #define WINTER 0

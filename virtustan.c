@@ -785,7 +785,7 @@ for (y=local_max_y; y>=local_min_y; y--)
 	{
 	setcolor(world[x][y].color);
 	esc(world[x][y].bg); // background
-	if ((x==global_x)&&(y==global_y)) {setcolor(7); printf("@");}
+	if ((x==global_x)&&(y==global_y)) {setcolor(PLAYER_COLOR); printf("@");}
 	else
 	    putchar(world[x][y].symbol);
 	printf(" ");

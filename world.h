@@ -1,4 +1,4 @@
-// world file for Virtustan application. created Sun Nov 29 23:11:58 2015
+// world file for Virtustan application. created Wed Jan 20 15:16:34 2016
 // www.prool.kharkov.org www.virtustan.net
 world[0][0].color=3;
 world[0][1].color=3;
@@ -220,7 +220,7 @@ world[50][48].color=3;
 world[50][48].symbol=118;
 world[50][49].object=1;
 world[50][49].symbol=32;
-world[50][50].descr="Вы находитесь перед воротами Виртустана (ворота на севере, идти на север надо командой n от слова north). На воротах висит объявление. Для просмотра объявления наберите vorotaob";
+world[50][50].descr="Вы находитесь перед воротами Виртустана (ворота на севере, идти на север надо командой n от слова north или командой <стрелочка вверх>, а затем <Enter>). На воротах висит объявление. Для просмотра объявления наберите vorotaob";
 world[50][50].room_type=1;
 world[50][50].symbol=32;
 world[50][51].descr="Вы находитесь на пограничном посту Виртустана. Отсюда на север тянется Виртустан";
