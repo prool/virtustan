@@ -126,3 +126,4 @@ void rogalik_help(void);
 void realtime (void);
 void print_holyday(void);
 void skript(void);
+int exec (char *);

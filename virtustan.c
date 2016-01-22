@@ -156,13 +156,13 @@ while(!feof(fp))
 	if (*cc=='#') continue; // this is comment
 	if (*cc==']')
 		{// this is command
-		char *cmd;
-		if (!memcmp(cc,cmd="]COLOR",strlen(cmd))) setcolor(atoi(cc+strlen(cmd)));
+		if (!memcmp(cc,"]COLOR",strlen("]COLOR"))) setcolor(atoi(cc+strlen("]COLOR")));
+		if (!memcmp(cc,"]ESC",strlen("]ESC"))) esc(atoi(cc+strlen("]ESC")));
 		continue;
 		}
 	if (str[0])
-		{
-		print(str);
+		{int ii=0;
+		while(str[ii]) putchar(str[ii++]);
 		if (++i>=(lines-1)) {i=0;c=pressanykey(); if (c=='q') {printf("QUIT\n");fclose(fp);set_terminal_no_raw();return;} }
 		printf("\r                                    \r");
 		}
@@ -411,6 +411,7 @@ char str[MAXLEN];
 for (i=40;i<=47;i++)
 	{
 	esc(i);
+	if (i==47) setcolor(2);
 	printf("[bg %i] ",i);
 	}
 setcolor(0);
@@ -906,6 +907,15 @@ fflush(0);
 fclose(fp);
 }
 
+int exec(char *file)
+{FILE *fp;
+fp=fopen(file,"r");
+if (fp==NULL) return 1;
+fclose(fp);
+printfile(file);
+return 0;
+}
+
 void sysinfo(char *envp[])
 {
 char terminal [MAXLEN];
@@ -1114,14 +1124,14 @@ while(1)
 	else if (!strcmp(cmd,"dir-move")) dir_move();
 	else if (!strcmp(cmd,"cat")) cat();
 	else if (!strcmp(cmd,"skript")) skript();
-	else 	{int i;
-		printf("\nUnknown command `%s'\n\n(", cmd);
-		i=0;
-		while(cmd[i])
+	else 	{// No internal command. External command:
+		if (exec(cmd))
 			{
-			printf("%02X ", cmd[i++]);
+			printf("\nUnknown command `%s'\n\n(", cmd);
+			i=0;
+			while(cmd[i]) printf("%02X ", cmd[i++]);
+			printf(")\n");
 			}
-		printf(")\n");
 		}
 	}
 log_("Virtustan application finished");
