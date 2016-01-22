@@ -289,7 +289,7 @@ while(1/*fayl[faylp]*/)
 					}
 				}
 			else if (!strcmp(buf,"quit")) return;
-			else if (!strcmp(buf,"north")) move_(0,+1);
+#include	"aux-skripts.c"
 			else
 				{puts0("\r\nUnknown operator: '");puts0(buf);puts("'");}
 			}

@@ -73,6 +73,15 @@
 #define RIGHT_ARROW "\x1b\x5b\x43"
 #define LEFT_ARROW "\x1b\x5b\x44"
 
+#define puts0(STR) printf("%s",STR)
+#define putdec(DIGIT) printf("%i", DIGIT)
+#define puthex(DIGIT) printf("%04X", DIGIT)
+#define puthex_l(DIGIT) printf("%08X", DIGIT)
+#define puthex_b(DIGIT) printf("%02X", DIGIT)
+#define peek(ADR) 0
+#define peek2(SEG,OFFSET) 0
+#define putch(a) putchar(a)
+
 // static variables
 
 int Codetable;
@@ -109,6 +118,7 @@ void print (char *);
 void print2 (char *);
 void map(void);
 char *ptime(void);
+long int unixtime(void);
 void log_(char *str);
 void computation_boundaries(void);
 void rogalik(void);

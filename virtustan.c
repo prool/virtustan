@@ -23,6 +23,7 @@ else printf("\033[1;3%im", color-7);
 void date(void)
 {
 puts(ptime());
+printf("unixtime = %li\n", unixtime());
 print_holyday();
 printf("Время года: ");
 switch(sezon)
@@ -152,6 +153,13 @@ while(!feof(fp))
 	str[0]=0;
 	cc=fgets(str,MAXLEN,fp);
 	if (cc==NULL) break;
+	if (*cc=='#') continue; // this is comment
+	if (*cc==']')
+		{// this is command
+		char *cmd;
+		if (!memcmp(cc,cmd="]COLOR",strlen(cmd))) setcolor(atoi(cc+strlen(cmd)));
+		continue;
+		}
 	if (str[0])
 		{
 		print(str);
@@ -161,6 +169,7 @@ while(!feof(fp))
 	}
 fclose(fp);
 set_terminal_no_raw();
+setcolor(0);
 }
 
 #if 0
@@ -223,7 +232,6 @@ world[i][j].mob=0;
 
 world[50][50].descr="Вы находитесь перед воротами Виртустана (ворота на севере, идти на север надо командой n от слова north). На воротах висит объявление. Для просмотра объявления наберите vorotaob";
 world[50][50].object=1;
-world[50][50].room_type=1;
 world[50][51].descr="Вы находитесь на пограничном посту Виртустана. Отсюда на север тянется Виртустан"; world[50][51].symbol='!';
 world[50][52].descr="Вы находитесь на Виртустанской улице, идущей в меридиональном направлении";
 world[50][53].descr="Вы находитесь на Виртустанской площади";
@@ -386,7 +394,7 @@ setcolor(0);
 
 printf("\nColor number (1-)? ");
 str[0]=0;i=0;
-fgets(str,MAXLEN,stdin); // и нафига я тут использовал fgets, а не gets ? :) prool
+fgets(str,MAXLEN,stdin);
 i=atoi(str);
 if (i)	{
 	world[global_x][global_y].color=i;
@@ -409,7 +417,7 @@ setcolor(0);
 
 printf("\nBackground number (40-47)? ");
 str[0]=0;i=0;
-fgets(str,MAXLEN,stdin); // и нафига я тут использовал fgets, а не gets ? :) prool
+fgets(str,MAXLEN,stdin);
 i=atoi(str);
 if (i)	{
 	world[global_x][global_y].bg=i;
@@ -427,7 +435,7 @@ char str[MAXLEN];
 
 printf("\nRoom symbol code? ");
 str[0]=0;i=0;
-fgets(str,MAXLEN,stdin); // и нафига я тут использовал fgets, а не gets ? :) prool
+fgets(str,MAXLEN,stdin);
 i=atoi(str);
 if (1)	{
 	world[global_x][global_y].symbol=i;
@@ -442,7 +450,7 @@ char *c, *mm;
 
 printf("\nRoom description? ");
 str[0]=0;i=0;
-fgets(str,MAXLEN,stdin); // и нафига я тут использовал fgets, а не gets ? :) prool
+fgets(str,MAXLEN,stdin);
 
 c=strchr(str,'\n');
 if (c) *c=0;
@@ -554,7 +562,7 @@ char str[MAXLEN];
 
 printf("\nESC code? ");
 str[0]=0;i=0;
-fgets(str,MAXLEN,stdin); // и нафига я тут использовал fgets, а не gets ? :) prool
+fgets(str,MAXLEN,stdin);
 i=atoi(str);
 printf("entered ESC code %i\n", i);
 
@@ -879,8 +887,13 @@ char *ptime(void)
 	*(tmstr + strlen(tmstr) - 1) = '\0';
 
 	return tmstr;
-
 	}
+
+long int unixtime(void)
+	{
+	return time(0);
+	}
+
 void log_(char *str)
 {
 FILE *fp;
@@ -898,6 +911,10 @@ void sysinfo(char *envp[])
 char terminal [MAXLEN];
 char **envpp;
 
+printf("\r\nsize of int %li",sizeof(int));
+printf("\r\nsize of long int %li",sizeof(long int));
+printf("\r\nsize of short int %li",sizeof(short int));
+printf("\r\nsize of char %li\n",sizeof(char));
 printf ("lines %d\n", lines);
 printf ("columns %d\n", COLUMNS);
 #define S_TERM "TERM="
@@ -974,7 +991,7 @@ void dir_move(void)
 {char str[MAXLEN]; int i;
 printf("Move directory cursor by lines ? ");
 str[0]=0;i=0;
-fgets(str,MAXLEN,stdin); // и нафига я тут использовал fgets, а не gets ? :) prool
+fgets(str,MAXLEN,stdin);
 i=atoi(str);
 file_no+=i;
 ls();
@@ -985,12 +1002,10 @@ void reset(void) // reset terminal
 printf("%cc",ESC); // ESC c - reset terminal
 }
 
-/************************************************************************************************************************/
-/************************************************************************************************************************/
-/************************************************************************************************************************/
+///////////////////////////////////////////////
 int main (int argc, char *argv[], char *envp[])
 {
-char cmd[MAXLEN_CMD];
+unsigned char cmd[MAXLEN_CMD];
 char *cc;
 int i, j;
 
@@ -1024,7 +1039,7 @@ look();
 while(1)
 	{
 	printf("virtustan app> ");
-	fgets(cmd,MAXLEN_CMD,stdin); // и нафига я тут использовал fgets, а не gets ? :) prool
+	fgets(cmd,MAXLEN_CMD,stdin); // и нафига я тут использовал fgets, а не gets ? наверное из-за проверки длины
 	switch (Codetable)
 		{
 		case KOI: fromkoi(cmd); break;
@@ -1104,7 +1119,7 @@ while(1)
 		i=0;
 		while(cmd[i])
 			{
-			printf("%X ", cmd[i++]);
+			printf("%02X ", cmd[i++]);
 			}
 		printf(")\n");
 		}

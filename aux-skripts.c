@@ -1,0 +1,23 @@
+// auxiliary skripts commands
+	else if (!strcmp(buf,"north")) move_(0,+1);
+	else if (!strcmp(buf,"south")) move_(0,-1);
+	else if (!strcmp(buf,"west" )) move_(-1,0);
+	else if (!strcmp(buf,"east" )) move_(+1,0);
+	else if (!strcmp(buf,"look")) look();
+	else if (!strcmp(buf,"map")) map();
+	else if (!strcmp(buf,"cls")) clearscreen();
+	else if (!strcmp(buf,"date")) date();
+	else if (!strcmp(buf,"inv")) inv();
+	else if (!strcmp(buf,"get_item")) get();
+	else if (!strcmp(buf,"put_item")) put();
+	else if (!strcmp(buf,"swap_item")) swap();
+	else if (!strcmp(buf,"dup_item")) dup_();
+	else if (!strcmp(buf,"create_item")) create();
+	else if (!strcmp(buf,"destroy_item")) destroy();
+	else if (!strcmp(buf,"save")) save_world();
+	else if (!strcmp(buf,"ls")) ls();
+	else if (!strcmp(buf,"holyday")) print_holyday();
+	else if (!strcmp(buf,"reset")) reset();
+	else if (!strcmp(buf,"dir_up")) dir_up();
+	else if (!strcmp(buf,"dir_down")) dir_down();
+	else if (!strcmp(buf,"cat")) cat();
