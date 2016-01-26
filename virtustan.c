@@ -434,6 +434,8 @@ void roomsymbolcode(void)
 {int i;
 char str[MAXLEN];
 
+printfile("ascii.txt");
+
 printf("\nRoom symbol code? ");
 str[0]=0;i=0;
 fgets(str,MAXLEN,stdin);
