@@ -84,6 +84,7 @@
 
 // static variables
 
+int updated; // =1 if world is update
 int Codetable;
 char *CodetableName[] = {"UTF","KOI","WIN","LAT"};
 char out[MAXUTF];
@@ -96,8 +97,15 @@ struct
 	char bg; // color of background
 	int object; // object in room
 	int mob; // mob in room
+	long int timer;
 	}
 	world[MAX_X][MAX_Y];
+
+// room_type - типы комнат
+//0 - безтиповая (обычная)
+#define TILLED	1	// вспахано
+#define SOWED	2	// засеяно
+// далее будет вода, непроходимо (стена или забор), горы, лес, пустыня, луг, помещение, болото, пещера
 
 int inv_o=0; // inventory
 
@@ -126,4 +134,6 @@ void rogalik_help(void);
 void realtime (void);
 void print_holyday(void);
 void skript(void);
+char plant_symbol(int, long int);
 int exec (char *);
+

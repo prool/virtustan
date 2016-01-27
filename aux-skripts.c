@@ -17,7 +17,10 @@
 	else if (!strcmp(buf,"save")) save_world();
 	else if (!strcmp(buf,"ls")) ls();
 	else if (!strcmp(buf,"holyday")) print_holyday();
-	else if (!strcmp(buf,"reset")) reset();
+	else if (!strcmp(buf,"reset_terminal")) reset();
+	else if (!strcmp(buf,"reset_room")) resetroom();
 	else if (!strcmp(buf,"dir_up")) dir_up();
 	else if (!strcmp(buf,"dir_down")) dir_down();
 	else if (!strcmp(buf,"cat")) cat();
+	else if (!strcmp(buf,"till")) till();
+	else if (!strcmp(buf,"sow")) sow();

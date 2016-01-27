@@ -202,6 +202,7 @@ for (i=0; i<MAX_X; i++) for (j=0; j<MAX_Y; j++)
 	{
 	if (cc=world[i][j].descr) fprintf(fp, "world[%i][%i].descr=\"%s\";\n", i, j, cc);
 	if (ii=world[i][j].room_type) fprintf(fp, "world[%i][%i].room_type=%i;\n", i, j, ii);
+	if (world[i][j].room_type==SOWED) fprintf(fp, "world[%i][%i].timer=time(0);\n", i, j);
 	if (ii=world[i][j].object) fprintf(fp, "world[%i][%i].object=%i;\n", i, j, ii);
 	if (ii=world[i][j].mob) fprintf(fp, "world[%i][%i].mob=%i;\n", i, j, ii);
 	if ((ii=world[i][j].color)!=DEFAULT_COLOR) fprintf(fp, "world[%i][%i].color=%i;\n", i, j, ii);
@@ -210,6 +211,12 @@ for (i=0; i<MAX_X; i++) for (j=0; j<MAX_Y; j++)
 	}
 fprintf(fp,"// end of world file\n");
 fclose(fp);
+printf("Мир сохранен. ");
+if (updated)
+	printf("Не забудьте перекомпилировать его командой make\n");
+else
+	printf("Но по нашим данным в мире ничего не менялось\n");
+updated=0;
 }
 
 void init_world(void)
@@ -224,6 +231,7 @@ world[i][j].color=DEFAULT_COLOR;
 world[i][j].bg=DEFAULT_BG;
 world[i][j].object=0;
 world[i][j].mob=0;
+world[i][j].timer=0;
 }
 
 #include "world.h"
@@ -307,6 +315,7 @@ switch (o)
 	{
 	case 1: printf("Маленький камешек"); break;
 	case 2: printf("Кости"); break;
+	case 3: printf("Семя"); break;
 	default: printf("Черт знает что");
 	}
 printf("%s\n",NORM_COLOR);
@@ -397,6 +406,7 @@ str[0]=0;i=0;
 fgets(str,MAXLEN,stdin);
 i=atoi(str);
 if (i)	{
+	updated=1;
 	world[global_x][global_y].color=i;
 	setcolor(i);
 	printf("set color %i\n", i);
@@ -421,6 +431,7 @@ str[0]=0;i=0;
 fgets(str,MAXLEN,stdin);
 i=atoi(str);
 if (i)	{
+	updated=1;
 	world[global_x][global_y].bg=i;
 	setcolor(0);
 	printf("set bg %i ", i);
@@ -441,6 +452,7 @@ str[0]=0;i=0;
 fgets(str,MAXLEN,stdin);
 i=atoi(str);
 if (1)	{
+	updated=1;
 	world[global_x][global_y].symbol=i;
 	printf("set symbol '%c'\n", i);
 	}
@@ -462,6 +474,7 @@ mm=malloc(MAXLEN);
 if (!mm) {printf("All your memory is belong to us\n"); return;}
 strcpy(mm,str);
 if (1)	{
+	updated=1;
 	world[global_x][global_y].descr=mm;
 	printf("set descr '%s'\n", mm);
 	}
@@ -474,9 +487,53 @@ char c;
 printf("\nSymbol? ");
 c=getchar();
 if (c!=10)	{
+	updated=1;
 	world[global_x][global_y].symbol=c;
 	printf("set symbol '%c'\n", c);
 	}
+}
+
+void resetroom (void)
+{
+	updated=1;
+	world[global_x][global_y].descr=0;
+	world[global_x][global_y].room_type=0;
+	world[global_x][global_y].symbol=DEFAULT_SYMBOL;
+	world[global_x][global_y].color=DEFAULT_COLOR;
+	world[global_x][global_y].bg=DEFAULT_BG;
+	printf("Комната очищена!!\n");
+}
+
+void till (void)
+{
+if (world[global_x][global_y].descr==0)
+	{
+	updated=1;
+	world[global_x][global_y].descr="Вспахано";
+	world[global_x][global_y].room_type=TILLED;
+	world[global_x][global_y].symbol=' ';
+	world[global_x][global_y].color=1;
+	world[global_x][global_y].bg=43;
+	printf("Мы вспахали!\n");
+	}
+else
+	printf("Здесь нельзя пахать!\n");
+}
+
+void sow (void)
+{
+if (world[global_x][global_y].room_type==TILLED)
+	{
+	updated=1;
+	world[global_x][global_y].descr="Засеяно";
+	world[global_x][global_y].room_type=SOWED;
+	world[global_x][global_y].color=9; // green
+	world[global_x][global_y].bg=DEFAULT_BG;
+	world[global_x][global_y].object=3; // Семя
+	world[global_x][global_y].timer=time(0);
+	}
+else
+	printf("Здесь не вспахано, сеять нельзя\n");
 }
 
 void create(void)
@@ -521,6 +578,12 @@ else
 printf("\n");
 
 if (i=world[global_x][global_y].object) print_object(i);
+
+if (world[global_x][global_y].room_type==SOWED)
+	{
+	printf("Таймер %li Возраст объекта %li\n",
+	world[global_x][global_y].timer, time(0) - world[global_x][global_y].timer);
+	}
 }
 
 int try_move_to(int x, int y)
@@ -798,14 +861,26 @@ for (y=local_max_y; y>=local_min_y; y--)
 	setcolor(world[x][y].color);
 	esc(world[x][y].bg); // background
 	if ((x==global_x)&&(y==global_y)) {setcolor(PLAYER_COLOR); printf("@");}
-	else
-	    putchar(world[x][y].symbol);
+	else if (world[x][y].room_type==SOWED)
+		putchar(plant_symbol(world[x][y].object, world[x][y].timer));
+	else putchar(world[x][y].symbol);
 	printf(" ");
 	setcolor(0);
 	}
     printf("\n");
     }
 printf(NORM_COLOR);
+}
+
+char plant_symbol(int obj, long int timer)
+{long int age;
+age=time(0)-timer;
+// . , | V W
+if (age<60) return '.';
+if (age<60*2) return ',';
+if (age<60*3) return '|';
+if (age<60*4) return 'V';
+return 'W';
 }
 
 void env(char *envp[])
@@ -1021,6 +1096,8 @@ unsigned char cmd[MAXLEN_CMD];
 char *cc;
 int i, j;
 
+updated=0;
+
 ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
 
 clearscreen();
@@ -1061,10 +1138,12 @@ while(1)
 	cc=strchr(cmd,'\n');
 	if (cc) *cc=0;
 	if (cmd[0]==0) continue;
-	if (!strcmp(cmd,"q")) break;
-	if (!strcmp(cmd,"quit")) break;
-	if (!strcmp(cmd,"exit")) break;
-	if (!strcmp(cmd,"конец")) break;
+	if ((!strcmp(cmd,"q")) || (!strcmp(cmd,"quit")) || (!strcmp(cmd,"exit")) || (!strcmp(cmd,"конец"))) 
+		{
+		if (updated==0) break;
+		printf("Мир был изменен! Сохраните мир командой save. Или выйдите командой непосредственного выхода Quit\n");
+		}
+	else if (!strcmp(cmd,"Quit")) break;
 	else if (!strcmp(cmd,"help")) printfile("texts/help.txt");
 	else if (!strcmp(cmd,"h"))  printfile("texts/help.txt");
 	else if (!strcmp(cmd,"?"))  printfile("texts/help.txt");
@@ -1114,6 +1193,7 @@ while(1)
 	else if (!strcmp(cmd,"roomsymbol")) roomsymbol();
 	else if (!strcmp(cmd,"roomsymbolcode")) roomsymbolcode();
 	else if (!strcmp(cmd,"roomdescr")) roomdescr();
+	else if (!strcmp(cmd,"resetroom")) resetroom();
 	else if (!strcmp(cmd,"save")) save_world();
 	else if (!strcmp(cmd,"ls")) ls();
 	else if (!strcmp(cmd,"holyday")) print_holyday();
@@ -1126,6 +1206,8 @@ while(1)
 	else if (!strcmp(cmd,"dir-move")) dir_move();
 	else if (!strcmp(cmd,"cat")) cat();
 	else if (!strcmp(cmd,"skript")) skript();
+	else if (!strcmp(cmd,"till")) till();
+	else if (!strcmp(cmd,"sow")) sow();
 	else 	{// No internal command. External command:
 		if (exec(cmd))
 			{

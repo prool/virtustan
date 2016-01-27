@@ -25,7 +25,9 @@ swap - swap objects in inventory and in room
 dup - duplicate object
 create - create object
 destroy - destroy object
-room edit commands: roomcolor, roombg, roomsymbol, roomsymbolcode, roomtype, roomdescr
+]COLOR1
+room edit commands: resetroom, roomcolor, roombg, roomsymbol, roomsymbolcode, roomtype, roomdescr
+]COLOR0
 save - save world
 env - print environment
 date - print date & time
@@ -36,6 +38,8 @@ pledge - print Virtustan pledge
 rog - rogalik (use arrows; q, Q - quit from rogalik)
 rt - realtime rogalik (Q - quit from rogalik)
 skript - run proolskript interpreter
+till - пахать
+sow - сеять
 q, quit, exit, конец - exit
 
 Sites: virtustan.net prool.kharkov.org github.com/prool/virtustan
