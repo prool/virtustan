@@ -998,6 +998,8 @@ void sysinfo(char *envp[])
 char terminal [MAXLEN];
 char **envpp;
 
+ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
+
 printf("\r\nsize of int %li",sizeof(int));
 printf("\r\nsize of long int %li",sizeof(long int));
 printf("\r\nsize of short int %li",sizeof(short int));
@@ -1233,11 +1235,20 @@ return 0;
 }
 
 void realtime (void)
-{char c; int i, j;
+{char c; int i, j; int x,y;
 struct termio tstdin;
 int oldf;
 int online_help=0;
 int i_c=0, j_c=0; // cursor location
+int cursor_blink=0;
+int MAX_I, MAX_J;
+
+//#define MAX_I 10
+//#define MAX_J 10
+
+ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
+MAX_I=20/*lines-8*/;
+MAX_J=60 /*COLUMNS-1*/;
 
 /*  Set stdin (file descriptor=0) to NOraw mode and echo */
 ioctl(0, TCGETA, &tstdin);
@@ -1247,25 +1258,36 @@ ioctl(0, TCSETA, &tstdin);
 oldf = fcntl(STDIN_FILENO, F_GETFL, 0);
 fcntl(STDIN_FILENO, F_SETFL, oldf | O_NONBLOCK);
 
-#define MAX_I 10
-#define MAX_J 10
-
 while(1)
 	{
 	// refresh screen
 	clearscreen();
 	//gotoxy(0,0);
-	printf("Virtustal realtime application. ~ - quit to virtustan app, q - quit to OS, ? - help ");
+	printf("Virtustan realtime application. ~ - quit to virtustan app, q - quit to OS, ? - help ");
 	setcolor(2);
 	printf("%s\n\n", ptime()+4);
 	setcolor(0);
 
-	for (i=0;i<MAX_I;i++)
+	for (i=MAX_I-1;i>=0;i--)
 		{
 		for (j=0;j<MAX_J;j++)
 			{
-			if ((i==i_c) && (j==j_c)) {setcolor(8); putchar('*'); setcolor(0);} // cursor
-			else putchar('.');
+			
+			x=j; y=i+42;
+			if ((x>=MAX_X)||(y>=MAX_Y)) putchar('~');
+			else
+				{
+				setcolor(world[x][y].color);
+				esc(world[x][y].bg); // background
+				if ((i==i_c) && (j==j_c)) // cursor
+					{if (cursor_blink==0) {setcolor(8); cursor_blink=1;}
+					else {cursor_blink=0; setcolor(9);}
+					putchar('*'); setcolor(0);}
+				else if (world[x][y].room_type==SOWED)
+				putchar(plant_symbol(world[x][y].object, world[x][y].timer));
+				else putchar(world[x][y].symbol);
+				setcolor(0);
+				}
 			}
 		puts("");
 		}
@@ -1274,7 +1296,7 @@ while(1)
 		{
 		printf("\nHelp:\n? - online help on and off\nn s w e or arrows - move\n");
 		}
-	usleep(100000);
+	usleep(200000);
 	c=getchar();
 	if (c!=-1) {}
 	fflush(0);
@@ -1307,10 +1329,10 @@ while(1)
 				if (c==91)
 					{
 					c=getchar();
-					if (c==65)	{l_n: // north
+					if (c==66)	{l_s: // s
 							if (i_c>0) i_c--; break;
 							}
-					else if (c==66)	{l_s: // south
+					else if (c==65)	{l_n: // n
 							if (i_c<MAX_I-1) i_c++; break;
 							}
 					else if (c==68)	{l_w: // west
