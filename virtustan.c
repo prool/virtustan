@@ -1102,7 +1102,7 @@ ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
 
 clearscreen();
 
-printf("Virtustan application\nCopyleft by Prool, 2015\nThis program comes with ABSOLUTELY NO WARRANTY; for details type `gpl3'.\
+printf("Virtustan application\nCopyleft by Prool, 2015-2016\nThis program comes with ABSOLUTELY NO WARRANTY; for details type `gpl3'.\
  Compile %s %s\n",__DATE__,__TIME__);
 
 //sysinfo(envp);
@@ -1116,7 +1116,6 @@ log_("Virtustan application started");
 //printf("init started\n");
 Codetable=UTF;
 
-
 global_x=50; global_y=50;
 
 init_world();
@@ -1125,10 +1124,21 @@ init_world();
 
 look();
 
+if (argc==2)
+	{
+	// printf("arg %s\n", argv[1]);
+	if (!strcmp(argv[1],"realtime")) realtime();
+	else
+		{
+		printf("\nusage: virtustan [realtime]\n");
+		return 1;
+		}
+	}
+
 while(1)
 	{
 	printf("virtustan app> ");
-	fgets(cmd,MAXLEN_CMD,stdin); // и нафига я тут использовал fgets, а не gets ? наверное из-за проверки длины
+	fgets(cmd,MAXLEN_CMD,stdin); // нафига я тут использовал fgets, а не gets ? наверное из-за проверки длины
 	switch (Codetable)
 		{
 		case KOI: fromkoi(cmd); break;
@@ -1223,9 +1233,11 @@ return 0;
 }
 
 void realtime (void)
-{char c; int i;
+{char c; int i, j;
 struct termio tstdin;
 int oldf;
+int online_help=0;
+int i_c=0, j_c=0; // cursor location
 
 /*  Set stdin (file descriptor=0) to NOraw mode and echo */
 ioctl(0, TCGETA, &tstdin);
@@ -1235,18 +1247,47 @@ ioctl(0, TCSETA, &tstdin);
 oldf = fcntl(STDIN_FILENO, F_GETFL, 0);
 fcntl(STDIN_FILENO, F_SETFL, oldf | O_NONBLOCK);
 
+#define MAX_I 10
+#define MAX_J 10
+
 while(1)
 	{
+	// refresh screen
 	clearscreen();
-	gotoxy(0,0);
-	printf("Q - quit");
-	gotoxy(30,0);
-	printf("%s", ptime());
+	//gotoxy(0,0);
+	printf("Virtustal realtime application. ~ - quit to virtustan app, q - quit to OS, ? - help ");
+	setcolor(2);
+	printf("%s\n\n", ptime()+4);
+	setcolor(0);
+
+	for (i=0;i<MAX_I;i++)
+		{
+		for (j=0;j<MAX_J;j++)
+			{
+			if ((i==i_c) && (j==j_c)) {setcolor(8); putchar('*'); setcolor(0);} // cursor
+			else putchar('.');
+			}
+		puts("");
+		}
+
+	if (online_help)
+		{
+		printf("\nHelp:\n? - online help on and off\nn s w e or arrows - move\n");
+		}
 	usleep(100000);
 	c=getchar();
 	if (c!=-1) {}
 	fflush(0);
-	if (c=='Q')
+	if ((c=='q')||(c=='Q'))
+		{
+		ioctl(0, TCGETA, &tstdin);
+    		tstdin.c_lflag |= (ICANON|ECHO);
+    		ioctl(0, TCSETA, &tstdin);
+		fcntl(STDIN_FILENO, F_SETFL, oldf);
+		printf("\n\nexit from realtime\n");
+		exit(0);
+		}
+	if (c=='~')
 		{
 		ioctl(0, TCGETA, &tstdin);
     		tstdin.c_lflag |= (ICANON|ECHO);
@@ -1254,6 +1295,33 @@ while(1)
 		fcntl(STDIN_FILENO, F_SETFL, oldf);
 		printf("\n\nexit from realtime\n");
 		return;
+		}
+	switch (c)
+		{
+		case '?': if (online_help==1) online_help=0; else online_help=1; break;
+		case 'n': /* north */ goto l_n;
+		case 's': /* south */ goto l_s;
+		case 'w': /* west */  goto l_w;
+		case 'e': /* east */  goto l_e;
+		case 27 :	c=getchar();
+				if (c==91)
+					{
+					c=getchar();
+					if (c==65)	{l_n: // north
+							if (i_c>0) i_c--; break;
+							}
+					else if (c==66)	{l_s: // south
+							if (i_c<MAX_I-1) i_c++; break;
+							}
+					else if (c==68)	{l_w: // west
+							if (j_c>0) j_c--; break;
+							}
+					else if (c==67)	{l_e: // east
+							if (j_c<MAX_J-1) j_c++; break;
+							}
+					}
+				break;
+		default : ;
 		}
 	}
 }
