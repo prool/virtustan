@@ -1247,8 +1247,8 @@ int MAX_I, MAX_J;
 //#define MAX_J 10
 
 ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
-MAX_I=20/*lines-8*/;
-MAX_J=60 /*COLUMNS-1*/;
+MAX_I=lines-8; // 20
+MAX_J=COLUMNS-1; // 60
 
 /*  Set stdin (file descriptor=0) to NOraw mode and echo */
 ioctl(0, TCGETA, &tstdin);
@@ -1258,12 +1258,16 @@ ioctl(0, TCSETA, &tstdin);
 oldf = fcntl(STDIN_FILENO, F_GETFL, 0);
 fcntl(STDIN_FILENO, F_SETFL, oldf | O_NONBLOCK);
 
+clearscreen();
+// скрыть курсор
+putchar(27);
+printf("[?25l");
+
 while(1)
 	{
 	// refresh screen
-	clearscreen();
-	//gotoxy(0,0);
-	printf("Virtustan realtime application. ~ - quit to virtustan app, q - quit to OS, ? - help ");
+	gotoxy(0,0);
+	printf("Virtustan realtime application! ~ - quit to virtustan app, q - quit to OS, ? - help ");
 	setcolor(2);
 	printf("%s\n\n", ptime()+4);
 	setcolor(0);
@@ -1307,6 +1311,9 @@ while(1)
     		ioctl(0, TCSETA, &tstdin);
 		fcntl(STDIN_FILENO, F_SETFL, oldf);
 		printf("\n\nexit from realtime\n");
+		// показать курсор
+		putchar(27);
+		printf("[?25h");
 		exit(0);
 		}
 	if (c=='~')
@@ -1316,6 +1323,9 @@ while(1)
     		ioctl(0, TCSETA, &tstdin);
 		fcntl(STDIN_FILENO, F_SETFL, oldf);
 		printf("\n\nexit from realtime\n");
+		// показать курсор
+		putchar(27);
+		printf("[?25h");
 		return;
 		}
 	switch (c)
@@ -1346,6 +1356,7 @@ while(1)
 		default : ;
 		}
 	}
+
 }
 
 #define ROG_X 10
