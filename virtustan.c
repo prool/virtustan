@@ -1248,7 +1248,8 @@ int MAX_I, MAX_J;
 
 ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
 MAX_I=lines-8; // 20
-MAX_J=COLUMNS-1; // 60
+if ((COLUMNS-1)>MAX_X) MAX_J=MAX_X;
+else MAX_J=COLUMNS-1;
 
 /*  Set stdin (file descriptor=0) to NOraw mode and echo */
 ioctl(0, TCGETA, &tstdin);
@@ -1276,22 +1277,24 @@ while(1)
 		{
 		for (j=0;j<MAX_J;j++)
 			{
-			
-			x=j; y=i+42;
+			if ((i==i_c) && (j==j_c)) // cursor
+				{if (cursor_blink==0) {setcolor(8); cursor_blink=1;}
+				else {cursor_blink=0; setcolor(1);}
+				putchar('*'); setcolor(0);}
+			else
+			 {
+			x=j; y=i+MAX_Y-MAX_I;
 			if ((x>=MAX_X)||(y>=MAX_Y)) putchar('~');
 			else
 				{
 				setcolor(world[x][y].color);
 				esc(world[x][y].bg); // background
-				if ((i==i_c) && (j==j_c)) // cursor
-					{if (cursor_blink==0) {setcolor(8); cursor_blink=1;}
-					else {cursor_blink=0; setcolor(9);}
-					putchar('*'); setcolor(0);}
-				else if (world[x][y].room_type==SOWED)
+				if (world[x][y].room_type==SOWED)
 				putchar(plant_symbol(world[x][y].object, world[x][y].timer));
 				else putchar(world[x][y].symbol);
 				setcolor(0);
 				}
+			 }
 			}
 		puts("");
 		}
@@ -1300,7 +1303,7 @@ while(1)
 		{
 		printf("\nHelp:\n? - online help on and off\nn s w e or arrows - move\n");
 		}
-	usleep(200000);
+	usleep(100000);
 	c=getchar();
 	if (c!=-1) {}
 	fflush(0);
