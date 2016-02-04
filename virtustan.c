@@ -1278,8 +1278,8 @@ while(1)
 		for (j=0;j<MAX_J;j++)
 			{
 			if ((i==i_c) && (j==j_c)) // cursor
-				{if (cursor_blink==0) {setcolor(8); cursor_blink=1;}
-				else {cursor_blink=0; setcolor(1);}
+				{if (time(0)&1/*cursor_blink==0*/) {setcolor(8); /*cursor_blink=1;*/}
+				else {/*cursor_blink=0; */setcolor(1);}
 				putchar('*'); setcolor(0);}
 			else
 			 {
@@ -1296,12 +1296,14 @@ while(1)
 				}
 			 }
 			}
-		puts("");
+		putchar('\r');
+		putchar('\n');
 		}
 
 	if (online_help)
 		{
-		printf("\nHelp:\n? - online help on and off\nn s w e or arrows - move\n");
+		printf("\nHelp:\n? - help\nn s w e or arrows - move\nbackspace - refresh screen");
+		online_help=0;
 		}
 	usleep(100000);
 	c=getchar();
@@ -1333,7 +1335,7 @@ while(1)
 		}
 	switch (c)
 		{
-		case '?': if (online_help==1) online_help=0; else online_help=1; break;
+		case '?': online_help=1; break;
 		case 'n': /* north */ goto l_n;
 		case 's': /* south */ goto l_s;
 		case 'w': /* west */  goto l_w;
@@ -1355,6 +1357,9 @@ while(1)
 							if (j_c<MAX_J-1) j_c++; break;
 							}
 					}
+				break;
+		case 127: // backspace - clrscr
+				clearscreen();
 				break;
 		default : ;
 		}
