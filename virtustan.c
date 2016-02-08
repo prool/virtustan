@@ -1101,9 +1101,12 @@ int i, j;
 
 updated=0;
 
-i_c=0; j_c=0; // cursor loc. for realtime mod
 
 ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
+MAX_I=lines-8; // 20
+if ((COLUMNS-1)>MAX_X) MAX_J=MAX_X;
+else MAX_J=COLUMNS-1;
+i_c=MAX_I-2; j_c=MAX_J-2; // cursor loc. for realtime mod
 
 clearscreen();
 
@@ -1243,15 +1246,7 @@ struct termio tstdin;
 int oldf;
 int online_help=0;
 int cursor_blink=0;
-int MAX_I, MAX_J;
-
-//#define MAX_I 10
-//#define MAX_J 10
-
-ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
-MAX_I=lines-8; // 20
-if ((COLUMNS-1)>MAX_X) MAX_J=MAX_X;
-else MAX_J=COLUMNS-1;
+int save_x, save_y;
 
 /*  Set stdin (file descriptor=0) to NOraw mode and echo */
 ioctl(0, TCGETA, &tstdin);
@@ -1266,6 +1261,8 @@ clearscreen();
 putchar(27);
 printf("[?25l");
 
+save_x=global_x; save_y=global_y;
+
 while(1)
 	{
 	// refresh screen
@@ -1275,6 +1272,7 @@ while(1)
 	printf("%s\n\n", ptime()+4);
 	setcolor(0);
 
+	global_x=j_c; global_y=i_c+MAX_Y-MAX_I;
 	for (i=MAX_I-1;i>=0;i--)
 		{
 		for (j=0;j<MAX_J;j++)
@@ -1304,13 +1302,13 @@ while(1)
 
 	if (online_help)
 		{
-		printf("\nHelp:\n? - help\nn s w e or arrows - move\nbackspace - refresh screen");
+		printf("Help:\n? - help\nn s w e N S W E or arrows - move\nbackspace - refresh screen");
 		online_help=0;
 		}
 	usleep(100000);
 	c=getchar();
-	if (c!=-1) {}
-	fflush(0);
+	//if (c!=-1) {}
+	//fflush(0);
 	if ((c=='q')||(c=='Q'))
 		{
 		ioctl(0, TCGETA, &tstdin);
@@ -1333,11 +1331,17 @@ while(1)
 		// показать курсор
 		putchar(27);
 		printf("[?25h");
+		global_x=save_x; global_y=save_y;
 		return;
 		}
 	switch (c)
 		{
 		case '?': online_help=1; break;
+		case '/': till(); break;
+		case 'N': i_c=MAX_I-1; printf("Мы переместились на крайний север"); break;
+		case 'S': i_c=0; break;
+		case 'W': j_c=0; break;
+		case 'E': j_c=MAX_J-1; break;
 		case 'n': /* north */ goto l_n;
 		case 's': /* south */ goto l_s;
 		case 'w': /* west */  goto l_w;
