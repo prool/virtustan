@@ -85,6 +85,7 @@
 // static variables
 
 int updated; // =1 if world is update
+int i_c, j_c; // cursor location for realtime mode
 int Codetable;
 char *CodetableName[] = {"UTF","KOI","WIN","LAT"};
 char out[MAXUTF];

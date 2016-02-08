@@ -531,6 +531,7 @@ if (world[global_x][global_y].room_type==TILLED)
 	world[global_x][global_y].bg=DEFAULT_BG;
 	world[global_x][global_y].object=3; // Семя
 	world[global_x][global_y].timer=time(0);
+	printf("Мы посеяли!\n");
 	}
 else
 	printf("Здесь не вспахано, сеять нельзя\n");
@@ -1100,6 +1101,8 @@ int i, j;
 
 updated=0;
 
+i_c=0; j_c=0; // cursor loc. for realtime mod
+
 ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
 
 clearscreen();
@@ -1239,7 +1242,6 @@ void realtime (void)
 struct termio tstdin;
 int oldf;
 int online_help=0;
-int i_c=0, j_c=0; // cursor location
 int cursor_blink=0;
 int MAX_I, MAX_J;
 
