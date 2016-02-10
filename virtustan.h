@@ -17,6 +17,9 @@
 #include <termios.h>
 #include <locale.h> // for UTF-8 under ncurses
 
+#define MAX_X 60 // 130
+#define MAX_Y 60
+
 #define MAXLEN 255
 #define MAXLEN_CMD 4096
 #define MAXUTF 1024
@@ -26,9 +29,6 @@
 #define WIN 2
 #define LAT 3
 #define ALFAVIT "В ЧАЩАХ ЮГА ЖИЛ БЫ ЦИТРУС ДА НО ФАЛЬШИВЫЙ ЭКЗЕМПЛЯР в чащах юга жил бы цитрус да но фальшивый экземпляр Ёё Ъъ\n"
-
-#define MAX_X 60
-#define MAX_Y 60
 
 #define lines w.ws_row
 #define COLUMNS w.ws_col

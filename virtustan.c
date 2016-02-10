@@ -1240,6 +1240,8 @@ log_("Virtustan application finished");
 return 0;
 }
 
+#define CLR for(jj=0;jj<MAX_J; jj++) putch(' ');putch('\r')
+
 void realtime (void)
 {char c; int i, j; int x,y;
 struct termio tstdin;
@@ -1247,6 +1249,7 @@ int oldf;
 int online_help=0;
 int cursor_blink=0;
 int save_x, save_y;
+int jj;
 
 /*  Set stdin (file descriptor=0) to NOraw mode and echo */
 ioctl(0, TCGETA, &tstdin);
@@ -1267,11 +1270,12 @@ while(1)
 	{
 	// refresh screen
 	gotoxy(0,0);
-	printf("Virtustan realtime application! ~ - quit to virtustan app, q - quit to OS, ? - help ");
-	setcolor(2);
-	printf("%s\n\n", ptime()+4);
-	setcolor(0);
+	printf("Virtustan realtime application ~ - quit to virtustan app, q - quit to OS, ? - help ");
+	//setcolor(2);
+	//printf("%s\n\n", ptime()+4);
+	//setcolor(0);
 
+	printf("\r\n");
 	global_x=j_c; global_y=i_c+MAX_Y-MAX_I;
 	for (i=MAX_I-1;i>=0;i--)
 		{
@@ -1302,6 +1306,7 @@ while(1)
 
 	if (online_help)
 		{
+		CLR;
 		printf("Help:\n? - help\nn s w e N S W E or arrows - move\nbackspace - refresh screen");
 		online_help=0;
 		}
@@ -1337,11 +1342,13 @@ while(1)
 	switch (c)
 		{
 		case '?': online_help=1; break;
-		case '/': till(); break;
-		case 'N': i_c=MAX_I-1; printf("Мы переместились на крайний север"); break;
-		case 'S': i_c=0; break;
-		case 'W': j_c=0; break;
-		case 'E': j_c=MAX_J-1; break;
+		case '/': CLR; till(); break;
+		case '.': CLR; sow(); break;
+		case 'B': clearscreen(); ls(); while(getchar()==-1) ; break; // boss key
+		case 'N': i_c=MAX_I-1; CLR; printf("Мы переместились на крайний север"); break;
+		case 'S': i_c=0; CLR; printf("Мы переместились на крайний юг"); break;
+		case 'W': j_c=0; CLR; printf("Мы переместились на крайний запад"); break;
+		case 'E': j_c=MAX_J-1; CLR; printf("Мы переместились на крайний восток"); break;
 		case 'n': /* north */ goto l_n;
 		case 's': /* south */ goto l_s;
 		case 'w': /* west */  goto l_w;
@@ -1351,23 +1358,31 @@ while(1)
 					{
 					c=getchar();
 					if (c==66)	{l_s: // s
-							if (i_c>0) i_c--; break;
+							if (i_c>0) i_c--;
+							CLR; printf("Мы переместились на юг"); 
+							break;
 							}
 					else if (c==65)	{l_n: // n
-							if (i_c<MAX_I-1) i_c++; break;
+							if (i_c<MAX_I-1) i_c++;
+							CLR; printf("Мы переместились на север"); 
+							break;
 							}
 					else if (c==68)	{l_w: // west
-							if (j_c>0) j_c--; break;
+							if (j_c>0) j_c--;
+							CLR; printf("Мы переместились на запад");
+							break;
 							}
 					else if (c==67)	{l_e: // east
-							if (j_c<MAX_J-1) j_c++; break;
+							if (j_c<MAX_J-1) j_c++;
+							CLR; printf("Мы переместились на восток"); 
+							break;
 							}
 					}
 				break;
 		case 127: // backspace - clrscr
 				clearscreen();
 				break;
-		default : ;
+		default :;
 		}
 	}
 
