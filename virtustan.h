@@ -139,3 +139,6 @@ void skript(void);
 char plant_symbol(int, long int);
 int exec (char *);
 
+// defines for proolskript interpteter
+
+#define MAXFAJL 2500
