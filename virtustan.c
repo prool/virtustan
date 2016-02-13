@@ -1307,7 +1307,39 @@ while(1)
 	if (online_help)
 		{
 		CLR;
-		printf("Help:\n? - help\nn s w e N S W E or arrows - move\nbackspace - refresh screen");
+printf("Help:\n");
+setcolor(14);
+printf("?");
+setcolor(0);
+printf(" help ");
+setcolor(14);
+printf("q");
+setcolor(0);
+printf(" quit to OS ");
+setcolor(14);
+printf("~");
+setcolor(0);
+printf(" quit to app.\n");
+setcolor(14);
+printf("n s w e N S W E ");
+setcolor(0);
+printf("or ");
+setcolor(14);
+printf("arrows");
+setcolor(0);
+printf(" move\n");
+setcolor(14);
+printf("/");
+setcolor(0);
+printf(" till ");
+setcolor(14);
+printf(".");
+setcolor(0);
+printf(" sow ");
+setcolor(14);
+printf("backspace");
+setcolor(0);
+printf(" refresh screen");
 		online_help=0;
 		}
 	usleep(100000);
