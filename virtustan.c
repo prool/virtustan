@@ -873,14 +873,15 @@ for (y=local_max_y; y>=local_min_y; y--)
 printf(NORM_COLOR);
 }
 
+#define SEKADI 30
 char plant_symbol(int obj, long int timer)
 {long int age;
 age=time(0)-timer;
 // . , | V W
-if (age<60) return '.';
-if (age<60*2) return ',';
-if (age<60*3) return '|';
-if (age<60*4) return 'V';
+if (age<SEKADI) return '.';
+if (age<SEKADI*2) return ',';
+if (age<SEKADI*3) return '|';
+if (age<SEKADI*4) return 'V';
 return 'W';
 }
 
