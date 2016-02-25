@@ -11,13 +11,15 @@
 #include "../proollib/proollib.h"
 
 #define PORT 2222
+#define BUFLEN 2048
 
 int main()
 {
     int sock, listener;
     struct sockaddr_in addr;
-    char buf[1024];
+    char buf[BUFLEN];
     int bytes_read;
+    int i;
 
     printf("%s Test echoserver started\n", ptime());
 
@@ -50,10 +52,44 @@ int main()
 
         while(1)
         {
-            bytes_read = recv(sock, buf, 1024, 0);
+	    for (i=0;i<BUFLEN;i++) buf[i]=0;
+            bytes_read = recv(sock, buf, BUFLEN, 0);
             if(bytes_read <= 0) break;
-	    printf("input: %s\n", buf);
-            send(sock, buf, bytes_read, 0);
+	    printf("Input %s", buf);
+	    if (!memcmp(buf,"GET ",4))
+		{
+		//printf("GET CMD\n");
+
+#define HTML1 "\
+HTTP/1.1 200 OK\n\
+Server: prool-test-server/0.0.1\n\
+Date: Thu, 25 Feb 2016 21:08:12 GMT\n\
+Content-Type: text/html\n\
+Content-Length: 612\n\
+Last-Modified: Tue, 26 Jan 2016 15:03:33 GMT\n\
+Connection: close\n\
+Accept-Ranges: bytes\n\
+\n\
+<!DOCTYPE html>\n\
+\n\
+<html>\n\
+<head>\n\
+<title>First page</title>\n\
+</head>\n\
+<body>\n\
+First <b>HTML</b> page v.2\n\
+</body>\n\
+</html>\n\n"
+            	send(sock, HTML1, strlen(HTML1), 0);
+		close(sock);
+		}
+	    else
+		{
+		//printf("NO GET CMD\n");
+		#define UNKN_CMD "Unknown command\r\n"
+            	send(sock, UNKN_CMD, strlen(UNKN_CMD), 0);
+		}
+            //send(sock, buf, bytes_read, 0);
         }
 close(sock);
     }
