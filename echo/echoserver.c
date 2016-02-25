@@ -8,6 +8,10 @@
 #include <stdlib.h>
 #include <unistd.h>
 
+#include "../proollib/proollib.h"
+
+#define PORT 2222
+
 int main()
 {
     int sock, listener;
@@ -15,24 +19,26 @@ int main()
     char buf[1024];
     int bytes_read;
 
+    printf("%s Test echoserver started\n", ptime());
+
     listener = socket(AF_INET, SOCK_STREAM, 0);
     if(listener < 0)
     {
         perror("socket");
         exit(1);
     }
-    
+
     addr.sin_family = AF_INET;
-    addr.sin_port = htons(3425);
+    addr.sin_port = htons(PORT);
     addr.sin_addr.s_addr = htonl(INADDR_ANY);
     if(bind(listener, (struct sockaddr *)&addr, sizeof(addr)) < 0)
     {
-        perror("bind");
+        perror("echoserver bind");
         exit(2);
     }
 
     listen(listener, 1);
-    
+
     while(1)
     {
         sock = accept(listener, NULL, NULL);
@@ -46,10 +52,11 @@ int main()
         {
             bytes_read = recv(sock, buf, 1024, 0);
             if(bytes_read <= 0) break;
+	    printf("input: %s\n", buf);
             send(sock, buf, bytes_read, 0);
         }
 close(sock);
     }
-    
+
     return 0;
 }
