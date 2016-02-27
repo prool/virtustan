@@ -1066,6 +1066,56 @@ while(1)
 
 }
 
+void filestatus(void)
+{DIR *dir;
+struct dirent *entry;
+struct stat struktura;
+
+int i=0;
+
+dir = opendir(".");
+
+if (dir==0) {printf("Can't open current directory\n"); return;}
+
+while(1)
+	{
+	entry=readdir(dir);
+	if (entry==0) break;
+	if (i++ == file_no)
+		{
+		if (!stat(entry->d_name, &struktura))
+			{
+/* struct stat {
+               dev_t     st_dev;         // ID of device containing file
+               ino_t     st_ino;         // inode number
+               mode_t    st_mode;        // protection
+               nlink_t   st_nlink;       // number of hard links
+               uid_t     st_uid;         // user ID of owner
+               gid_t     st_gid;         // group ID of owner
+               dev_t     st_rdev;        // device ID (if special file)
+               off_t     st_size;        // total size, in bytes
+               blksize_t st_blksize;     // blocksize for filesystem I/O
+               blkcnt_t  st_blocks;      // number of 512B blocks allocated
+		}
+ */
+               printf("device major/minor %04lX\n",struktura.st_dev); // ID of device containing file
+               printf("inode %li\n",struktura.st_ino);         // inode number
+               printf("mode %o\n",struktura.st_mode);        // protection
+               printf("hardlinks %li\n",struktura.st_nlink);       // number of hard links
+               printf("uid %i\n",struktura.st_uid);         // user ID of owner
+               printf("gid %i\n",struktura.st_gid);         // group ID of owner
+               printf("device id %li\n",struktura.st_rdev);        // device ID (if special file)
+               printf("size %li bytes\n",struktura.st_size);        // total size, in bytes
+               printf("blocks allocated %li (bytes allocated %li)\n",
+		struktura.st_blocks, struktura.st_blocks*512); // number of 512B blocks allocated
+               printf("blksize %li\n",struktura.st_blksize);     // blocksize for filesystem I/O
+			}
+		return;
+		}
+	}
+
+}
+
 void dir_up(void)
 {
 file_no--;
@@ -1224,6 +1274,7 @@ while(1)
 	else if (!strcmp(cmd,"dir-down")) dir_down();
 	else if (!strcmp(cmd,"dir-move")) dir_move();
 	else if (!strcmp(cmd,"cat")) cat();
+	else if (!strcmp(cmd,"stat")) filestatus();
 	else if (!strcmp(cmd,"skript")) skript();
 	else if (!strcmp(cmd,"till")) till();
 	else if (!strcmp(cmd,"sow")) sow();
