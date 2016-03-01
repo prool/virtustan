@@ -1,4 +1,4 @@
-// world file for Virtustan application. created Wed Feb 10 15:30:27 2016
+// world file for Virtustan application. created Sun Feb 28 22:51:34 2016
 // www.prool.kharkov.org www.virtustan.net
 world[0][0].color=3;
 world[0][0].symbol=42;
@@ -75,6 +75,8 @@ world[1][40].symbol=32;
 world[1][59].color=3;
 world[2][0].color=3;
 world[2][1].symbol=87;
+world[2][55].descr="symbol chr(24)";
+world[2][55].symbol=24;
 world[2][56].bg=41;
 world[2][57].color=8;
 world[2][57].symbol=35;
@@ -82,6 +84,8 @@ world[2][58].color=1;
 world[2][58].symbol=35;
 world[2][59].color=3;
 world[3][0].color=3;
+world[3][55].descr="symbol chr(26)";
+world[3][55].symbol=26;
 world[3][56].bg=42;
 world[3][57].color=9;
 world[3][57].symbol=35;
@@ -344,6 +348,7 @@ world[50][54].descr="Вы находитесь на Виртустанском �
 world[50][54].symbol=32;
 world[50][55].descr="Проспект Ленина. Здесь стоит памятник какому-то челу";
 world[50][55].symbol=33;
+world[50][59].descr="Горы";
 world[50][59].color=3;
 world[51][0].color=3;
 world[51][49].object=3;

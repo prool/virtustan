@@ -1,0 +1,5 @@
+
+int window_width = glutGet(GLUT_WINDOW_WIDTH);
+int window_height = glutGet(GLUT_WINDOW_HEIGHT);
+
+https://ru.wikibooks.org/wiki/GlBegin

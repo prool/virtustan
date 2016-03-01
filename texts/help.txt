@@ -4,7 +4,6 @@ codetable - print current codetable
 sysinfo - print sysinfo
 alf - print alfavit
 ascii - print ascii table
-help, помощь, ? - help
 source - print source
 ls - ls
 dir-up, dir-down, dir-move - смена выделенного файла
