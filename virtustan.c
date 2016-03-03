@@ -2,6 +2,9 @@
 // by Prool
 // www.prool.kharkov.org www.virtustan.net
 
+int HALF_X; // полуразмеры карты от центра карты по измерениям: (10,10) by default
+int HALF_Y; 
+
 #include "virtustan.h"
 
 void esc(int code)
@@ -840,11 +843,6 @@ void map(void)
 int x, y;
 int local_max_y, local_max_x, local_min_y, local_min_x;
 
-//computation_boundaries();
-
-#define HALF_X 10 // полуразмеры карты от центра карты по измерениям
-#define HALF_Y 10
-
 local_min_x=global_x-HALF_X; if (local_min_x<0) local_min_x=0;
 local_min_y=global_y-HALF_Y; if (local_min_y<0) local_min_y=0;
 
@@ -1151,7 +1149,8 @@ char *cc;
 int i, j;
 
 updated=0;
-
+HALF_X=10; // полуразмеры карты от центра карты по измерениям: (10,10) by default
+HALF_Y=10; 
 
 ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
 MAX_I=lines-8; // 20
@@ -1225,6 +1224,7 @@ while(1)
 	else if (!strcmp(cmd,"lat")) {Codetable=LAT; printf("Codetable switch to LAT: yet not implemented!\n");}
 	else if (!strcmp(cmd,"codetable")) printf("Current codetable is %s\n",CodetableName[Codetable]);
 	else if (!strcmp(cmd,"look")) look();
+	else if (!strcmp(cmd,"см")) look();
 	else if (!strcmp(cmd,"n")) move_(0,+1);
 	else if (!strcmp(cmd,UP_ARROW)) move_(0,+1);
 	else if (!strcmp(cmd,"N")) move_(0,MAX_Y-1-global_y);
@@ -1278,6 +1278,10 @@ while(1)
 	else if (!strcmp(cmd,"skript")) skript();
 	else if (!strcmp(cmd,"till")) till();
 	else if (!strcmp(cmd,"sow")) sow();
+	else if (!strcmp(cmd,"шире")) {HALF_X++; look(); }
+	else if (!strcmp(cmd,"уже")) {HALF_X--; look(); }
+	else if (!strcmp(cmd,"выше")) {HALF_Y++; look(); }
+	else if (!strcmp(cmd,"ниже")) {HALF_Y--; look(); }
 	else 	{// No internal command. External command:
 		if (exec(cmd))
 			{
@@ -1466,7 +1470,8 @@ printf(" refresh screen");
 		case 127: // backspace - clrscr
 				clearscreen();
 				break;
-		default :;
+		case -1: break;
+		default : CLR; printf("Invalid key = %i", c);
 		}
 	}
 

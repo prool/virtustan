@@ -1,4 +1,4 @@
-// world file for Virtustan application. created Sun Feb 28 22:51:34 2016
+// world file for Virtustan application. created Thu Mar  3 15:14:37 2016
 // www.prool.kharkov.org www.virtustan.net
 world[0][0].color=3;
 world[0][0].symbol=42;
@@ -199,6 +199,8 @@ world[39][48].timer=time(0);
 world[39][48].object=3;
 world[39][48].color=9;
 world[39][48].symbol=32;
+world[39][50].descr="Тут лежит большой валун, принесенный сюда явно ледником";
+world[39][50].symbol=42;
 world[39][59].color=3;
 world[40][0].color=3;
 world[40][47].descr="Засеяно";
