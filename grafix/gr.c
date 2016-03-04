@@ -12,11 +12,16 @@
 
 #include "../proollib/proollib.h"
 
-#define DELTA 0.01f
+#define DELTA 0.010f
+#define STEP_X 0.05f
+#define STEP_Y 0.10f
 
 float global_x;
 float global_y;
 int text_x, text_y;
+int cursor_i, cursor_j;
+
+int oldx, oldy;
 
 void init ()
 {
@@ -39,17 +44,6 @@ glVertex3f( 1.0f, -1.0f, -2.0f);
 glEnd();
 }
 #endif
-
-
-void draw_string(void *font, const char* string) 
-
-{
-
-  while(*string)
-
-    glutStrokeCharacter(font, *string++);
-
-}
 
 void drawText(const char *text, int length, int x, int y)
 {
@@ -79,6 +73,8 @@ void display ()
 float dx, dy;
 int i, j;
 signed char c;
+float x,y;
+float cursor_coord_x, cursor_coord_y;
 
 dx=1.0f-DELTA;
 dy=1.0f-DELTA;
@@ -90,17 +86,57 @@ glClear(GL_COLOR_BUFFER_BIT);   ///очистим буфер
  
 glColor3f(0.0,1.0,0.0); ///зададим цвет которым будем рисовать
 
-glBegin(GL_POINTS);
-glVertex2f(global_x,global_y);   /// точка 
+//glBegin(GL_POINTS); glVertex2f(global_x,global_y); glEnd();
+
+// решётка
+// vertikal lines
+x=-dx;
+#define MAX_X_C 40
+glBegin(GL_LINES);
+glColor3f(0.0,0.0,1.0);
+for (i=0;i<MAX_X_C;i++)
+	{
+	if ((i==0)||(i==MAX_X_C-1)) glColor3f(1.0,0.0,1.0);
+	else glColor3f(0.0,0.0,1.0);
+	glVertex2f(x,+dy-0.076);glVertex2f(x,-dy);
+	x+=STEP_X;
+	}
+glEnd();
+// horizontal lines
+y=-dy;
+#define MAX_Y_C 20
+glBegin(GL_LINES);
+glColor3f(0.0,0.0,1.0);
+for (i=0;i<MAX_Y_C;i++)
+	{
+	if ((i==0)||(i==MAX_Y_C-1)) glColor3f(1.0,0.0,1.0);
+	else glColor3f(0.0,0.0,1.0);
+	glVertex2f(-dx,y);glVertex2f(+dx-0.030,y);
+	y+=STEP_Y;
+	}
 glEnd();
 
+#if 0 // border
+glColor3f(1.0,0.0,0.0); ///зададим цвет которым будем рисовать
 glBegin(GL_LINES);glVertex2f(-dx,-dy);glVertex2f(-dx,+dy);glEnd();
 glBegin(GL_LINES);glVertex2f(-dx,-dy);glVertex2f(+dx,-dy);glEnd();
 glBegin(GL_LINES);glVertex2f(+dx,+dy);glVertex2f(+dx,-dy);glEnd();
 glBegin(GL_LINES);glVertex2f(+dx,+dy);glVertex2f(-dx,+dy);glEnd();
+#endif
 
+// cursor
+
+cursor_coord_x=-dx + (cursor_i*STEP_X) + STEP_X/2;
+cursor_coord_y= dy - (cursor_j*STEP_Y) - STEP_Y - 0.015f;
+glBegin(GL_TRIANGLES);
+glColor3f(1.0,1.0,0.0); ///зададим цвет которым будем рисовать
+glVertex2f(cursor_coord_x,cursor_coord_y);
+glVertex2f(cursor_coord_x+0.02f,cursor_coord_y-0.02f);
+glVertex2f(cursor_coord_x+0.02f,cursor_coord_y+0.02f);
+glEnd();
+
+#if 0 // out ascii table
 c=0;
-
 for (i=0;i<16;i++)
 	{
 	for (j=0;j<16;j++)
@@ -110,6 +146,7 @@ for (i=0;i<16;i++)
 		}
 	printf("i=%i\n", i);
 	}
+#endif
 
 glFlush();
 glutSwapBuffers(); 
@@ -161,12 +198,13 @@ glLoadIdentity();
 //gluOrtho2D(-1, 1, -1, 1);
 glMatrixMode(GL_MODELVIEW);
 #endif
-    printf("prool: reshape\n");
+
+printf("prool: reshape()\n");
 }
 
 void print_coord(void)
 {
-printf("point (%f, %f)\n", global_x, global_y);
+printf("cursor (%i, %i)\n", cursor_i, cursor_j);
 }
 
 void print_text_coord(void)
@@ -174,24 +212,53 @@ void print_text_coord(void)
 printf("text (%i, %i)\n", text_x, text_y);
 }
 
+void key2 ( int key, int x, int y )
+{
+switch(key)
+	{
+	case GLUT_KEY_F1: printf("pressed F1\n"); break;
+	default: printf("pressed unknown special key with code %i\n", key);
+	}
+}
+
 void key ( unsigned char key, int x, int y )
 {
 switch (key)
 	{
-	case 27:
-	case 'q':
-	case 'Q': exit(0);
+	case 'q': printf("Quit!\n"); exit(0);
 	case ' ': global_x+=DELTA; global_y+=DELTA; print_coord(); break;
-	case 'n': global_y+=DELTA; print_coord(); break; // north
-	case 's': global_y-=DELTA; print_coord(); break; // south
-	case 'w': global_x-=DELTA; print_coord(); break; // south
-	case 'e': global_x+=DELTA; print_coord(); break; // south
+	case 'n': cursor_j--; print_coord(); break; // north
+	case 's': cursor_j++; print_coord(); break; // south
+	case 'w': cursor_i--; print_coord(); break; // south
+	case 'e': cursor_i++; print_coord(); break; // south
 	case 'N': text_y++; print_text_coord(); break; // text north
 	case 'S': text_y--; print_text_coord(); break; // 
 	case 'W': text_x--; print_text_coord(); break; // 
-	case 'E': text_x++; print_text_coord(); break; // 
+	case 'E': text_x++; print_text_coord(); break;
+	case '1': glutSwapBuffers(); break; // for testing. proolfool
 	default: printf("key = %i\n", key);
 	}
+}
+
+void mouseButton(int button, int state, int x, int y) {
+int d, i, j;
+ 
+	if (button == GLUT_LEFT_BUTTON) {
+		if (state==GLUT_DOWN) {
+			printf("glut left button. state=%i x=%i y=%i", state, x, y);
+			d=x-oldx; oldx=x;
+			printf(" DX=%i", d);
+			i=(x-6)/30;
+			printf(" cursor i=%i", i);
+			cursor_i=i;
+
+			d=y-oldy; oldy=y;
+			printf(" DY=%i", d);
+			j=(y-28)/30;
+			printf(" cursor j = %i\n", j);
+			cursor_j=j;
+			}
+		}
 }
 
 int main ( int argc, char * argv [] )
@@ -200,6 +267,10 @@ global_x=0.0f;
 global_y=0;
 text_x=10;
 text_y=370;
+cursor_i=0;
+cursor_j=0;
+oldx=0;
+oldy=0;
                                 // initialize glut
     glutInit            ( &argc, argv );
     glutInitDisplayMode ( GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH );
@@ -216,9 +287,12 @@ text_y=370;
     glutCreateWindow ( "prool grafix test (q - quit)" );
 
                                 // register handlers
-    glutDisplayFunc  ( display );
-    glutReshapeFunc  ( reshape );
-    glutKeyboardFunc ( key     );
+glutDisplayFunc  ( display );
+glutReshapeFunc  ( reshape );
+glutKeyboardFunc ( key     );
+glutSpecialFunc ( key2     );
+
+glutMouseFunc(mouseButton);
 
     const char * slVer = (const char *) glGetString ( GL_SHADING_LANGUAGE_VERSION );
     printf ( "GLSL Version: %s\n", slVer );
