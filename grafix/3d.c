@@ -16,20 +16,72 @@ float angle=0.0;
 float lx=0.0f,lz=-1.0f;
 // XZ позиция камеры
 float x=0.0f,z=5.0f;
+// высота и ширина окна
+int h,w;
 
-#if 0
-float cos (double x) // proolfool
-{
-return 0.0f;
+void *font = GLUT_STROKE_ROMAN;
+
+// переменные для вычисления количества кадров в секунду
+int frame;
+long time_, timebase;
+char s[50];
+
+void renderBitmapString(
+		float x,
+		float y,
+		float z,
+		void *font,
+		char *string) {
+ 
+	char *c;
+	glRasterPos3f(x, y,z);
+	for (c=string; *c != '\0'; c++) {
+		glutBitmapCharacter(font, *c);
+	}
 }
 
-float sin (double x) // proolfool
-{
-return 0.0f;
+void renderStrokeFontString(
+		float x,
+		float y,
+		float z,
+		void *font,
+		char *string) {  
+ 
+	char *c;
+	glPushMatrix();
+	glTranslatef(x, y,z);
+	glScalef(0.002f, 0.002f, 0.002f);
+	for (c=string; *c != '\0'; c++) {
+		glutStrokeCharacter(font, *c);
+	}
+	glPopMatrix();
 }
-#endif
+ 
+void restorePerspectiveProjection() {
+	glMatrixMode(GL_PROJECTION);
+	//восстановить предыдущую матрицу проекции
+	glPopMatrix();
+	//вернуться в режим модели
+	glMatrixMode(GL_MODELVIEW);
+}
 
-void changeSize(int w, int h) {
+void setOrthographicProjection() {
+	//выбрать режим проекции
+	glMatrixMode(GL_PROJECTION);
+	//Сохраняем предыдущую матрицу, которая содерж
+	//параметры перспективной проекции
+	glPushMatrix();
+	//обнуляем матрицу
+	glLoadIdentity();
+	//устанавливаем 2D ортогональную проекцию
+	gluOrtho2D(0, w, h, 0);
+	//выбираем режим обзора модели
+	glMatrixMode(GL_MODELVIEW);
+}
+
+void changeSize(int ww, int hh) {
+	h = hh;
+	w = ww;
 	// предотвращение деления на ноль
 	if (h == 0)
 		h = 1;
@@ -45,10 +97,10 @@ void changeSize(int w, int h) {
 	// вернуться к матрице проекции
 	glMatrixMode(GL_MODELVIEW);
 }
-
+ 
 void processNormalKeys(unsigned char key, int x, int y) {
  
-	if (key == 27)
+	if (key == 'q')
 		exit(0);
 }
 
@@ -79,6 +131,7 @@ void drawSnowMan() {
 
 void renderScene(void) {
 	// Очистка буфера цвета и глубины.
+	glClearColor (0.0, 0.0, 0.2, 0.0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	// обнулить трансформацию
 	glLoadIdentity();
@@ -87,8 +140,9 @@ void renderScene(void) {
 		  x+lx, 1.0f,  z+lz,
 		  0.0f, 1.0f,  0.0f );
         // нарисуем "землю"
-	glColor3f(0.9f, 0.9f, 0.9f);
-	glBegin(GL_QUADS); // полигон с коондинатами
+	//glColor3f(0.9f, 0.9f, 0.9f);
+	glColor3f(0.0f, 0.9f, 0.0f);
+	glBegin(GL_QUADS); // полигон с координатами
 		glVertex3f(-100.0f, 0.0f, -100.0f);
 		glVertex3f(-100.0f, 0.0f,  100.0f);
 		glVertex3f( 100.0f, 0.0f,  100.0f);
@@ -110,8 +164,27 @@ void renderScene(void) {
 			glPushMatrix();
 			glTranslatef(i*5.0, 0, j * 5.0);
 			drawSnowMan();
+			renderStrokeFontString(0.0f, 0.5f, 0.0f, (void *)font ,"SnowMan");
 			glPopMatrix();
 #endif
+// Код для вычисления кадров в секунду
+	frame++;
+ 
+	time_=glutGet(GLUT_ELAPSED_TIME);
+	if (time_ - timebase > 1000) {
+		sprintf(s,"FPS:%4.2f",
+			frame*1000.0/(time_-timebase));
+		timebase = time_;
+		frame = 0;
+	}
+	//Код для отображения строки (кадров в секунду) с растровых шрифтов
+	setOrthographicProjection();
+	glPushMatrix();
+	glLoadIdentity();
+	renderBitmapString(5,30,0,GLUT_BITMAP_HELVETICA_18,s);
+	glPopMatrix();
+ 
+	restorePerspectiveProjection();
 	glutSwapBuffers();
 }
 
@@ -120,21 +193,25 @@ void processSpecialKeys(int key, int xx, int yy) {
 	switch (key) {
 		case GLUT_KEY_LEFT :
 			angle -= 0.01f;
+			printf("x=%f z=%f angle=%f rad\n", x, z, angle);
 			lx = sin(angle);
 			lz = -cos(angle);
 			break;
 		case GLUT_KEY_RIGHT :
 			angle += 0.01f;
+			printf("x=%f z=%f angle=%f rad\n", x, z, angle);
 			lx = sin(angle);
 			lz = -cos(angle);
 			break;
 		case GLUT_KEY_UP :
 			x += lx * fraction;
 			z += lz * fraction;
+			printf("x=%f z=%f angle=%f rad\n", x, z, angle);
 			break;
 		case GLUT_KEY_DOWN :
 			x -= lx * fraction;
 			z -= lz * fraction;
+			printf("x=%f z=%f angle=%f rad\n", x, z, angle);
 			break;
 	}
 }
@@ -142,11 +219,10 @@ void processSpecialKeys(int key, int xx, int yy) {
 int main(int argc, char **argv) {
 	// Инициализация и создание окна
 	glutInit(&argc, argv);
-//	glutInitDisplayMode(GLUT_DEPTH | GLUT_DOUBLE | GLUT_RGBA);
-	glutInitDisplayMode(GLUT_DEPTH | GLUT_DOUBLE | GLUT_RGB);
-	glutInitWindowPosition(100,100);
-	glutInitWindowSize(400,400);
-	glutCreateWindow("3D test");
+	glutInitDisplayMode(GLUT_DEPTH | GLUT_DOUBLE | GLUT_RGBA);
+	glutInitWindowPosition(0,0/*100,100*/);
+	glutInitWindowSize(1200,600/*400,400*/);
+	glutCreateWindow("Prool's 3D test. q - quit");
  
 	// Регистрация
 	glutDisplayFunc(renderScene);
@@ -157,6 +233,9 @@ int main(int argc, char **argv) {
  
 	// Инициализация OpenGL функции теста
 	glEnable(GL_DEPTH_TEST);
+
+	printf("3D test\n");
+	printf("x=%f z=%f angle=%f rad\n", x, z, angle);
  
 	// Основной цикл GLUT
 	glutMainLoop();
