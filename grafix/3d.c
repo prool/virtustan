@@ -98,12 +98,6 @@ void changeSize(int ww, int hh) {
 	glMatrixMode(GL_MODELVIEW);
 }
  
-void processNormalKeys(unsigned char key, int x, int y) {
- 
-	if (key == 'q')
-		exit(0);
-}
-
 void drawSnowMan() {
  
 	glColor3f(1.0f, 1.0f, 1.0f);
@@ -216,6 +210,23 @@ void processSpecialKeys(int key, int xx, int yy) {
 	}
 }
 
+void print_help()
+{
+printf("Help:\n\
+? - help\n\
+q - quit\n\
+arrows - move and rotate\n\
+");
+}
+
+void processNormalKeys(unsigned char key, int x, int y) {
+	switch(key)
+		{
+		case 'q': exit(0);
+		case '?': print_help(); break;
+		}
+}
+
 int main(int argc, char **argv) {
 	// Инициализация и создание окна
 	glutInit(&argc, argv);
@@ -234,7 +245,7 @@ int main(int argc, char **argv) {
 	// Инициализация OpenGL функции теста
 	glEnable(GL_DEPTH_TEST);
 
-	printf("3D test\n");
+	printf("3D test. Пруль\nq - quit ? - help");
 	printf("x=%f z=%f angle=%f rad\n", x, z, angle);
  
 	// Основной цикл GLUT
