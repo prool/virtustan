@@ -3,3 +3,7 @@ int window_width = glutGet(GLUT_WINDOW_WIDTH);
 int window_height = glutGet(GLUT_WINDOW_HEIGHT);
 
 https://ru.wikibooks.org/wiki/GlBegin
+http://steps3d.narod.ru/tutorials/ogl3-tutorial.html
+http://blablacode.ru/game-devel/174
+https://habrahabr.ru/post/177885/
+http://glew.sourceforge.net/
