@@ -21,6 +21,10 @@
 #define POLE_I 39
 #define POLE_J 19
 
+#ifdef MINGW
+#define random rand
+#endif
+
 // global variables
 long time_, timebase;
 float global_x;
@@ -36,8 +40,9 @@ int help_flag=0;
 int frame;
 char head_str[MAXSTR];
 
-struct 
+struct  polya
 	{
+	int room_type; // 0 - notype
 	float r;
 	float g;
 	float b;
@@ -69,7 +74,7 @@ glEnd();
 #endif
 
 void drawText(const char *text, int length, int x, int y)
-{
+{int i;
 	glMatrixMode(GL_PROJECTION);
 	double matrix [16];
 	glGetDoublev(GL_PROJECTION_MATRIX, matrix);
@@ -80,7 +85,7 @@ void drawText(const char *text, int length, int x, int y)
 	glPushMatrix();
 	glLoadIdentity();
 	glRasterPos2i(x,y);
-	for(int i=0; i<length; i++)
+	for(i=0; i<length; i++)
 	{
 		glutBitmapCharacter(GLUT_BITMAP_9_BY_15,(int)text[i]);
 	}
@@ -89,6 +94,26 @@ void drawText(const char *text, int length, int x, int y)
 	glLoadMatrixd(matrix);
 	glMatrixMode(GL_MODELVIEW);
 
+}
+
+char *room_text(int room_type)
+{
+switch(room_type)
+	{
+	case 1: return "Tilled room";
+	case 0: // typeless ;
+	default: return "Typeless room";
+	}
+}
+
+float room_color(int room_type, int color_no)
+{
+switch(room_type)
+	{
+	case 1: if (color_no==1) return 0.0f; else if (color_no==2) return 0.0f; else return 0.0f;
+	case 0: // typeless ;
+	default: if (color_no==1) return 0.0f; else if (color_no==2) return 0.0f; else return 1.0f;
+	}
 }
 
 void display ()
@@ -127,7 +152,7 @@ for (i=0;i<16;i++)
 	}
 #endif
 
-#define HELP_TXT "? - exit from help. ` - out FPS. arrows, mouse left button - ... PROFIT"
+#define HELP_TXT "? - exit from help. ` - out FPS. arrows, mouse left button - ... / - till"
 drawText(HELP_TXT,strlen(HELP_TXT),text_x,text_y);
 	}
 else
@@ -146,7 +171,8 @@ else
 	}
 #endif
 //strcpy(head_str,"<HEAD>");
-drawText(head_str,strlen(head_str),10,390);
+drawText(room_text(pole[cursor_i][cursor_j].room_type),
+	strlen(room_text(pole[cursor_i][cursor_j].room_type)),10,390);
 // решётка
 // vertikal lines
 x=-dx;
@@ -188,7 +214,8 @@ glBegin(GL_QUADS);
 for (i=0;i<POLE_I;i++)
 	for (j=0;j<POLE_J;j++)
 		{
-		glColor3f(pole[i][j].r,pole[i][j].g,pole[i][j].b); // цвет
+		glColor3f(room_color(pole[i][j].room_type,1),
+			room_color(pole[i][j].room_type,2),room_color(pole[i][j].room_type,3));
 		quad_x=-dx + (i*STEP_X) + STEP_X/2 - 0.025f;
 		quad_y= dy - (j*STEP_Y) - STEP_Y + 0.017f;
 		glVertex2f(quad_x, quad_y);
@@ -198,8 +225,8 @@ for (i=0;i<POLE_I;i++)
 		}
 // creeper
 		i=creeper_i; j=creeper_j;
-		pole[i][j].g=0.9f;
-		glColor3f(1.0f,0.0f,0.0f); ///зададим цвет которым будем рисовать
+		//pole[i][j].g=0.9f; // крипер не красит!
+		glColor3f(1.0f,0.0f,0.0f); // цвет
 		quad_x=-dx + (i*STEP_X) + STEP_X/2 - 0.008f;
 		quad_y= dy - (j*STEP_Y) - STEP_Y + 0.0f;
 		glVertex2f(quad_x, quad_y);
@@ -210,7 +237,7 @@ glEnd();
 
 // алгоритм крипера
 // 1. лезем или стоим на месте
-if (random()<(RAND_MAX/20)) // лезем?
+if (random()<(RAND_MAX/90)) // лезем?
 	{// лезем
 	// 2. куда лезем
 if (random()<(RAND_MAX/4))
@@ -229,7 +256,6 @@ else 	{
 	creeper_j++; if (creeper_j>=POLE_J) creeper_j--;
 	}
 	} // end of лезем
-
 
 // cursor
 
@@ -343,6 +369,7 @@ switch (key)
 	case '1': glutSwapBuffers(); break; // for testing. proolfool
 	case '?': if (help_flag==0) help_flag=1; else help_flag=0; break;
 	case '`': sprintf(head_str,"FPS:%4.2f", FPS); break;
+	case '/': pole[cursor_i][cursor_j].room_type=1; break; // till
 #if 0
 	case 'R': global_r+=0.01f; print_rgb(); break;
 	case 'r': global_r-=0.01f; print_rgb(); break;
@@ -397,6 +424,7 @@ head_str[MAXSTR-1]=0;
 for (i=0;i<POLE_I;i++)
 	for (j=0;j<POLE_J; j++)
 		{
+		pole[i][j].room_type=0;
 		pole[i][j].r=0.0f; //if(random()<(RAND_MAX/100)) pole[i][j].r=1.0f;
 		pole[i][j].g=0.0f;
 		pole[i][j].b=1.0f;
@@ -425,9 +453,10 @@ glutSpecialFunc ( key2     );
 
 glutMouseFunc(mouseButton);
 
+#ifndef MINGW
     const char * slVer = (const char *) glGetString ( GL_SHADING_LANGUAGE_VERSION );
     printf ( "GLSL Version: %s\n", slVer );
-
+#endif
 
     glutMainLoop ();
 

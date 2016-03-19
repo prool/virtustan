@@ -1,12 +1,12 @@
 all:	gr 3d
 
 gr:	gr.c
-#	gcc -o gr gr.c -lglut -lGL -lm
-	g++ -o gr gr.c -lglew32 -lfreeglut -lopengl32 -lglu32 -Wl,--subsystem,windows ../proollib/proollib.a
+	gcc -o gr gr.c -lglew32 -lfreeglut -lopengl32 -lglu32 -Wl,--subsystem,windows -DMINGW ../proollib/proollib.a
+#gcc -o gr gr.c -lglut -lGL -lm
 
 3d:	3d.c
-	gcc -o 3d 3d.c -lglew32 -lfreeglut -lopengl32 -lglu32 -Wl,--subsystem,windows ../proollib/proollib.a
-# g++ -o test.exe test.cpp -lglew32 -lfreeglut -lopengl32 -lglu32 -Wl,--subsystem,windows
+	gcc -o 3d 3d.c -lglew32 -lfreeglut -lopengl32 -lglu32 -Wl,--subsystem,windows -DMINGW ../proollib/proollib.a
+#g++ -o test.exe test.cpp -lglew32 -lfreeglut -lopengl32 -lglu32 -Wl,--subsystem,windows
 
 clean:
 	rm gr
