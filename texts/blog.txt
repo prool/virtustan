@@ -218,3 +218,6 @@ OpenGL и glut
 Графические программы нормально собрались и заработали в Винде (собирал при помощи MinGW, см.
 Makefile.mingw)
 
+18 марта
+
+Prool Grafix FPS: ~59 (in Linux)

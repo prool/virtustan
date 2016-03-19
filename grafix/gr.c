@@ -12,16 +12,41 @@
 
 #include "../proollib/proollib.h"
 
+#define MAXLEN 255
+
 #define DELTA 0.010f
 #define STEP_X 0.05f
 #define STEP_Y 0.10f
 
+#define POLE_I 39
+#define POLE_J 19
+
+// global variables
 float global_x;
 float global_y;
+float qdx=0.047f;
+float qdy=0.095f;
 int text_x, text_y;
 int cursor_i, cursor_j;
+int creeper_i=10, creeper_j=10;
 
 int oldx, oldy;
+
+int help_flag=0;
+
+int frame;
+
+long time_, timebase;
+
+struct 
+	{
+	float r;
+	float g;
+	float b;
+	}
+	pole [POLE_I][POLE_J];
+
+// functions
 
 void init ()
 {
@@ -75,6 +100,8 @@ int i, j;
 signed char c;
 float x,y;
 float cursor_coord_x, cursor_coord_y;
+char head_str[MAXLEN];
+float quad_x, quad_y;
 
 dx=1.0f-DELTA;
 dy=1.0f-DELTA;
@@ -88,6 +115,41 @@ glColor3f(0.0,1.0,0.0); ///зададим цвет которым будем р�
 
 //glBegin(GL_POINTS); glVertex2f(global_x,global_y); glEnd();
 
+if (help_flag)
+	{ // help
+#if 0 // out ascii table
+c=0;
+for (i=0;i<16;i++)
+	{
+	for (j=0;j<16;j++)
+		{
+		drawText(&c,1,text_x+j*8,text_y-i*12);
+		c++;
+		}
+	//printf("i=%i\n", i);
+	}
+#endif
+
+#define HELP_TXT "? - exit from help"
+drawText(HELP_TXT,strlen(HELP_TXT),text_x,text_y);
+	}
+else
+	{
+
+#if 0
+// Код для вычисления кадров в секунду
+	frame++;
+ 
+	time_=glutGet(GLUT_ELAPSED_TIME);
+	if (time_ - timebase > 1000) {
+		sprintf(head_str,"FPS:%4.2f",
+			frame*1000.0/(time_-timebase));
+		timebase = time_;
+		frame = 0;
+	}
+#endif
+strcpy(head_str,"<HEAD>");
+drawText(head_str,strlen(head_str),10,390);
 // решётка
 // vertikal lines
 x=-dx;
@@ -124,6 +186,54 @@ glBegin(GL_LINES);glVertex2f(+dx,+dy);glVertex2f(+dx,-dy);glEnd();
 glBegin(GL_LINES);glVertex2f(+dx,+dy);glVertex2f(-dx,+dy);glEnd();
 #endif
 
+// kvadrategi
+glBegin(GL_QUADS);
+for (i=0;i<POLE_I;i++)
+	for (j=0;j<POLE_J;j++)
+		{
+		glColor3f(pole[i][j].r,pole[i][j].g,pole[i][j].b); // цвет
+		quad_x=-dx + (i*STEP_X) + STEP_X/2 - 0.025f;
+		quad_y= dy - (j*STEP_Y) - STEP_Y + 0.017f;
+		glVertex2f(quad_x, quad_y);
+		glVertex2f(quad_x+qdx, quad_y);
+		glVertex2f(quad_x+qdx, quad_y-qdy);
+		glVertex2f(quad_x, quad_y-qdy);
+		}
+// creeper
+		i=creeper_i; j=creeper_j;
+		pole[i][j].g=0.9f;
+		glColor3f(1.0f,0.0f,0.0f); ///зададим цвет которым будем рисовать
+		quad_x=-dx + (i*STEP_X) + STEP_X/2 - 0.008f;
+		quad_y= dy - (j*STEP_Y) - STEP_Y + 0.0f;
+		glVertex2f(quad_x, quad_y);
+		glVertex2f(quad_x+0.02f, quad_y);
+		glVertex2f(quad_x+0.02f, quad_y-0.06f);
+		glVertex2f(quad_x, quad_y-0.06f);
+glEnd();
+
+// алгоритм крипера
+// 1. лезем или стоим на месте
+if (random()<(RAND_MAX/20)) // лезем?
+	{// лезем
+	// 2. куда лезем
+if (random()<(RAND_MAX/4))
+	{
+	creeper_i++; if (creeper_i>=POLE_I) creeper_i--;
+	}
+else if (random()<(RAND_MAX/3))
+	{
+	creeper_i--; if (creeper_i<0) creeper_i++;
+	}
+else if (random()<(RAND_MAX/2))
+	{
+	creeper_j--; if (creeper_j<0) creeper_j++;
+	}
+else 	{
+	creeper_j++; if (creeper_j>=POLE_J) creeper_j--;
+	}
+	} // end of лезем
+
+
 // cursor
 
 cursor_coord_x=-dx + (cursor_i*STEP_X) + STEP_X/2;
@@ -135,18 +245,7 @@ glVertex2f(cursor_coord_x+0.02f,cursor_coord_y-0.02f);
 glVertex2f(cursor_coord_x+0.02f,cursor_coord_y+0.02f);
 glEnd();
 
-#if 0 // out ascii table
-c=0;
-for (i=0;i<16;i++)
-	{
-	for (j=0;j<16;j++)
-		{
-		drawText(&c,1,text_x+j*8,text_y-i*12);
-		c++;
-		}
-	printf("i=%i\n", i);
 	}
-#endif
 
 glFlush();
 glutSwapBuffers(); 
@@ -212,11 +311,20 @@ void print_text_coord(void)
 printf("text (%i, %i)\n", text_x, text_y);
 }
 
+void print_rgb(void)
+{
+//printf("RGB = (%f, %f, %f)\n", global_r, global_g, global_b);
+}
+
 void key2 ( int key, int x, int y )
 {
 switch(key)
 	{
 	case GLUT_KEY_F1: printf("pressed F1\n"); break;
+	case GLUT_KEY_UP: cursor_j--; print_coord(); break; // north
+	case GLUT_KEY_DOWN: cursor_j++; print_coord(); break; // south
+	case GLUT_KEY_LEFT: cursor_i--; print_coord(); break; // south
+	case GLUT_KEY_RIGHT: cursor_i++; print_coord(); break; // south
 	default: printf("pressed unknown special key with code %i\n", key);
 	}
 }
@@ -236,6 +344,15 @@ switch (key)
 	case 'W': text_x--; print_text_coord(); break; // 
 	case 'E': text_x++; print_text_coord(); break;
 	case '1': glutSwapBuffers(); break; // for testing. proolfool
+	case '?': if (help_flag==0) help_flag=1; else help_flag=0; break;
+#if 0
+	case 'R': global_r+=0.01f; print_rgb(); break;
+	case 'r': global_r-=0.01f; print_rgb(); break;
+	case 'G': global_g+=0.01f; print_rgb(); break;
+	case 'g': global_g-=0.01f; print_rgb(); break;
+	case 'B': global_b+=0.01f; print_rgb(); break;
+	case 'b': global_b-=0.01f; print_rgb(); break;
+#endif
 	default: printf("key = %i\n", key);
 	}
 }
@@ -245,17 +362,17 @@ int d, i, j;
  
 	if (button == GLUT_LEFT_BUTTON) {
 		if (state==GLUT_DOWN) {
-			printf("glut left button. state=%i x=%i y=%i", state, x, y);
+			printf("glut left button. x=%4i y=%4i", x, y);
 			d=x-oldx; oldx=x;
-			printf(" DX=%i", d);
+			//printf(" DX=%i", d);
 			i=(x-6)/30;
-			printf(" cursor i=%i", i);
+			printf(" cursor_i=%2i", i);
 			cursor_i=i;
 
 			d=y-oldy; oldy=y;
-			printf(" DY=%i", d);
+			//printf(" DY=%i", d);
 			j=(y-28)/30;
-			printf(" cursor j = %i\n", j);
+			printf(" cursor_j = %2i\n", j);
 			cursor_j=j;
 			}
 		}
@@ -263,6 +380,8 @@ int d, i, j;
 
 int main ( int argc, char * argv [] )
 {
+int i,j;
+
 global_x=0.0f;
 global_y=0;
 text_x=10;
@@ -271,10 +390,21 @@ cursor_i=0;
 cursor_j=0;
 oldx=0;
 oldy=0;
-                                // initialize glut
-    glutInit            ( &argc, argv );
-    glutInitDisplayMode ( GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH );
-    glutInitWindowSize  ( 1200, 600 );
+
+// init pole
+
+for (i=0;i<POLE_I;i++)
+	for (j=0;j<POLE_J; j++)
+		{
+		pole[i][j].r=0.0f; //if(random()<(RAND_MAX/100)) pole[i][j].r=1.0f;
+		pole[i][j].g=0.0f;
+		pole[i][j].b=1.0f;
+		}
+// initialize glut
+glutInit            ( &argc, argv );
+glutInitDisplayMode ( GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH );
+glutInitWindowPosition(0,0/*100,100*/);
+glutInitWindowSize  ( 1200, 600 );
 
 #if 0 // я пока мало что в этом понимаю, но эти строки мешают, с ними не работает. prool fool
                                 // prepare context for 3.3
@@ -284,7 +414,7 @@ oldy=0;
 #endif
 
                                 // create window
-    glutCreateWindow ( "prool grafix test (q - quit)" );
+    glutCreateWindow ( "Prool Grafix (q - quit, ? - help)" );
 
                                 // register handlers
 glutDisplayFunc  ( display );
