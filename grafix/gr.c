@@ -12,7 +12,7 @@
 
 #include "../proollib/proollib.h"
 
-#define MAXLEN 255
+#define MAXSTR 120
 
 #define DELTA 0.010f
 #define STEP_X 0.05f
@@ -22,21 +22,19 @@
 #define POLE_J 19
 
 // global variables
+long time_, timebase;
 float global_x;
 float global_y;
 float qdx=0.047f;
 float qdy=0.095f;
+float FPS = 0;
 int text_x, text_y;
 int cursor_i, cursor_j;
 int creeper_i=10, creeper_j=10;
-
 int oldx, oldy;
-
 int help_flag=0;
-
 int frame;
-
-long time_, timebase;
+char head_str[MAXSTR];
 
 struct 
 	{
@@ -100,7 +98,6 @@ int i, j;
 signed char c;
 float x,y;
 float cursor_coord_x, cursor_coord_y;
-char head_str[MAXLEN];
 float quad_x, quad_y;
 
 dx=1.0f-DELTA;
@@ -130,25 +127,25 @@ for (i=0;i<16;i++)
 	}
 #endif
 
-#define HELP_TXT "? - exit from help"
+#define HELP_TXT "? - exit from help. ` - out FPS. arrows, mouse left button - ... PROFIT"
 drawText(HELP_TXT,strlen(HELP_TXT),text_x,text_y);
 	}
 else
 	{
 
-#if 0
+#if 1
 // Код для вычисления кадров в секунду
 	frame++;
  
 	time_=glutGet(GLUT_ELAPSED_TIME);
 	if (time_ - timebase > 1000) {
-		sprintf(head_str,"FPS:%4.2f",
-			frame*1000.0/(time_-timebase));
+		FPS=frame*1000.0/(time_-timebase);
+		//sprintf(head_str,"FPS:%4.2f", frame*1000.0/(time_-timebase));
 		timebase = time_;
 		frame = 0;
 	}
 #endif
-strcpy(head_str,"<HEAD>");
+//strcpy(head_str,"<HEAD>");
 drawText(head_str,strlen(head_str),10,390);
 // решётка
 // vertikal lines
@@ -345,6 +342,7 @@ switch (key)
 	case 'E': text_x++; print_text_coord(); break;
 	case '1': glutSwapBuffers(); break; // for testing. proolfool
 	case '?': if (help_flag==0) help_flag=1; else help_flag=0; break;
+	case '`': sprintf(head_str,"FPS:%4.2f", FPS); break;
 #if 0
 	case 'R': global_r+=0.01f; print_rgb(); break;
 	case 'r': global_r-=0.01f; print_rgb(); break;
@@ -390,6 +388,9 @@ cursor_i=0;
 cursor_j=0;
 oldx=0;
 oldy=0;
+
+for (i=0;i<MAXSTR;i++) head_str[i]='*';
+head_str[MAXSTR-1]=0;
 
 // init pole
 
