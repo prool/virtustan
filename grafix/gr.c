@@ -10,6 +10,8 @@
 #include	<math.h>
 #include	<GL/glext.h>
 
+#include "FTGL/ftgl.h"
+
 #include "../proollib/proollib.h"
 
 #define MAXSTR 120
@@ -154,6 +156,28 @@ for (i=0;i<16;i++)
 
 #define HELP_TXT "? - exit from help. ` - out FPS. arrows, mouse left button - ... / - till"
 drawText(HELP_TXT,strlen(HELP_TXT),text_x,text_y);
+
+#if 1 // FTGL
+glRasterPos2f(0.0f, 0.0f);
+//FTGLPixmapFont("/usr/share/fonts/truetype/ttf-dejavu/DejaVuSansMono.ttf");
+FTGLfont *font = ftglCreatePixmapFont("/usr/share/fonts/truetype/ttf-dejavu/DejaVuSansMono.ttf");
+/* If something went wrong, bail out. */
+if(!font)
+	{
+	printf("FTGL font error\n");
+    	return;
+	}
+
+/* Set the font size and render a small text. */
+ftglSetFontFaceSize(font, 12, 12);
+ftglRenderFont(font, "Кириллица", FTGL_RENDER_ALL);
+
+/* Destroy the font object. */
+ftglDestroyFont(font);
+
+glRasterPos2f(1, -4);
+glutSwapBuffers();
+#endif
 	}
 else
 	{
