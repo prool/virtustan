@@ -20,6 +20,8 @@
 #define STEP_X 0.05f
 #define STEP_Y 0.10f
 
+#define ftgl_d 0.01f
+
 #define POLE_I 39
 #define POLE_J 19
 
@@ -35,6 +37,7 @@ float qdx=0.047f;
 float qdy=0.095f;
 float FPS = 0;
 int text_x, text_y;
+float ftgl_x=-0.99f, ftgl_y=0.93f;
 int cursor_i, cursor_j;
 int creeper_i=10, creeper_j=10;
 int oldx, oldy;
@@ -102,7 +105,7 @@ char *room_text(int room_type)
 {
 switch(room_type)
 	{
-	case 1: return "Tilled room";
+	case 1: return "Вскопано";
 	case 0: // typeless ;
 	default: return "Typeless room";
 	}
@@ -157,27 +160,6 @@ for (i=0;i<16;i++)
 #define HELP_TXT "? - exit from help. ` - out FPS. arrows, mouse left button - ... / - till"
 drawText(HELP_TXT,strlen(HELP_TXT),text_x,text_y);
 
-#if 1 // FTGL
-glRasterPos2f(0.0f, 0.0f);
-//FTGLPixmapFont("/usr/share/fonts/truetype/ttf-dejavu/DejaVuSansMono.ttf");
-FTGLfont *font = ftglCreatePixmapFont("/usr/share/fonts/truetype/ttf-dejavu/DejaVuSansMono.ttf");
-/* If something went wrong, bail out. */
-if(!font)
-	{
-	printf("FTGL font error\n");
-    	return;
-	}
-
-/* Set the font size and render a small text. */
-ftglSetFontFaceSize(font, 12, 12);
-ftglRenderFont(font, "Кириллица", FTGL_RENDER_ALL);
-
-/* Destroy the font object. */
-ftglDestroyFont(font);
-
-glRasterPos2f(1, -4);
-glutSwapBuffers();
-#endif
 	}
 else
 	{
@@ -194,9 +176,13 @@ else
 		frame = 0;
 	}
 #endif
+
+#if 0 // вывод текста обычным шрифтом (не ttf)
 //strcpy(head_str,"<HEAD>");
 drawText(room_text(pole[cursor_i][cursor_j].room_type),
 	strlen(room_text(pole[cursor_i][cursor_j].room_type)),10,390);
+#endif
+
 // решётка
 // vertikal lines
 x=-dx;
@@ -292,6 +278,28 @@ glVertex2f(cursor_coord_x+0.02f,cursor_coord_y-0.02f);
 glVertex2f(cursor_coord_x+0.02f,cursor_coord_y+0.02f);
 glEnd();
 
+#if 1 // FTGL
+// FTGL from: https://www.linux.org.ru/forum/development/6091539
+glRasterPos2f(ftgl_x, ftgl_y);
+//FTGLPixmapFont("/usr/share/fonts/truetype/ttf-dejavu/DejaVuSansMono.ttf");
+FTGLfont *font = ftglCreatePixmapFont("/usr/share/fonts/truetype/ttf-dejavu/DejaVuSansMono.ttf");
+/* If something went wrong, bail out. */
+if(!font)
+	{
+	printf("FTGL font error\n");
+    	return;
+	}
+
+/* Set the font size and render a small text. */
+ftglSetFontFaceSize(font, 22, 22);
+ftglRenderFont(font, room_text(pole[cursor_i][cursor_j].room_type) , FTGL_RENDER_ALL);
+
+/* Destroy the font object. */
+ftglDestroyFont(font);
+
+glRasterPos2f(1, -4);
+glutSwapBuffers();
+#endif
 	}
 
 glFlush();
@@ -363,6 +371,11 @@ void print_rgb(void)
 //printf("RGB = (%f, %f, %f)\n", global_r, global_g, global_b);
 }
 
+void print_ftgl_coord(void)
+{
+printf("FTGL coord (%f, %f)\n", ftgl_x, ftgl_y);
+}
+
 void key2 ( int key, int x, int y )
 {
 switch(key)
@@ -376,6 +389,7 @@ switch(key)
 	}
 }
 
+
 void key ( unsigned char key, int x, int y )
 {
 switch (key)
@@ -386,10 +400,10 @@ switch (key)
 	case 's': cursor_j++; print_coord(); break; // south
 	case 'w': cursor_i--; print_coord(); break; // south
 	case 'e': cursor_i++; print_coord(); break; // south
-	case 'N': text_y++; print_text_coord(); break; // text north
-	case 'S': text_y--; print_text_coord(); break; // 
-	case 'W': text_x--; print_text_coord(); break; // 
-	case 'E': text_x++; print_text_coord(); break;
+	case 'N': ftgl_y+=ftgl_d; print_ftgl_coord(); break; // text north
+	case 'S': ftgl_y-=ftgl_d; print_ftgl_coord(); break; // 
+	case 'W': ftgl_x-=ftgl_d; print_ftgl_coord(); break; // 
+	case 'E': ftgl_x+=ftgl_d; print_ftgl_coord(); break;
 	case '1': glutSwapBuffers(); break; // for testing. proolfool
 	case '?': if (help_flag==0) help_flag=1; else help_flag=0; break;
 	case '`': sprintf(head_str,"FPS:%4.2f", FPS); break;
