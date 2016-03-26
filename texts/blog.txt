@@ -221,3 +221,7 @@ Makefile.mingw)
 18 марта
 
 Prool Grafix FPS: ~59 (in Linux)
+
+23 марта
+
+FPS ~30 (Linux)

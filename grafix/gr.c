@@ -129,6 +129,7 @@ signed char c;
 float x,y;
 float cursor_coord_x, cursor_coord_y;
 float quad_x, quad_y;
+char str[MAXSTR];
 
 dx=1.0f-DELTA;
 dy=1.0f-DELTA;
@@ -157,9 +158,25 @@ for (i=0;i<16;i++)
 	}
 #endif
 
+#if 0
 #define HELP_TXT "? - exit from help. ` - out FPS. arrows, mouse left button - ... / - till"
 drawText(HELP_TXT,strlen(HELP_TXT),text_x,text_y);
+#endif
 
+#if 1 // out FTGL text
+FTGLfont *font = ftglCreatePixmapFont("/usr/share/fonts/truetype/ttf-dejavu/DejaVuSansMono.ttf");
+if(!font) { printf("FTGL font error\n"); return; }
+ftglSetFontFaceSize(font, 20, 20);
+glRasterPos2f(-0.99f, 0.93f);
+ftglRenderFont(font,
+"? - exit from help. ` - out FPS. arrows, mouse left button - ... / - вскопать",FTGL_RENDER_ALL);
+glRasterPos2f(-0.99f, 0.83f);
+sprintf(str,"FPS: %4.2f", FPS);
+ftglRenderFont(font,str,FTGL_RENDER_ALL);
+ftglDestroyFont(font);
+glRasterPos2f(1, -4);
+glutSwapBuffers();
+#endif
 	}
 else
 	{
@@ -280,23 +297,16 @@ glEnd();
 
 #if 1 // FTGL
 // FTGL from: https://www.linux.org.ru/forum/development/6091539
-glRasterPos2f(ftgl_x, ftgl_y);
+glRasterPos2f(-0.99f, 0.93f);
 //FTGLPixmapFont("/usr/share/fonts/truetype/ttf-dejavu/DejaVuSansMono.ttf");
 FTGLfont *font = ftglCreatePixmapFont("/usr/share/fonts/truetype/ttf-dejavu/DejaVuSansMono.ttf");
 /* If something went wrong, bail out. */
-if(!font)
-	{
-	printf("FTGL font error\n");
-    	return;
-	}
-
+if(!font) { printf("FTGL font error\n"); return; }
 /* Set the font size and render a small text. */
-ftglSetFontFaceSize(font, 22, 22);
+ftglSetFontFaceSize(font, 20, 20);
 ftglRenderFont(font, room_text(pole[cursor_i][cursor_j].room_type) , FTGL_RENDER_ALL);
-
 /* Destroy the font object. */
 ftglDestroyFont(font);
-
 glRasterPos2f(1, -4);
 glutSwapBuffers();
 #endif
@@ -406,7 +416,7 @@ switch (key)
 	case 'E': ftgl_x+=ftgl_d; print_ftgl_coord(); break;
 	case '1': glutSwapBuffers(); break; // for testing. proolfool
 	case '?': if (help_flag==0) help_flag=1; else help_flag=0; break;
-	case '`': sprintf(head_str,"FPS:%4.2f", FPS); break;
+	case '`': printf("FPS:%4.2f\n", FPS); break;
 	case '/': pole[cursor_i][cursor_j].room_type=1; break; // till
 #if 0
 	case 'R': global_r+=0.01f; print_rgb(); break;
