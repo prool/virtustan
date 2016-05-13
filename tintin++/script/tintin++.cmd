@@ -13,6 +13,10 @@
 #alias инв inv
 #alias э eq
 #alias кто who
+#alias пить drink
+#alias есть eat
+#alias взять get
+#alias бр drop
 #alias вмуд #sess vmud mud.kharkov.org 3000
 #alias зеркало #sess zerkalo zerkalo.kharkov.org 4000
 #alias былины #sess byliny byliny.kharkov.ru 4000
