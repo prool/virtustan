@@ -8,3 +8,11 @@
 #alias в e
 #alias вв up
 #alias вн down
+#alias помощь help
+#alias см look
+#alias инв inv
+#alias э eq
+#alias кто who
+#alias вмуд #sess vmud mud.kharkov.org 3000
+#alias зеркало #sess zerkalo zerkalo.kharkov.org 4000
+#alias былины #sess byliny byliny.kharkov.ru 4000

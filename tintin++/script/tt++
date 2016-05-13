@@ -1,0 +1,3 @@
+#/bin/sh
+# script for run tintin++ with prool's config
+/usr/local/bin/tt++.elf /home/prool/tintin++.cmd
