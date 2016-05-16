@@ -18,6 +18,8 @@
 #alias взять get
 #alias вз get
 #alias бр drop
+#alias сч score
+#alias счет score
 #alias вмуд #sess vmud mud.kharkov.org 3000
 #alias зеркало #sess zerkalo zerkalo.kharkov.org 4000
 #alias былины #sess byliny byliny.kharkov.ru 4000
