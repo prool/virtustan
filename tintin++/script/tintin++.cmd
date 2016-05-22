@@ -20,6 +20,11 @@
 #alias бр drop
 #alias сч score
 #alias счет score
+#alias карта map
+#alias время time
+#alias дата date
+#alias погода weather
+#alias lokal #sess local localhost 4000
 #alias вмуд #sess vmud mud.kharkov.org 3000
 #alias зеркало #sess zerkalo zerkalo.kharkov.org 4000
 #alias былины #sess byliny byliny.kharkov.ru 4000
