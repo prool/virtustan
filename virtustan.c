@@ -5,6 +5,8 @@
 int HALF_X; // полуразмеры карты от центра карты по измерениям: (10,10) by default
 int HALF_Y; 
 
+char recode_buffer [1024];
+
 #include "virtustan.h"
 
 void esc(int code)
@@ -28,14 +30,14 @@ void date(void)
 puts(ptime());
 printf("unixtime = %li\n", unixtime());
 print_holyday();
-printf("Время года: ");
+print("Время года: ");
 switch(sezon)
 	{
-	case WINTER: printf("Зима"); break;
-	case SPRING: printf("Весна"); break;
-	case SUMMER: printf("Лето"); break;
-	case AUTUMN: printf("Осень"); break;
-	default: printf("Пиздец");
+	case WINTER: print("Зима"); break;
+	case SPRING: print("Весна"); break;
+	case SUMMER: print("Лето"); break;
+	case AUTUMN: print("Осень"); break;
+	default: print("Пиздец");
 	}
 printf("\n");
 }
@@ -214,11 +216,11 @@ for (i=0; i<MAX_X; i++) for (j=0; j<MAX_Y; j++)
 	}
 fprintf(fp,"// end of world file\n");
 fclose(fp);
-printf("Мир сохранен. ");
+print("Мир сохранен. ");
 if (updated)
-	printf("Не забудьте перекомпилировать его командой make\n");
+	print("Не забудьте перекомпилировать его командой make\n");
 else
-	printf("Но по нашим данным в мире ничего не менялось\n");
+	print("Но по нашим данным в мире ничего не менялось\n");
 updated=0;
 }
 
@@ -252,22 +254,27 @@ world[49][52].descr="Вы находитесь в Виртустанской Б�
 world[51][52].descr="Вы находитесь в Виртустанской Гостинице";
 world[51][53].descr="Вы находитесь в Виртустанском Банке. Слышен звон пересчитываемых монет, шелест купюр и звяканье кассового аппарата";
 world[50][48].descr="Вы находитесь в неглубокой яме"; world[50][48].object=2;
-
 for (i=0; i<MAX_X; i++) for (j=0; j<MAX_Y; j++)
 	{
 	if ((world[i][j].descr) && (world[i][j].symbol=='"')) world[i][j].symbol='W';
 	}
 
-for(i=0;i<MAX_X;i++)
-	{
-	world[i][0].color=3;
-	world[i][MAX_Y-1].color=3;
-	}
+#endif
 
+#if 0
 for(j=0;j<MAX_Y;j++)
 	{
 	world[0][j].color=3;
+	world[0][j].symbol='|';
 	world[MAX_X-1][j].color=3;
+	world[MAX_X-1][j].symbol='|';
+	}
+for(i=0;i<MAX_X;i++)
+	{
+	world[i][0].color=3;
+	world[i][0].symbol='_';
+	world[i][MAX_Y-1].color=3;
+	world[i][MAX_Y-1].symbol='_';
 	}
 #endif
 
@@ -316,45 +323,45 @@ if (o==0) return;
 printf("%s",ZHELT1);
 switch (o)
 	{
-	case 1: printf("Маленький камешек"); break;
-	case 2: printf("Кости"); break;
-	case 3: printf("Семя"); break;
-	default: printf("Черт знает что");
+	case 1: print("Маленький камешек"); break;
+	case 2: print("Кости"); break;
+	case 3: print("Семя"); break;
+	default: print("Черт знает что");
 	}
 printf("%s\n",NORM_COLOR);
 }
 
 void inv(void)
 {
-if (inv_o) {printf("У вас в инвентаре находится:\n"); print_object(inv_o);}
-else printf("Ваш инвентарь пуст\n");
+if (inv_o) {print("У вас в инвентаре находится:\n"); print_object(inv_o);}
+else print("Ваш инвентарь пуст\n");
 }
 
 void get(void)
 {int i;
-if ((i=world[global_x][global_y].object)==0) printf("Что вы хотите взять? Тут ничего нет\n");
+if ((i=world[global_x][global_y].object)==0) print("Что вы хотите взять? Тут ничего нет\n");
 else
-	if (inv_o) printf("Ваш инвентарь заполнен, вы не можете ничего взять\n");
+	if (inv_o) print("Ваш инвентарь заполнен, вы не можете ничего взять\n");
 	else 
 		{
 		inv_o=i;
 		world[global_x][global_y].object=0;
-		printf("Вы взяли предмет: ");
+		print("Вы взяли предмет: ");
 		print_object(inv_o);
 		}
 }
 
 void put(void)
 {int i;
-if ((i=world[global_x][global_y].object)) printf("Сюда ничего нельзя положить, тут нет места\n");
+if ((i=world[global_x][global_y].object)) print("Сюда ничего нельзя положить, тут нет места\n");
 else
-	if (!inv_o) printf("Вы ничего не можете положить, у вас же ничего нет\n");
+	if (!inv_o) print("Вы ничего не можете положить, у вас же ничего нет\n");
 	else 
 		{
 		world[global_x][global_y].object=inv_o;
 		i=inv_o;
 		inv_o=0;
-		printf("Вы положили предмет: ");
+		print("Вы положили предмет: ");
 		print_object(i);
 		}
 }
@@ -364,16 +371,16 @@ void dup_(void)
 if ((i=world[global_x][global_y].object)==0)
 	if (inv_o)	{
 			world[global_x][global_y].object=inv_o;
-			printf("Вы дуплицировали и бросили на землю: "); print_object(inv_o);
+			print("Вы дуплицировали и бросили на землю: "); print_object(inv_o);
 			}
-	else		printf("У вас ничего нет. На земле ничего нет. Ничего не делаем\n");
+	else		print("У вас ничего нет. На земле ничего нет. Ничего не делаем\n");
 else
 	if (inv_o)	{
-			printf("Инвентарь и комната заполнены, вы ничего не можете дуплицировать\n");
+			print("Инвентарь и комната заполнены, вы ничего не можете дуплицировать\n");
 			}
 	else		{
 			inv_o=i;
-			printf("Вы создали себе дубликат того, что лежало на земле: "); print_object(i);
+			print("Вы создали себе дубликат того, что лежало на земле: "); print_object(i);
 			}
 }
 
@@ -381,14 +388,14 @@ void swap(void)
 {int i, j;
 if ((i=world[global_x][global_y].object)==0)
 	if (inv_o)	put();
-	else		printf("У вас ничего нет. На земле ничего нет. Ничего не делаем\n");
+	else		print("У вас ничего нет. На земле ничего нет. Ничего не делаем\n");
 else
 	if (inv_o)	{
 			j=inv_o;
 			world[global_x][global_y].object=j;
 			inv_o=i;
-			printf("Вы бросили: "); print_object(j);
-			printf("А взамен вы подняли: "); print_object(i);
+			print("Вы бросили: "); print_object(j);
+			print("А взамен вы подняли: "); print_object(i);
 			}
 	else		get();
 }
@@ -504,7 +511,7 @@ void resetroom (void)
 	world[global_x][global_y].symbol=DEFAULT_SYMBOL;
 	world[global_x][global_y].color=DEFAULT_COLOR;
 	world[global_x][global_y].bg=DEFAULT_BG;
-	printf("Комната очищена!!\n");
+	print("Комната очищена!!\n");
 }
 
 void till (void)
@@ -517,10 +524,10 @@ if (world[global_x][global_y].descr==0)
 	world[global_x][global_y].symbol=' ';
 	world[global_x][global_y].color=1;
 	world[global_x][global_y].bg=43;
-	printf("Мы вспахали!\n");
+	print("Мы вспахали!\n");
 	}
 else
-	printf("Здесь нельзя пахать!\n");
+	print("Здесь нельзя пахать!\n");
 }
 
 void sow (void)
@@ -534,36 +541,35 @@ if (world[global_x][global_y].room_type==TILLED)
 	world[global_x][global_y].bg=DEFAULT_BG;
 	world[global_x][global_y].object=3; // Семя
 	world[global_x][global_y].timer=time(0);
-	printf("Мы посеяли!\n");
+	print("Мы посеяли!\n");
 	}
 else
-	printf("Здесь не вспахано, сеять нельзя\n");
+	print("Здесь не вспахано, сеять нельзя\n");
 }
 
 void create(void)
 {
-if (inv_o) printf("Вы не можете создать объект, у вас заполнен инвентарь\n");
+if (inv_o) print("Вы не можете создать объект, у вас заполнен инвентарь\n");
 else 	{
 	inv_o=CREATED_OBJECT;
-	printf("Вы создали объект: ");
+	print("Вы создали объект: ");
 	print_object(inv_o);
 	}	
 }
 
 void destroy (void)
 {int i;
-if (!inv_o) printf("Вы ничего не можете уничтожить, у вас же ничего нет\n");
+if (!inv_o) print("Вы ничего не можете уничтожить, у вас же ничего нет\n");
 else	{
 	i=inv_o;
 	inv_o=0;
-	printf("Объект уничтожен: ");
+	print("Объект уничтожен: ");
 	print_object(i);
 	}
 }
 
 void look(void)
 {int i;
-#define EMPTY "Вы находитесь в пустоте"
 map();
 printf("%s(%i,%i)%s\n",GOLUB1,global_x,global_y,NORM_COLOR);
 if (world[global_x][global_y].descr) print(world[global_x][global_y].descr);
@@ -571,11 +577,11 @@ else
 	{
 	switch(sezon)
 	{
-	case WINTER: printf("Зимняя снежная равнина"); break;
-	case SPRING: printf("Грязюка"); break;
-	case SUMMER: printf("Луг"); break;
-	case AUTUMN: printf("Грязюка. Опавшие листья"); break;
-	default: printf("Вокруг пиздец");
+	case WINTER: print("Зимняя снежная равнина"); break;
+	case SPRING: print("Грязюка"); break;
+	case SUMMER: print("Луг"); break;
+	case AUTUMN: print("Грязюка. Опавшие листья"); break;
+	default: print("Вокруг пиздец");
 	}
 	//world[global_x][global_y].descr="Тут был Пруль";
 	}
@@ -585,7 +591,7 @@ if (i=world[global_x][global_y].object) print_object(i);
 
 if (world[global_x][global_y].room_type==SOWED)
 	{
-	printf("Таймер %li Возраст объекта %li\n",
+	printf("Timer %li Item age %li\n",
 	world[global_x][global_y].timer, time(0) - world[global_x][global_y].timer);
 	}
 }
@@ -608,8 +614,8 @@ i=try_move_to(try_x, try_y);
 switch (i)
 	{
 	case 0: break;
-	case 1: printf("В этом направлении переместиться невозможно. Там край мира\n"); return;
-	default: printf("В этом направлении переместиться невозможно\n"); return;
+	case 1: print("В этом направлении переместиться невозможно. Там край мира\n"); return;
+	default: print("В этом направлении переместиться невозможно\n"); return;
 	}
 
 global_x+=dx;
@@ -948,7 +954,8 @@ for (i=0;i<MAX_HOLYDAY;i++)
 	if (holyday[i].day==day)
 		if (holyday[i].month==month)
 			{
-			printf ("Сегодня праздник: %s\n", holyday[i].text);
+			sprintf (recode_buffer,"Сегодня праздник: %s\n", holyday[i].text);
+			print(recode_buffer);
 			break;
 			}
 	}
@@ -1094,8 +1101,23 @@ while(1)
                off_t     st_size;        // total size, in bytes
                blksize_t st_blksize;     // blocksize for filesystem I/O
                blkcnt_t  st_blocks;      // number of 512B blocks allocated
-		}
- */
+		} */
+/*The following mask values are defined for the file type component of the st_mode field:
+
+           S_IFMT     0170000   bit mask for the file type bit fields
+
+           S_IFSOCK   0140000   socket
+           S_IFLNK    0120000   symbolic link
+           S_IFREG    0100000   regular file
+           S_IFBLK    0060000   block device
+           S_IFDIR    0040000   directory
+           S_IFCHR    0020000   character device
+           S_IFIFO    0010000   FIFO */
+	       printf("\nStatus of current file\n\n");
+	       printf("Name %s ", entry->d_name);
+		if (struktura.st_mode&0100000U) printf("=regular file\n");
+		else if (struktura.st_mode&040000U) printf("=directory\n");
+		else print("=не файл и не каталог\n");
                printf("device major/minor %04lX\n",struktura.st_dev); // ID of device containing file
                printf("inode %li\n",struktura.st_ino);         // inode number
                printf("mode %o\n",struktura.st_mode);        // protection
@@ -1178,6 +1200,9 @@ global_x=50; global_y=50;
 
 init_world();
 
+HALF_X = COLUMNS/4-2;
+HALF_Y = lines/2-2;
+
 //printf("init ended\n\n");
 
 look();
@@ -1209,7 +1234,7 @@ while(1)
 	if ((!strcmp(cmd,"q")) || (!strcmp(cmd,"quit")) || (!strcmp(cmd,"exit")) || (!strcmp(cmd,"конец"))) 
 		{
 		if (updated==0) break;
-		printf("Мир был изменен! Сохраните мир командой save. Или выйдите командой непосредственного выхода Quit\n");
+		print("Мир был изменен! Сохраните мир командой save. Или выйдите командой непосредственного выхода Quit\n");
 		}
 	else if (!strcmp(cmd,"Quit")) break;
 	else if (!strcmp(cmd,"help")) printfile("texts/help.txt");
@@ -1326,7 +1351,7 @@ while(1)
 	{
 	// refresh screen
 	gotoxy(0,0);
-	printf("Virtustan realtime application ~ - quit to virtustan app, q - quit to OS, ? - help ");
+	printf("Virtustan realtime application q - quit to virtustan app, Q - quit to OS, ? - help ");
 	//setcolor(2);
 	//printf("%s\n\n", ptime()+4);
 	//setcolor(0);
@@ -1369,11 +1394,11 @@ printf("?");
 setcolor(0);
 printf(" help ");
 setcolor(14);
-printf("q");
+printf("Q");
 setcolor(0);
 printf(" quit to OS ");
 setcolor(14);
-printf("~");
+printf("q");
 setcolor(0);
 printf(" quit to app.\n");
 setcolor(14);
@@ -1402,7 +1427,7 @@ printf(" refresh screen");
 	c=getchar();
 	//if (c!=-1) {}
 	//fflush(0);
-	if ((c=='q')||(c=='Q'))
+	if (c=='Q')
 		{
 		ioctl(0, TCGETA, &tstdin);
     		tstdin.c_lflag |= (ICANON|ECHO);
@@ -1414,7 +1439,7 @@ printf(" refresh screen");
 		printf("[?25h");
 		exit(0);
 		}
-	if (c=='~')
+	if (c=='q')
 		{
 		ioctl(0, TCGETA, &tstdin);
     		tstdin.c_lflag |= (ICANON|ECHO);
@@ -1433,10 +1458,10 @@ printf(" refresh screen");
 		case '/': CLR; till(); break;
 		case '.': CLR; sow(); break;
 		case 'B': clearscreen(); ls(); while(getchar()==-1) ; break; // boss key
-		case 'N': i_c=MAX_I-1; CLR; printf("Мы переместились на крайний север"); break;
-		case 'S': i_c=0; CLR; printf("Мы переместились на крайний юг"); break;
-		case 'W': j_c=0; CLR; printf("Мы переместились на крайний запад"); break;
-		case 'E': j_c=MAX_J-1; CLR; printf("Мы переместились на крайний восток"); break;
+		case 'N': i_c=MAX_I-1; CLR; print("Мы переместились на крайний север"); break;
+		case 'S': i_c=0; CLR; print("Мы переместились на крайний юг"); break;
+		case 'W': j_c=0; CLR; print("Мы переместились на крайний запад"); break;
+		case 'E': j_c=MAX_J-1; CLR; print("Мы переместились на крайний восток"); break;
 		case 'n': /* north */ goto l_n;
 		case 's': /* south */ goto l_s;
 		case 'w': /* west */  goto l_w;
@@ -1447,22 +1472,22 @@ printf(" refresh screen");
 					c=getchar();
 					if (c==66)	{l_s: // s
 							if (i_c>0) i_c--;
-							CLR; printf("Мы переместились на юг"); 
+							CLR; print("Мы переместились на юг"); 
 							break;
 							}
 					else if (c==65)	{l_n: // n
 							if (i_c<MAX_I-1) i_c++;
-							CLR; printf("Мы переместились на север"); 
+							CLR; print("Мы переместились на север"); 
 							break;
 							}
 					else if (c==68)	{l_w: // west
 							if (j_c>0) j_c--;
-							CLR; printf("Мы переместились на запад");
+							CLR; print("Мы переместились на запад");
 							break;
 							}
 					else if (c==67)	{l_e: // east
 							if (j_c<MAX_J-1) j_c++;
-							CLR; printf("Мы переместились на восток"); 
+							CLR; print("Мы переместились на восток"); 
 							break;
 							}
 					}
