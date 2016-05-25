@@ -14,9 +14,11 @@
 #include <fcntl.h>
 #include <time.h>
 //#include <ncurses.h>
+#include <locale.h> // for UTF-8 under ncurses
 #include <ctype.h>
 #include <termios.h>
-#include <locale.h> // for UTF-8 under ncurses
+
+#include "roomtypes.h"
 
 #define MAX_X 60 // 130
 #define MAX_Y 60
@@ -74,6 +76,9 @@
 #define RIGHT_ARROW "\x1b\x5b\x43"
 #define LEFT_ARROW "\x1b\x5b\x44"
 
+#define L_UP "l\x1b\x5b\x41"
+#define L_DOWN "l\x1b\x5b\x42"
+
 #define puts0(STR) printf("%s",STR)
 #define putdec(DIGIT) printf("%i", DIGIT)
 #define puthex(DIGIT) printf("%04X", DIGIT)
@@ -103,12 +108,6 @@ struct
 	long int timer;
 	}
 	world[MAX_X][MAX_Y];
-
-// room_type - типы комнат
-//0 - безтиповая (обычная)
-#define TILLED	1	// вспахано
-#define SOWED	2	// засеяно
-// далее будет вода, непроходимо (стена или забор), горы, лес, пустыня, луг, помещение, болото, пещера
 
 int inv_o=0; // inventory
 

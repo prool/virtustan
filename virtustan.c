@@ -461,10 +461,27 @@ printf("\nRoom symbol code? ");
 str[0]=0;i=0;
 fgets(str,MAXLEN,stdin);
 i=atoi(str);
-if (1)	{
+if (i)	{
 	updated=1;
 	world[global_x][global_y].symbol=i;
 	printf("set symbol '%c'\n", i);
+	}
+}
+
+void roomtype(void)
+{int i;
+char str[MAXLEN];
+
+printfile("roomtypes.h");
+
+printf("\nRoom type? ");
+str[0]=0;i=0;
+fgets(str,MAXLEN,stdin);
+i=atoi(str);
+if (1)	{
+	updated=1;
+	world[global_x][global_y].room_type=i;
+	printf("set type = %i\n", i);
 	}
 }
 
@@ -598,6 +615,7 @@ if (world[global_x][global_y].room_type==SOWED)
 
 int try_move_to(int x, int y)
 {
+if (world[x][y].room_type==-1) return 2;
 if ((x>MAX_X-1)||(y>MAX_Y-1)||(x<0)||(y<0)) return 1;
 return 0;
 }
@@ -614,7 +632,7 @@ i=try_move_to(try_x, try_y);
 switch (i)
 	{
 	case 0: break;
-	case 1: print("В этом направлении переместиться невозможно. Там край мира\n"); return;
+	case 1: print("В этом направлении переместиться невозможно. Там край Мира\n"); return;
 	default: print("В этом направлении переместиться невозможно\n"); return;
 	}
 
@@ -1007,7 +1025,7 @@ char **envpp;
 
 ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
 
-printf("\r\nsize of int %li",sizeof(int));
+printf("size of int %li",sizeof(int));
 printf("\r\nsize of long int %li",sizeof(long int));
 printf("\r\nsize of short int %li",sizeof(short int));
 printf("\r\nsize of char %li\n",sizeof(char));
@@ -1027,6 +1045,7 @@ while (*envp)
     }
 envp=envpp;
 printf("Current codetable is %s. ",CodetableName[Codetable]);print("Ktulhu ФХТАГН!!\n");
+if (updated) print("\nМир был изменен!\n");
 }
 
 int file_no=0;
@@ -1068,7 +1087,23 @@ while(1)
 	if (entry==0) break;
 	if (i++ == file_no) {printfile(entry->d_name); return;}
 	}
+}
 
+void hexcat(void)
+{DIR *dir;
+struct dirent *entry;
+int i=0;
+
+dir = opendir(".");
+
+if (dir==0) {printf("Can't open current directory\n"); return;}
+
+while(1)
+	{
+	entry=readdir(dir);
+	if (entry==0) break;
+	if (i++ == file_no) {hexfile(entry->d_name); return;}
+	}
 }
 
 void filestatus(void)
@@ -1287,6 +1322,7 @@ while(1)
 	else if (!strcmp(cmd,"roomsymbol")) roomsymbol();
 	else if (!strcmp(cmd,"roomsymbolcode")) roomsymbolcode();
 	else if (!strcmp(cmd,"roomdescr")) roomdescr();
+	else if (!strcmp(cmd,"roomtype")) roomtype();
 	else if (!strcmp(cmd,"resetroom")) resetroom();
 	else if (!strcmp(cmd,"save")) save_world();
 	else if (!strcmp(cmd,"ls")) ls();
@@ -1296,7 +1332,9 @@ while(1)
 	else if (!strcmp(cmd,"sysinfo")) sysinfo(envp);
 	else if (!strcmp(cmd,"reset")) reset();
 	else if (!strcmp(cmd,"dir-up")) dir_up();
+	else if (!strcmp(cmd,L_UP)) dir_up();
 	else if (!strcmp(cmd,"dir-down")) dir_down();
+	else if (!strcmp(cmd,L_DOWN)) dir_down();
 	else if (!strcmp(cmd,"dir-move")) dir_move();
 	else if (!strcmp(cmd,"cat")) cat();
 	else if (!strcmp(cmd,"stat")) filestatus();
