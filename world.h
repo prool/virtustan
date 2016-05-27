@@ -1,4 +1,4 @@
-// world file for Virtustan application. created Wed May 25 12:26:31 2016
+// world file for Virtustan application. created Fri May 27 16:31:41 2016
 // www.prool.kharkov.org www.virtustan.net
 world[0][0].color=3;
 world[0][1].color=3;
@@ -426,20 +426,12 @@ world[45][59].color=3;
 world[45][59].symbol=95;
 world[46][0].color=3;
 world[46][0].symbol=95;
-world[46][48].descr="Засеяно";
-world[46][48].room_type=2;
-world[46][48].timer=time(0);
-world[46][48].object=3;
 world[46][48].color=9;
 world[46][48].symbol=32;
 world[46][59].color=3;
 world[46][59].symbol=95;
 world[47][0].color=3;
 world[47][0].symbol=95;
-world[47][48].descr="Засеяно";
-world[47][48].room_type=2;
-world[47][48].timer=time(0);
-world[47][48].object=3;
 world[47][48].color=9;
 world[47][48].symbol=32;
 world[47][50].descr="Тут стоит высокая сосна";
@@ -448,10 +440,6 @@ world[47][59].color=3;
 world[47][59].symbol=95;
 world[48][0].color=3;
 world[48][0].symbol=95;
-world[48][48].descr="Засеяно";
-world[48][48].room_type=2;
-world[48][48].timer=time(0);
-world[48][48].object=3;
 world[48][48].color=9;
 world[48][48].symbol=32;
 world[48][50].descr="Полянка, заросшая высокой травой по пояс";
@@ -501,7 +489,7 @@ world[50][48].color=3;
 world[50][48].symbol=118;
 world[50][49].object=1;
 world[50][49].symbol=32;
-world[50][50].descr="Вы находитесь перед воротами Виртустана (ворота на севере, идти на север надо командой n от слова north или командой <стрелочка вверх>, а затем <Enter>). На воротах висит объявление. Для просмотра объявления наберите vorotaob";
+world[50][50].descr="Вы находитесь перед воротами Виртустана (ворота на севере, идти на север надо командой n от слова north или клавишей <стрелка вверх>, а затем <Enter>). На воротах написано: Use `help' command for help and `quit' for quit";
 world[50][50].symbol=32;
 world[50][51].descr="Вы находитесь на пограничном посту Виртустана. Отсюда на север тянется Виртустан";
 world[50][51].symbol=61;

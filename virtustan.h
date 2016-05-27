@@ -121,6 +121,8 @@ struct termio tstdin;
 
 int sezon;
 
+int crop=0;
+
 // function definitions (prototypes)
 
 void outhex(char *);

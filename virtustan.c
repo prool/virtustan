@@ -262,14 +262,14 @@ for (i=0; i<MAX_X; i++) for (j=0; j<MAX_Y; j++)
 #endif
 
 #if 0
-for(j=0;j<MAX_Y;j++)
+for(j=1;j<MAX_Y-1;j++)
 	{
 	world[0][j].color=3;
 	world[0][j].symbol='|';
 	world[MAX_X-1][j].color=3;
 	world[MAX_X-1][j].symbol='|';
 	}
-for(i=0;i<MAX_X;i++)
+for(i=1;i<MAX_X-1;i++)
 	{
 	world[i][0].color=3;
 	world[i][0].symbol='_';
@@ -535,7 +535,6 @@ void till (void)
 {
 if (world[global_x][global_y].descr==0)
 	{
-	updated=1;
 	world[global_x][global_y].descr="Вспахано";
 	world[global_x][global_y].room_type=TILLED;
 	world[global_x][global_y].symbol=' ';
@@ -551,7 +550,6 @@ void sow (void)
 {
 if (world[global_x][global_y].room_type==TILLED)
 	{
-	updated=1;
 	world[global_x][global_y].descr="Засеяно";
 	world[global_x][global_y].room_type=SOWED;
 	world[global_x][global_y].color=9; // green
@@ -562,6 +560,36 @@ if (world[global_x][global_y].room_type==TILLED)
 	}
 else
 	print("Здесь не вспахано, сеять нельзя\n");
+}
+
+void harvest (void)
+{
+if (world[global_x][global_y].room_type==SOWED)
+	{
+	if (plant_symbol(world[global_x][global_y].object, world[global_x][global_y].timer)=='W')
+		{
+		world[global_x][global_y].descr=0;
+		world[global_x][global_y].room_type=0;
+		world[global_x][global_y].color=9; // green
+		world[global_x][global_y].bg=DEFAULT_BG;
+		world[global_x][global_y].object=0;
+		world[global_x][global_y].timer=0;
+		crop++;
+		print("Урожай убран. Всего в закромах:"); printf(" %i\n", crop);
+		}
+	else
+		{
+		print("Урожай еще не созрел!\n");
+		return;
+		}
+	}
+else
+	print("Здесь не посеяно: убирать нечего\n");
+}
+
+void score(void)
+{
+print("Закрома: "); printf("%i\n", crop);
 }
 
 void create(void)
@@ -654,21 +682,25 @@ void testesc (void)
 {int i;
 char str[MAXLEN];
 
+//printf("7m");
+
+#if 0
 printf("\nESC code? ");
 str[0]=0;i=0;
 fgets(str,MAXLEN,stdin);
 i=atoi(str);
 printf("entered ESC code %i\n", i);
-
 esc(i);
-
 printf("test text test text test text\n");
+#endif
 
-#if 0 // old test
+#if 1 
 printf("\
 -------------------------------------\
-[7m\
----------------------------------------\n\
+[7m\n");
+#endif
+#if 0
+printf("---------------------------------------\n\
 [0;40;37;1m\
 -----------------------------------------------------------------------------\n\
 [0m\n\
@@ -1089,6 +1121,11 @@ while(1)
 	}
 }
 
+void hexfile (char *filename)
+{
+printf("hexfile() coming soon...\n");
+}
+
 void hexcat(void)
 {DIR *dir;
 struct dirent *entry;
@@ -1340,7 +1377,14 @@ while(1)
 	else if (!strcmp(cmd,"stat")) filestatus();
 	else if (!strcmp(cmd,"skript")) skript();
 	else if (!strcmp(cmd,"till")) till();
+	else if (!strcmp(cmd,"пахать")) till();
 	else if (!strcmp(cmd,"sow")) sow();
+	else if (!strcmp(cmd,"сеять")) sow();
+	else if (!strcmp(cmd,"harvest")) harvest();
+	else if (!strcmp(cmd,"убрать")) harvest();
+	else if (!strcmp(cmd,"score")) score();
+	else if (!strcmp(cmd,"счет")) score();
+	else if (!strcmp(cmd,"сч")) score();
 	else if (!strcmp(cmd,"шире")) {HALF_X++; look(); }
 	else if (!strcmp(cmd,"уже")) {HALF_X--; look(); }
 	else if (!strcmp(cmd,"выше")) {HALF_Y++; look(); }
@@ -1351,7 +1395,7 @@ while(1)
 			printf("\nUnknown command `%s'\n\n(", cmd);
 			i=0;
 			while(cmd[i]) printf("%02X ", cmd[i++]);
-			printf(")\n");
+			printf(")\n\nUse help for help. Use quit for quit\n\Используйте команду помощь для получения помощи, а команду конец для выхода из программы\n");
 			}
 		}
 	}
