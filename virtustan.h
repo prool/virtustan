@@ -123,6 +123,8 @@ int sezon;
 
 int crop=0;
 
+long int start_time;
+
 // function definitions (prototypes)
 
 void outhex(char *);
@@ -138,7 +140,7 @@ void rogalik_help(void);
 void realtime (void);
 void print_holyday(void);
 void skript(void);
-char plant_symbol(int, long int);
+char plant_symbol(int, int);
 int exec (char *);
 
 // defines for proolskript interpteter

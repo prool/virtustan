@@ -29,6 +29,7 @@ void date(void)
 {
 puts(ptime());
 printf("unixtime = %li\n", unixtime());
+printf("game uptime %li sec\n", unixtime()-start_time);
 print_holyday();
 print("Время года: ");
 switch(sezon)
@@ -566,7 +567,7 @@ void harvest (void)
 {
 if (world[global_x][global_y].room_type==SOWED)
 	{
-	if (plant_symbol(world[global_x][global_y].object, world[global_x][global_y].timer)=='W')
+	if (plant_symbol(global_x, global_y)=='W')
 		{
 		world[global_x][global_y].descr=0;
 		world[global_x][global_y].room_type=0;
@@ -917,7 +918,7 @@ for (y=local_max_y; y>=local_min_y; y--)
 	esc(world[x][y].bg); // background
 	if ((x==global_x)&&(y==global_y)) {setcolor(PLAYER_COLOR); printf("@");}
 	else if (world[x][y].room_type==SOWED)
-		putchar(plant_symbol(world[x][y].object, world[x][y].timer));
+		putchar(plant_symbol(x,y));
 	else putchar(world[x][y].symbol);
 	printf(" ");
 	setcolor(0);
@@ -928,8 +929,14 @@ printf(NORM_COLOR);
 }
 
 #define SEKADI 30
-char plant_symbol(int obj, long int timer)
+char plant_symbol(int x, int y /*int obj, long int timer*/)
 {long int age;
+int obj;
+long int timer;
+
+obj=world[x][y].object;
+timer=world[x][y].timer;
+
 age=time(0)-timer;
 // . , | V W
 if (age<SEKADI) return '.';
@@ -1242,6 +1249,8 @@ unsigned char cmd[MAXLEN_CMD];
 char *cc;
 int i, j;
 
+start_time=unixtime();
+
 updated=0;
 HALF_X=10; // полуразмеры карты от центра карты по измерениям: (10,10) by default
 HALF_Y=10; 
@@ -1457,7 +1466,7 @@ while(1)
 				setcolor(world[x][y].color);
 				esc(world[x][y].bg); // background
 				if (world[x][y].room_type==SOWED)
-				putchar(plant_symbol(world[x][y].object, world[x][y].timer));
+				putchar(plant_symbol(x,y));
 				else putchar(world[x][y].symbol);
 				setcolor(0);
 				}
