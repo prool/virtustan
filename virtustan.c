@@ -1404,7 +1404,7 @@ while(1)
 			printf("\nUnknown command `%s'\n\n(", cmd);
 			i=0;
 			while(cmd[i]) printf("%02X ", cmd[i++]);
-			printf(")\n\nUse help for help. Use quit for quit\n\Используйте команду помощь для получения помощи, а команду конец для выхода из программы\n");
+			printf(")\n\nUse help for help. Use quit for quit\nИспользуйте команду помощь для получения помощи, а команду конец для выхода из программы\n");
 			}
 		}
 	}
