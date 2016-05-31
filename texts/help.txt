@@ -1,6 +1,7 @@
 Command list:
 koi, win, utf, lat - switch codetable
 codetable - print current codetable
+contrast - enable & disable contrast colors
 sysinfo - print sysinfo
 alf - print alfavit
 ascii - print ascii table

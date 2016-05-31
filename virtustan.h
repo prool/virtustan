@@ -61,6 +61,7 @@
 #define REVERSE "\033[7m"
 
 #define DEFAULT_COLOR	2
+#define DEFAULT_CONTRAST_COLOR	14
 #define DEFAULT_BG	40 // 40	
 #define DEFAULT_SYMBOL	'.'
 #define PLAYER_COLOR	0
@@ -122,6 +123,7 @@ struct termio tstdin;
 int sezon;
 
 int crop=0;
+int contrast_mode=0;
 
 long int start_time;
 
