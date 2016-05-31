@@ -31,10 +31,26 @@ else printf("\033[1;3%im", color-7);
 }
 
 void date(void)
-{
+{long uptime; char *tmstr;
+
 puts(ptime());
 printf("unixtime = %li\n", unixtime());
-printf("game uptime %li sec\n", unixtime()-start_time);
+uptime=unixtime()-start_time;
+if (uptime<=60)printf("uptime %li sec", uptime);
+else
+	{
+	uptime=uptime/60;
+	if (uptime<=60) printf ("uptime %li min", uptime);
+	else
+		{
+		uptime=uptime/60;
+		if (uptime<=24) printf("uptime %li hour", uptime);
+		else printf("uptime %li days", uptime/24);
+		}
+	}
+	tmstr = asctime(localtime(&start_time));
+	*(tmstr + strlen(tmstr) - 1) = '\0';
+printf(" since %s\n", tmstr);
 print_holyday();
 print("Время года: ");
 switch(sezon)
@@ -1530,6 +1546,10 @@ printf(".");
 setcolor(0);
 printf(" sow ");
 setcolor(14);
+printf(",");
+setcolor(0);
+printf(" harvest ");
+setcolor(14);
 printf("backspace");
 setcolor(0);
 printf(" refresh screen");
@@ -1569,6 +1589,7 @@ printf(" refresh screen");
 		case '?': online_help=1; break;
 		case '/': CLR; till(); break;
 		case '.': CLR; sow(); break;
+		case ',': CLR; harvest(); break;
 		case 'B': clearscreen(); ls(); while(getchar()==-1) ; break; // boss key
 		case 'N': i_c=MAX_I-1; CLR; print("Мы переместились на крайний север"); break;
 		case 'S': i_c=0; CLR; print("Мы переместились на крайний юг"); break;
