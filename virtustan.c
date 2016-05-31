@@ -112,6 +112,134 @@ putchar(0xe2); putchar(0x98); putchar(0xad);
 printf("\n");
 }
 
+void test4(void)
+{int i; unsigned char str[3];
+char input[MAXLEN];
+
+printf("test of UTF-8 2-bytes codes. Enter prefix (for cyrillic D0 or D1) ? ");
+fgets(input,MAXLEN,stdin);
+input[2]=0; // dirty hack! truncate to 2 digits!
+printf("Input = '%s'\n", input);
+str[0]=htoi(input);
+printf("htoi=%i\n", str[0]);
+if (str[0]==0) return;
+str[2]=0;
+
+for (i=0x80;i<0xC0;i++)
+	{
+	str[1]=i&0xFF;
+	printf("%02X %02X %s | ",str[0], str[1], str);
+	}
+}
+
+void utf_to_lat(unsigned char *utfstr, char *latstr)
+{
+if (utfstr==0) return;
+if (latstr==0) return;
+while (*utfstr)
+	{
+	switch (*utfstr)
+		{
+		case 0xD0:
+			utfstr++;
+			switch (*utfstr++)
+				{
+				case 0: *latstr=0; return;
+				case 0x81: *latstr++='E'; break;
+				case 0x84: *latstr++='E'; break;
+				case 0x86: *latstr++='I'; break;
+				case 0x87: *latstr++='I'; break;
+				case 0x90: *latstr++='A'; break;
+				case 0x91: *latstr++='B'; break;
+				case 0x92: *latstr++='V'; break;
+				case 0x93: *latstr++='G'; break;
+				case 0x94: *latstr++='D'; break;
+				case 0x95: *latstr++='E'; break;
+				case 0x96: *latstr++='#'; break;
+				case 0x97: *latstr++='Z'; break;
+				case 0x98: *latstr++='I'; break;
+				case 0x99: *latstr++='J'; break;
+				case 0x9a: *latstr++='K'; break;
+				case 0x9b: *latstr++='L'; break;
+				case 0x9c: *latstr++='M'; break;
+				case 0x9d: *latstr++='N'; break;
+				case 0x9e: *latstr++='O'; break;
+				case 0x9f: *latstr++='P'; break;
+
+				case 0xa0: *latstr++='R'; break;
+				case 0xa1: *latstr++='S'; break;
+				case 0xa2: *latstr++='T'; break;
+				case 0xa3: *latstr++='U'; break;
+				case 0xa4: *latstr++='F'; break;
+				case 0xa5: *latstr++='H'; break;
+				case 0xa6: *latstr++='C'; break;
+				case 0xa7: *latstr++='4'; break;
+				case 0xa8: *latstr++='W'; break;
+				case 0xa9: *latstr++='W'; break;
+				case 0xaa: *latstr++= 39; break;
+				case 0xab: *latstr++='Y'; break;
+				case 0xac: *latstr++= 39; break;
+				case 0xad: *latstr++='E'; break;
+				case 0xae: *latstr++='Y'; break;
+				case 0xaf: *latstr++='9'; break;
+
+				case 0xB0: *latstr++='a'; break;
+				case 0xB1: *latstr++='b'; break;
+				case 0xB2: *latstr++='v'; break;
+				case 0xB3: *latstr++='g'; break;
+				case 0xB4: *latstr++='d'; break;
+				case 0xB5: *latstr++='e'; break;
+				case 0xB6: *latstr++='#'; break;
+				case 0xB7: *latstr++='z'; break;
+				case 0xB8: *latstr++='i'; break;
+				case 0xB9: *latstr++='j'; break;
+				case 0xBa: *latstr++='k'; break;
+				case 0xBb: *latstr++='l'; break;
+				case 0xBc: *latstr++='m'; break;
+				case 0xBd: *latstr++='n'; break;
+				case 0xBe: *latstr++='o'; break;
+				case 0xBf: *latstr++='p'; break;
+				default: *latstr++='*';
+				}
+			break;
+		case 0xD1:
+			utfstr++;
+			switch (*utfstr++)
+				{
+				case 0: *latstr=0; return;
+				case 0x80: *latstr++='r'; break;
+				case 0x81: *latstr++='s'; break;
+				case 0x82: *latstr++='t'; break;
+				case 0x83: *latstr++='u'; break;
+				case 0x84: *latstr++='f'; break;
+				case 0x85: *latstr++='h'; break;
+				case 0x86: *latstr++='c'; break;
+				case 0x87: *latstr++='4'; break;
+				case 0x88: *latstr++='w'; break;
+				case 0x89: *latstr++='w'; break;
+				case 0x8a: *latstr++= 39; break;
+				case 0x8b: *latstr++='y'; break;
+				case 0x8c: *latstr++= 39; break;
+				case 0x8d: *latstr++='e'; break;
+				case 0x8e: *latstr++='y'; break;
+				case 0x8f: *latstr++='9'; break;
+
+				case 0x91: *latstr++='e'; break;
+				case 0x93: *latstr++='g'; break;
+				case 0x94: *latstr++='e'; break;
+				case 0x96: *latstr++='i'; break;
+				case 0x97: *latstr++='i'; break;
+
+				default: *latstr++='*';
+				}
+			break;
+		default:
+			*latstr++=*utfstr++;
+		}
+	}
+*latstr=0;
+}
+
 void test2 (void)
 {char c; int i;
 struct termio tstdin;
@@ -133,7 +261,7 @@ while(1)
 	{
 	usleep(100000);
 	c=getchar(); putchar('.');
-	if (c!=-1) printf ("test2. Code=%i\r\n",(int)c);
+	if (c!=-1) printf ("test2. Code=%02X\r\n",(unsigned char)c);
 	fflush(0);
 	if (c=='Q')
 		{
@@ -889,9 +1017,14 @@ utf8_to_win(str, out);
 return out;
 }
 
-char *utf2lat (char *str)
-{
+char *utf2lat (unsigned char *str)
+{int i;
+utf_to_lat(str,out);
+return out;
+#if 0
+for (i=0; i<strlen(str); i++) printf("%02X ", *(str+i));
 return "lat not implemented yet\n";
+#endif
 }
 
 void print (char *str)
@@ -1363,7 +1496,7 @@ while(1)
 	else if (!strcmp(cmd,"koi")) {Codetable=KOI; printf("Codetable switch to KOI\n");}
 	else if (!strcmp(cmd,"utf")) {Codetable=UTF; printf("Codetable switch to UTF\n");}
 	else if (!strcmp(cmd,"win")) {Codetable=WIN; printf("Codetable switch to WIN\n");}
-	else if (!strcmp(cmd,"lat")) {Codetable=LAT; printf("Codetable switch to LAT: yet not implemented!\n");}
+	else if (!strcmp(cmd,"lat")) {Codetable=LAT; printf("Codetable switch to LAT: beta\n");}
 	else if (!strcmp(cmd,"codetable")) printf("Current codetable is %s\n",CodetableName[Codetable]);
 	else if (!strcmp(cmd,"look")) look();
 	else if (!strcmp(cmd,"см")) look();
@@ -1388,6 +1521,7 @@ while(1)
 	else if (!strcmp(cmd,"testesc")) testesc();
 	else if (!strcmp(cmd,"test2")) test2();
 	else if (!strcmp(cmd,"test3")) test3();
+	else if (!strcmp(cmd,"test4")) test4();
 	else if (!strcmp(cmd,"rog")) rogalik();
 	else if (!strcmp(cmd,"cls")) clearscreen();
 	else if (!strcmp(cmd,"date")) date();
@@ -1749,3 +1883,5 @@ return i;
 }
 
 #include "proolskript.c"
+
+// END OF FILE. КОНЕЦ ФАЙЛА

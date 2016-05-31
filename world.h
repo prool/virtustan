@@ -1,4 +1,4 @@
-// world file for Virtustan application. created Mon May 30 16:16:05 2016
+// world file for Virtustan application. created Tue May 31 15:22:59 2016
 // www.prool.kharkov.org www.virtustan.net
 world[0][0].color=3;
 world[0][1].color=3;
@@ -132,8 +132,6 @@ world[1][59].symbol=95;
 world[2][0].color=3;
 world[2][0].symbol=95;
 world[2][1].symbol=87;
-world[2][55].descr="symbol chr(24)";
-world[2][55].symbol=24;
 world[2][56].bg=41;
 world[2][57].color=8;
 world[2][57].symbol=35;

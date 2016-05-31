@@ -144,6 +144,7 @@ void print_holyday(void);
 void skript(void);
 char plant_symbol(int, int);
 int exec (char *);
+int htoi(const char  *s);
 
 // defines for proolskript interpteter
 

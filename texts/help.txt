@@ -1,10 +1,10 @@
 Command list:
 koi, win, utf, lat - switch codetable
 codetable - print current codetable
+alf - print Russian alfavit
+ascii - print ascii table
 contrast - enable & disable contrast colors
 sysinfo - print sysinfo
-alf - print alfavit
-ascii - print ascii table
 source - print source
 ls - ls
 dir-up, dir-down, dir-move - смена выделенного файла
@@ -14,6 +14,7 @@ blog - Prool's blog
 testesc - test of ESC codes
 test2 - test of keyboard
 test3 - test of UTF-8
+test4 - test of cyrillic in UTF-8
 cls - clearscreen
 reset - reset terminal
 look, см - look
