@@ -3,7 +3,7 @@ koi, win, utf, lat - switch codetable
 codetable - print current codetable
 alf - print Russian alfavit
 ascii - print ascii table
-contrast - enable & disable contrast colors
+normcolor, nocolor, contrast - color modes
 sysinfo - print sysinfo
 source - print source
 ls - ls

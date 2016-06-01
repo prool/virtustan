@@ -20,7 +20,8 @@ else return x;}
 
 void setcolor(int color)
 {
-if (contrast_mode)
+if (color_mode==NO_COLOR) return;
+if (color_mode==CONTRAST)
 	{
 	if (color==0) color=14;
 	else color+=7;
@@ -1069,7 +1070,7 @@ for (y=local_max_y; y>=local_min_y; y--)
     for (x=local_min_x; x<=local_max_x; x++)
 	{
 	setcolor((world[x][y].color));
-	esc(world[x][y].bg); // background
+	if (color_mode!=NO_COLOR) esc(world[x][y].bg); // background
 	if ((x==global_x)&&(y==global_y)) {setcolor((PLAYER_COLOR)); printf("@");}
 	else if (world[x][y].room_type==SOWED)
 		putchar(plant_symbol(x,y));
@@ -1238,7 +1239,16 @@ while (*envp)
     }
 envp=envpp;
 printf("Current codetable is %s. ",CodetableName[Codetable]);print("Ktulhu ФХТАГН!!\n");
-if (contrast_mode) printf("Contrast mode is ON\n");
+printf("Color mode = ");
+setcolor(7);
+switch(color_mode)
+	{
+	case 0: printf("normal color\n"); break;
+	case NO_COLOR: printf("no color\n"); break;
+	case CONTRAST: printf("contrast color\n"); break;
+	delault: printf("ЖОПА\n");
+	}
+setcolor(0);
 if (updated) print("\nМир был изменен!\n");
 }
 
@@ -1397,20 +1407,6 @@ void reset(void) // reset terminal
 printf("%cc",ESC); // ESC c - reset terminal
 }
 
-void contrast (void)
-{
-if (contrast_mode)
-	{
-	printf("Contrast disabled\n");
-	contrast_mode=0;
-	}
-else
-	{
-	printf("Contrast enabled\n");
-	contrast_mode=1;
-	}
-}
-
 ///////////////////////////////////////////////
 int main (int argc, char *argv[], char *envp[])
 {
@@ -1564,7 +1560,9 @@ while(1)
 	else if (!strcmp(cmd,"score")) score();
 	else if (!strcmp(cmd,"счет")) score();
 	else if (!strcmp(cmd,"сч")) score();
-	else if (!strcmp(cmd,"contrast")) contrast();
+	else if (!strcmp(cmd,"contrast")) {color_mode=CONTRAST; printf("set contrast color mode\n");}
+	else if (!strcmp(cmd,"nocolor")) {color_mode=NO_COLOR; reset(); printf("set nocolor mode\n");}
+	else if (!strcmp(cmd,"normcolor")) {color_mode=0;printf("set normal color mode\n");}
 	else if (!strcmp(cmd,"шире")) {HALF_X++; look(); }
 	else if (!strcmp(cmd,"уже")) {HALF_X--; look(); }
 	else if (!strcmp(cmd,"выше")) {HALF_Y++; look(); }
@@ -1635,7 +1633,7 @@ while(1)
 			else
 				{
 				setcolor(world[x][y].color);
-				esc(world[x][y].bg); // background
+				if (color_mode!=NO_COLOR) esc(world[x][y].bg); // background
 				if (world[x][y].room_type==SOWED)
 				putchar(plant_symbol(x,y));
 				else putchar(world[x][y].symbol);

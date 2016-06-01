@@ -123,7 +123,11 @@ struct termio tstdin;
 int sezon;
 
 int crop=0;
-int contrast_mode=0;
+
+#define NORMAL_COLOR_MODE 0
+#define CONTRAST 1
+#define NO_COLOR 2
+int color_mode=0;
 
 long int start_time;
 
