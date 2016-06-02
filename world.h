@@ -1,4 +1,4 @@
-// world file for Virtustan application. created Tue May 31 15:22:59 2016
+// world file for Virtustan application. created Wed Jun  1 17:13:21 2016
 // www.prool.kharkov.org www.virtustan.net
 world[0][0].color=3;
 world[0][1].color=3;
@@ -490,7 +490,7 @@ world[50][49].object=1;
 world[50][49].symbol=32;
 world[50][50].descr="Вы находитесь перед воротами Виртустана (ворота на севере, идти на север надо командой n от слова north или клавишей <стрелка вверх>, а затем <Enter>). На воротах написано: Use `help' command for help and `quit' for quit";
 world[50][50].symbol=32;
-world[50][51].descr="Вы находитесь на пограничном посту Виртустана. Отсюда на север тянется Виртустан";
+world[50][51].descr="Вы находитесь на пограничном посту Виртустана. Отсюда на север тянется Виртустан. На доске объявлений написано: СУРОВАЯ ФЕРМА НА ЮГО-ЗАПАД";
 world[50][51].symbol=61;
 world[50][52].descr="Вы находитесь на Виртустанской улице, идущей в меридиональном направлении";
 world[50][52].symbol=32;
@@ -506,7 +506,12 @@ world[50][59].symbol=95;
 world[51][0].color=3;
 world[51][0].symbol=95;
 world[51][49].object=3;
+world[51][50].descr="Засеяно";
+world[51][50].room_type=2;
+world[51][50].timer=time(0);
 world[51][50].object=3;
+world[51][50].color=9;
+world[51][50].symbol=32;
 world[51][51].room_type=-1;
 world[51][51].symbol=45;
 world[51][52].descr="Вы находитесь в Виртустанской Гостинице";

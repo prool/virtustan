@@ -490,7 +490,11 @@ else print("Ваш инвентарь пуст\n");
 
 void get(void)
 {int i;
-if ((i=world[global_x][global_y].object)==0) print("Что вы хотите взять? Тут ничего нет\n");
+if (world[global_x][global_y].room_type==SOWED)
+	{
+	print("Здесь нечего взять, только растет растение\n");
+	}
+else if ((i=world[global_x][global_y].object)==0) print("Что вы хотите взять? Тут ничего нет\n");
 else
 	if (inv_o) print("Ваш инвентарь заполнен, вы не можете ничего взять\n");
 	else 
@@ -502,7 +506,7 @@ else
 		}
 }
 
-void put(void)
+void drop(void)
 {int i;
 if ((i=world[global_x][global_y].object)) print("Сюда ничего нельзя положить, тут нет места\n");
 else
@@ -538,7 +542,7 @@ else
 void swap(void)
 {int i, j;
 if ((i=world[global_x][global_y].object)==0)
-	if (inv_o)	put();
+	if (inv_o)	drop();
 	else		print("У вас ничего нет. На земле ничего нет. Ничего не делаем\n");
 else
 	if (inv_o)	{
@@ -783,12 +787,14 @@ else
 	}
 printf("\n");
 
-if (i=world[global_x][global_y].object) print_object(i);
-
 if (world[global_x][global_y].room_type==SOWED)
-	{
+	{// засеяно
 	printf("Timer %li Item age %li\n",
 	world[global_x][global_y].timer, time(0) - world[global_x][global_y].timer);
+	}
+else
+	{// не засеяно
+	if (i=world[global_x][global_y].object) print_object(i);
 	}
 }
 
@@ -1524,7 +1530,7 @@ while(1)
 	else if (!strcmp(cmd,"rt")) realtime();
 	else if (!strcmp(cmd,"inv")) inv();
 	else if (!strcmp(cmd,"get")) get();
-	else if (!strcmp(cmd,"put")) put();
+	else if (!strcmp(cmd,"drop")) drop();
 	else if (!strcmp(cmd,"swap")) swap();
 	else if (!strcmp(cmd,"dup")) dup_();
 	else if (!strcmp(cmd,"create")) create();
@@ -1570,7 +1576,7 @@ while(1)
 	else 	{// No internal command. External command:
 		if (exec(cmd))
 			{
-			printf("\nUnknown command `%s'\n\n(", cmd);
+			printf("\nBad command or file name `%s'\n\n(", cmd);
 			i=0;
 			while(cmd[i]) printf("%02X ", cmd[i++]);
 			printf(")\n\nUse help for help. Use quit for quit\nИспользуйте команду помощь для получения помощи, а команду конец для выхода из программы\n");

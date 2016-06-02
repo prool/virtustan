@@ -9,7 +9,7 @@
 	else if (!strcmp(buf,"date")) date();
 	else if (!strcmp(buf,"inv")) inv();
 	else if (!strcmp(buf,"get_item")) get();
-	else if (!strcmp(buf,"put_item")) put();
+	else if (!strcmp(buf,"drop_item")) drop();
 	else if (!strcmp(buf,"swap_item")) swap();
 	else if (!strcmp(buf,"dup_item")) dup_();
 	else if (!strcmp(buf,"create_item")) create();

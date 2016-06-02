@@ -24,7 +24,7 @@ directions: 1 step: n, s, w, e (от слов north, south, etc) or arrow+enter
 many steps: N, S, W, E
 inv - print inventory
 get - get object
-put - put object
+drop - drop object
 swap - swap objects in inventory and in room
 dup - duplicate object
 create - create object
