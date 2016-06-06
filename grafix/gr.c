@@ -135,6 +135,7 @@ dx=1.0f-DELTA;
 dy=1.0f-DELTA;
 
 //printf("%s\n", ptime());
+//printf("* ");
 
 glClearColor (0.2, 0.0, 0.0, 0.0);
 glClear(GL_COLOR_BUFFER_BIT);   ///очистим буфер
