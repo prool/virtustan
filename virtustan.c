@@ -1413,6 +1413,12 @@ void reset(void) // reset terminal
 printf("%cc",ESC); // ESC c - reset terminal
 }
 
+void version (void)
+{
+printf("Virtustan application\nCopyleft by Prool, 2015-2016\nThis program comes with ABSOLUTELY NO WARRANTY; for details type `gpl3'.\
+ Compile %s %s\n",__DATE__,__TIME__);
+}
+
 ///////////////////////////////////////////////
 int main (int argc, char *argv[], char *envp[])
 {
@@ -1434,8 +1440,7 @@ i_c=MAX_I-2; j_c=MAX_J-2; // cursor loc. for realtime mod
 
 clearscreen();
 
-printf("Virtustan application\nCopyleft by Prool, 2015-2016\nThis program comes with ABSOLUTELY NO WARRANTY; for details type `gpl3'.\
- Compile %s %s\n",__DATE__,__TIME__);
+version();
 
 //sysinfo(envp);
 
@@ -1494,6 +1499,7 @@ while(1)
 	else if (!strcmp(cmd,"?"))  printfile("texts/help.txt");
 	else if (!strcmp(cmd,"помощь"))  printfile("texts/help.txt");
 	else if (!strcmp(cmd,"alf")) print(ALFAVIT);
+	else if (!strcmp(cmd,"ver")) version();
 	else if (!strcmp(cmd,"ascii")) ascii();
 	else if (!strcmp(cmd,"koi")) {Codetable=KOI; printf("Codetable switch to KOI\n");}
 	else if (!strcmp(cmd,"utf")) {Codetable=UTF; printf("Codetable switch to UTF\n");}
@@ -1629,9 +1635,16 @@ while(1)
 		for (j=0;j<MAX_J;j++)
 			{
 			if ((i==i_c) && (j==j_c)) // cursor
-				{if (time(0)&1/*cursor_blink==0*/) {setcolor(8); /*cursor_blink=1;*/}
-				else {/*cursor_blink=0; */setcolor(1);}
-				putchar('*'); setcolor(0);}
+				{
+				#ifdef CURSOR_BLINKED
+				if (time(0)&1) setcolor(8);
+				else setcolor(1);
+				#endif
+				putchar('*');
+				#ifdef CURSOR_BLINKED
+				setcolor(0);
+				#endif
+				}
 			else
 			 {
 			x=j; y=i+MAX_Y-MAX_I;
