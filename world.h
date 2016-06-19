@@ -1,4 +1,4 @@
-// world file for Virtustan application. created Wed Jun  1 17:13:21 2016
+// world file for Virtustan application. created Sat Jun 18 14:53:11 2016
 // www.prool.kharkov.org www.virtustan.net
 world[0][0].color=3;
 world[0][1].color=3;
@@ -482,11 +482,11 @@ world[50][0].color=3;
 world[50][0].symbol=95;
 world[50][46].descr="Здесь растут сосны";
 world[50][47].descr="Густой лес";
+world[50][47].object=1;
 world[50][48].descr="Вы находитесь в неглубокой яме";
 world[50][48].object=2;
 world[50][48].color=3;
 world[50][48].symbol=118;
-world[50][49].object=1;
 world[50][49].symbol=32;
 world[50][50].descr="Вы находитесь перед воротами Виртустана (ворота на севере, идти на север надо командой n от слова north или клавишей <стрелка вверх>, а затем <Enter>). На воротах написано: Use `help' command for help and `quit' for quit";
 world[50][50].symbol=32;
