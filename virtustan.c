@@ -289,6 +289,37 @@ while(1)
 	}
 }
 
+#define NBUF 16
+void hexfile (char *filename)
+{
+int i, n, line;
+unsigned char buf[NBUF];
+unsigned char c;
+unsigned int addr;
+
+FILE *fp=fopen(filename,"r");
+line=1;
+addr=0;
+
+if (!fp) {printf("Can't open file %s\n", filename); return;}
+set_terminal_raw();
+while (!feof(fp))
+	{
+	n=fread(buf, 1, NBUF, fp);
+	printf("%04X ", addr);
+	for(i=0;i<n;i++) printf("%02X ", buf[i]);
+	if (n<NBUF) for (i=0;i<((NBUF-n)*3);i++) printf(" ");
+	printf(" ");
+	for(i=0;i<n;i++) {if ((buf[i]>=32)&&(buf[i]<127)) c=buf[i]; else c='.'; printf("%c", c);}
+	printf("\n");
+	addr+=NBUF;
+	if (++line>=lines) {c=pressanykey(); line=1; if (c=='q') break; printf("\r"); }
+	}
+fclose(fp);
+set_terminal_no_raw();
+printf("\n");
+}
+
 void printfile(char *filename)
 {
 FILE *fp;
@@ -1299,11 +1330,6 @@ while(1)
 	}
 }
 
-void hexfile (char *filename)
-{
-printf("hexfile() coming soon...\n");
-}
-
 void hexcat(void)
 {DIR *dir;
 struct dirent *entry;
@@ -1561,6 +1587,7 @@ while(1)
 	else if (!strcmp(cmd,L_DOWN)) dir_down();
 	else if (!strcmp(cmd,"dir-move")) dir_move();
 	else if (!strcmp(cmd,"cat")) cat();
+	else if (!strcmp(cmd,"hcat")) hexcat();
 	else if (!strcmp(cmd,"stat")) filestatus();
 	else if (!strcmp(cmd,"skript")) skript();
 	else if (!strcmp(cmd,"till")) till();
