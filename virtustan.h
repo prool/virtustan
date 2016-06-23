@@ -153,3 +153,25 @@ int htoi(const char  *s);
 // defines for proolskript interpteter
 
 #define MAXFAJL 2500
+
+#ifdef FREEBSD
+
+#define TCGETA          0x5405
+#define TCSETA          0x5406
+
+/*
+ * Classic struct termio. More modern Unix versions
+ * contain additional information. Unix versions who
+ * support termio and termios often use the same
+ * structure for termio and termios, so termio
+ * contains the full termios data on this systems.
+ */
+#define NCC 8
+struct termio {
+    int c_iflag;         /* input modes   */
+    int c_oflag;         /* output modes  */
+    int c_cflag;         /* control modes */
+    int c_lflag;         /* local modes   */
+    char c_cc[NCC];      /* control chars */
+};
+#endif // FREEBSD

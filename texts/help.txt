@@ -8,6 +8,7 @@ sysinfo - print sysinfo
 source - print source
 ls - ls
 dir-up, dir-down, dir-move - смена выделенного файла
+cd - change directory
 cat - вывод выделенного файла на экран
 hcat - hex вывод выделенного файла на экран
 stat - вывод статистики о выделенном файле

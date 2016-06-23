@@ -1,6 +1,6 @@
 #makefile for freebsd
-virtustan: virtustan.c
-	gcc virtustan.c -o virtustan -I /usr/local/include /usr/local/lib/libiconv.a
+virtustan: virtustan.c virtustan.h world.h proolskript.c readw.c aux-skripts.c roomtypes.h
+	gcc virtustan.c -o virtustan -DFREEBSD -I /usr/local/include /usr/local/lib/libiconv.a
 	strip virtustan
 clean:
 	rm virtustan
