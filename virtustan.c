@@ -2,11 +2,6 @@
 // by Prool
 // www.prool.kharkov.org www.virtustan.net
 
-int HALF_X; // полуразмеры карты от центра карты по измерениям: (10,10) by default
-int HALF_Y; 
-
-char recode_buffer [1024];
-
 #include "virtustan.h"
 
 void esc(int code)
@@ -1604,6 +1599,8 @@ while(1)
 	else if (!strcmp(cmd,L_DOWN)) dir_down();
 	else if (!strcmp(cmd,"dir-move")) dir_move();
 	else if (!strcmp(cmd,"cd")) cmd_chdir();
+	else if (!strcmp(cmd,"cd..")) chdir("..");
+	else if (!strcmp(cmd,"cd/")) chdir("/");
 	else if (!strcmp(cmd,"cat")) cat();
 	else if (!strcmp(cmd,"hcat")) hexcat();
 	else if (!strcmp(cmd,"stat")) filestatus();

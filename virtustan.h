@@ -131,6 +131,11 @@ int color_mode=0;
 
 long int start_time;
 
+int HALF_X; // полуразмеры карты от центра карты по измерениям: (10,10) by default
+int HALF_Y; 
+
+char recode_buffer [1024];
+
 // function definitions (prototypes)
 
 void outhex(char *);
