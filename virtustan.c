@@ -345,8 +345,7 @@ while(!feof(fp))
 	if (str[0])
 		{int ii=0;
 		while(str[ii]) putchar(str[ii++]);
-		if (++i>=(lines-1)) {i=0;c=pressanykey(); if (c=='q') {printf("QUIT\n");fclose(fp);set_terminal_no_raw();return;} }
-		printf("\r                                    \r");
+		if (++i>=(lines-1)) {i=0;c=pressanykey(); if (c=='q') {printf("QUIT\n");break;} }
 		}
 	}
 fclose(fp);
@@ -1291,6 +1290,8 @@ void ls(void)
 struct dirent *entry;
 int i=0;
 int counter=1;
+char c;
+int line=0;
 
 dir = opendir(".");
 
@@ -1298,14 +1299,18 @@ if (dir==0) {printf("Can't open current directory\n"); return;}
 
 printf("\n");
 
+set_terminal_raw();
+
 while(1)
 	{
 	entry=readdir(dir);
 	if (entry==0) break;
 	if (i++ == file_no) printf("%2i. %s%s%s\n", counter++, REVERSE, entry->d_name, NORM_COLOR);
 	else printf("%2i. %s\n", counter++, entry->d_name);
+	if (++line>=(lines-1)) {line=0;c=pressanykey(); if (c=='q') {printf("QUIT\n");break;}}
 	}
-
+set_terminal_no_raw();
+closedir(dir);
 }
 
 void cat(void)
@@ -1342,6 +1347,28 @@ while(1)
 	}
 }
 
+void delete_file(void)
+{DIR *dir;
+struct dirent *entry;
+int i=0;
+
+dir = opendir(".");
+
+if (dir==0) {printf("Can't open current directory\n"); return;}
+
+while(1)
+	{
+	entry=readdir(dir);
+	if (entry==0) break;
+	if (i++ == file_no)
+		{
+		if (remove(entry->d_name)==0) printf("File '%s' deleted\n", entry->d_name);
+		else printf("File '%s' not deleted\n", entry->d_name);
+		return;
+		}
+	}
+}
+
 void cmd_chdir(void)
 {DIR *dir;
 struct dirent *entry;
@@ -1357,6 +1384,12 @@ while(1)
 	if (entry==0) break;
 	if (i++ == file_no) {if (chdir(entry->d_name)==0) file_no=0; return;}
 	}
+}
+
+void pwd(void)
+{char buf[MAXLEN];
+getcwd(buf,MAXLEN);
+printf("%s\n", buf);
 }
 
 void filestatus(void)
@@ -1601,6 +1634,8 @@ while(1)
 	else if (!strcmp(cmd,"cd")) cmd_chdir();
 	else if (!strcmp(cmd,"cd..")) chdir("..");
 	else if (!strcmp(cmd,"cd/")) chdir("/");
+	else if (!strcmp(cmd,"pwd")) pwd();
+	else if (!strcmp(cmd,"delfile")) delete_file();
 	else if (!strcmp(cmd,"cat")) cat();
 	else if (!strcmp(cmd,"hcat")) hexcat();
 	else if (!strcmp(cmd,"stat")) filestatus();

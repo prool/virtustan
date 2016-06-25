@@ -11,6 +11,8 @@ dir-up, dir-down, dir-move - смена выделенного файла
 cd - change directory
 cd.. - cd ..
 cd/ - cd /
+pwd - print work directory
+delfile - delete file
 cat - вывод выделенного файла на экран
 hcat - hex вывод выделенного файла на экран
 stat - вывод статистики о выделенном файле
