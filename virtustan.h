@@ -20,8 +20,8 @@
 
 #include "roomtypes.h"
 
-#define MAX_X 60 // 130
-#define MAX_Y 60
+#define MAX_X 100 // 60 // 130
+#define MAX_Y 100 // 60
 
 #define MAXLEN 255
 #define MAXLEN_CMD 4096
@@ -110,6 +110,8 @@ struct
 	}
 	world[MAX_X][MAX_Y];
 
+char base_path [MAXLEN];
+
 int inv_o=0; // inventory
 
 int max_x, max_y;
@@ -154,6 +156,8 @@ void skript(void);
 char plant_symbol(int, int);
 int exec (char *);
 int htoi(const char  *s);
+void printfile(char *filename);
+void printfile_basepath(char *filename);
 
 // defines for proolskript interpteter
 

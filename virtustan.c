@@ -315,6 +315,14 @@ set_terminal_no_raw();
 printf("\n");
 }
 
+void printfile_basepath(char *filename)
+{char full_path[MAXLEN];
+strcpy(full_path, base_path);
+strcat(full_path,"/");
+strcat(full_path,filename);
+printfile(full_path);
+}
+
 void printfile(char *filename)
 {
 FILE *fp;
@@ -1256,6 +1264,7 @@ printf("\r\nsize of short int %li",sizeof(short int));
 printf("\r\nsize of char %li\n",sizeof(char));
 printf ("lines %d\n", lines);
 printf ("columns %d\n", COLUMNS);
+printf("base path %s\n", base_path);
 #define S_TERM "TERM="
 envpp=envp;
 while (*envp)
@@ -1307,7 +1316,9 @@ while(1)
 	if (entry==0) break;
 	if (i++ == file_no) printf("%2i. %s%s%s\n", counter++, REVERSE, entry->d_name, NORM_COLOR);
 	else printf("%2i. %s\n", counter++, entry->d_name);
-	if (++line>=(lines-1)) {line=0;c=pressanykey(); if (c=='q') {printf("QUIT\n");break;}}
+	if (++line>=(lines-1))
+		{line=0;c=pressanykey();
+		if (c=='q') {printf("QUIT\n");break;}else printf("\r                          \r");}
 	}
 set_terminal_no_raw();
 closedir(dir);
@@ -1499,6 +1510,10 @@ int i, j;
 
 start_time=unixtime();
 
+getcwd(base_path, MAXLEN);
+
+//printf("base path =%s\n", base_path);
+
 updated=0;
 HALF_X=10; // полуразмеры карты от центра карты по измерениям: (10,10) by default
 HALF_Y=10; 
@@ -1524,12 +1539,13 @@ log_("Virtustan application started");
 //printf("init started\n");
 Codetable=UTF;
 
-global_x=50; global_y=50;
+//global_x=50; global_y=50;
+global_x=30; global_y=40;
 
 init_world();
 
-HALF_X = COLUMNS/4-2;
-HALF_Y = lines/2-2;
+HALF_X = COLUMNS/4-1;
+HALF_Y = lines/2-3;
 
 //printf("init ended\n\n");
 
@@ -1565,10 +1581,8 @@ while(1)
 		print("Мир был изменен! Сохраните мир командой save. Или выйдите командой непосредственного выхода Quit\n");
 		}
 	else if (!strcmp(cmd,"Quit")) break;
-	else if (!strcmp(cmd,"help")) printfile("texts/help.txt");
-	else if (!strcmp(cmd,"h"))  printfile("texts/help.txt");
-	else if (!strcmp(cmd,"?"))  printfile("texts/help.txt");
-	else if (!strcmp(cmd,"помощь"))  printfile("texts/help.txt");
+	else if ((!strcmp(cmd,"help"))||(!strcmp(cmd,"h"))||(!strcmp(cmd,"?"))||(!strcmp(cmd,"помощь")))
+		printfile_basepath("texts/help.txt"); 
 	else if (!strcmp(cmd,"alf")) print(ALFAVIT);
 	else if (!strcmp(cmd,"ver")) version();
 	else if (!strcmp(cmd,"ascii")) ascii();
