@@ -130,6 +130,7 @@ float x,y;
 float cursor_coord_x, cursor_coord_y;
 float quad_x, quad_y;
 char str[MAXSTR];
+float cursor_r;
 
 dx=1.0f-DELTA;
 dy=1.0f-DELTA;
@@ -290,13 +291,15 @@ else 	{
 cursor_coord_x=-dx + (cursor_i*STEP_X) + STEP_X/2;
 cursor_coord_y= dy - (cursor_j*STEP_Y) - STEP_Y - 0.015f;
 glBegin(GL_TRIANGLES);
-glColor3f(1.0,1.0,0.0); ///зададим цвет которым будем рисовать
+cursor_r=1.0 / (time(0)%10);
+glColor3f(cursor_r/*1.0*/,1.0,0.0); ///зададим цвет которым будем рисовать
 glVertex2f(cursor_coord_x,cursor_coord_y);
 glVertex2f(cursor_coord_x+0.02f,cursor_coord_y-0.02f);
 glVertex2f(cursor_coord_x+0.02f,cursor_coord_y+0.02f);
 glEnd();
 
 #if 1 // FTGL
+glColor3f(1.0,1.0,0.0); ///зададим цвет которым будем рисовать
 // FTGL from: https://www.linux.org.ru/forum/development/6091539
 glRasterPos2f(-0.99f, 0.93f);
 //FTGLPixmapFont("/usr/share/fonts/truetype/ttf-dejavu/DejaVuSansMono.ttf");

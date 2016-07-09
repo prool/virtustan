@@ -510,7 +510,7 @@ switch (o)
 	case 1: print("Маленький камешек"); break;
 	case 2: print("Кости"); break;
 	case 3: print("Семя"); break;
-	default: print("Черт знает что");
+	default: print("Черный шарик");
 	}
 printf("%s\n",NORM_COLOR);
 }
