@@ -4,7 +4,7 @@ Virtustan application
 [Screenshots. Скриншоты](http://blog.mud.kharkov.org/screenshots#virtustan-app)
 
 ~~эзотерическое~~ приложение, имеющее отношение
-к виртуальному королевству Виртустан (www.virtustan.net)
+к виртуальному королевству Виртустан http://virtustan.kharkov.org
 
 По сути простейшая игра, некая смесь рогалика
 ([roguelike](http://lurkmore.to/%D0%A0%D0%BE%D0%B3%D0%B0%D0%BB%D0%B8%D0%BA%D0%B8))

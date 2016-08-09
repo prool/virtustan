@@ -51,7 +51,7 @@ sow, сеять - сеять
 harvest, убирать - убирать урожай
 q, quit, exit, конец - exit
 
-Sites: virtustan.net prool.kharkov.org github.com/prool/virtustan
+Sites: prool.kharkov.org virtustan.kharkov.org github.com/prool/virtustan
 Prool's email proolix dog gmail.com
 Prool's phone +380 (066) 297-7515
 

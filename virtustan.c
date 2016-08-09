@@ -1,6 +1,6 @@
 // Virtustan application (small rogue-like game)
 // by Prool
-// www.prool.kharkov.org www.virtustan.net
+// www.prool.kharkov.org virtustan.kharkov.org
 
 #include "virtustan.h"
 
@@ -386,7 +386,7 @@ FILE *fp;
 fp=fopen("world.h", "w");
 if (fp==NULL) {printf("Can't open world file\n"); return;}
 fprintf(fp,"// world file for Virtustan application. created %s\n", ptime());
-fprintf(fp,"// www.prool.kharkov.org www.virtustan.net\n");
+fprintf(fp,"// www.prool.kharkov.org\n");
 for (i=0; i<MAX_X; i++) for (j=0; j<MAX_Y; j++)
 	{
 	if (cc=world[i][j].descr) fprintf(fp, "world[%i][%i].descr=\"%s\";\n", i, j, cc);

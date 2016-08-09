@@ -1,5 +1,5 @@
-// world file for Virtustan application. created Sun Jun 26 13:01:56 2016
-// www.prool.kharkov.org www.virtustan.net
+// world file for Virtustan application. created Tue Aug  9 15:49:47 2016
+// www.prool.kharkov.org
 world[0][0].color=3;
 world[0][1].color=3;
 world[0][1].symbol=124;
@@ -250,6 +250,9 @@ world[22][59].color=3;
 world[22][59].symbol=95;
 world[23][0].color=3;
 world[23][0].symbol=95;
+world[23][40].descr="Красная гора";
+world[23][40].color=8;
+world[23][40].symbol=42;
 world[23][59].color=3;
 world[23][59].symbol=95;
 world[24][0].color=3;

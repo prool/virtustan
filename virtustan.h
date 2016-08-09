@@ -1,6 +1,6 @@
 // Virtustan application (small rogue-like game)
 // by Prool
-// www.prool.kharkov.org www.virtustan.net
+// www.prool.kharkov.org
 
 #include <stdio.h>
 #include <stdlib.h>
