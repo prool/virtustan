@@ -1,4 +1,4 @@
-// world file for Virtustan application. created Tue Aug  9 15:49:47 2016
+// world file for Virtustan application. created Wed Aug 10 15:00:10 2016
 // www.prool.kharkov.org
 world[0][0].color=3;
 world[0][1].color=3;
@@ -214,6 +214,9 @@ world[13][59].color=3;
 world[13][59].symbol=95;
 world[14][0].color=3;
 world[14][0].symbol=95;
+world[14][36].descr="Сапфировая гора";
+world[14][36].color=11;
+world[14][36].symbol=42;
 world[14][59].color=3;
 world[14][59].symbol=95;
 world[15][0].color=3;

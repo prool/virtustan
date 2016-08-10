@@ -1,4 +1,6 @@
+]COLOR14
 Command list:
+]COLOR0
 koi, win, utf, lat - switch codetable
 codetable - print current codetable
 alf - print Russian alfavit
@@ -51,7 +53,8 @@ sow, сеять - сеять
 harvest, убирать - убирать урожай
 q, quit, exit, конец - exit
 
+]COLOR14
 Sites: prool.kharkov.org virtustan.kharkov.org github.com/prool/virtustan
 Prool's email proolix dog gmail.com
 Prool's phone +380 (066) 297-7515
-
+]COLOR0
