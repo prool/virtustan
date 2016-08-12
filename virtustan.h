@@ -20,8 +20,8 @@
 
 #include "roomtypes.h"
 
-#define MAX_X 100 // 60 // 130
-#define MAX_Y 100 // 60
+#define MAX_X 200 // 100 // 60 // 130
+#define MAX_Y 200 // 60
 
 #define MAXLEN 255
 #define MAXLEN_CMD 4096

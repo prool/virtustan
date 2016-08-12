@@ -1540,6 +1540,7 @@ log_("Virtustan application started");
 Codetable=UTF;
 
 //global_x=50; global_y=50;
+//global_x=0; global_y=MAX_Y-1;
 global_x=30; global_y=40;
 
 init_world();
@@ -1694,6 +1695,17 @@ int online_help=0;
 int cursor_blink=0;
 int save_x, save_y;
 int jj;
+int MAX_I, MAX_J;
+
+ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
+MAX_I=lines-8; // 20
+
+if ((COLUMNS-1)>MAX_X) MAX_J=MAX_X;
+else MAX_J=COLUMNS-1;
+
+MAX_J=COLUMNS-0; // prool fool
+
+//i_c=MAX_I-2; j_c=MAX_J-2; // cursor loc. for realtime mod
 
 /*  Set stdin (file descriptor=0) to NOraw mode and echo */
 ioctl(0, TCGETA, &tstdin);
@@ -1714,7 +1726,7 @@ while(1)
 	{
 	// refresh screen
 	gotoxy(0,0);
-	printf("Virtustan realtime application q - quit to virtustan app, Q - quit to OS, ? - help ");
+	printf("Virtustan realtime application MAX_J=%i q - quit to virtustan app, Q - quit to OS, ? - help ", MAX_J);
 	//setcolor(2);
 	//printf("%s\n\n", ptime()+4);
 	//setcolor(0);
