@@ -1514,6 +1514,17 @@ getcwd(base_path, MAXLEN);
 
 //printf("base path =%s\n", base_path);
 
+srandom(unixtime());
+
+if (random()<(RAND_MAX/9))
+	{// fortune
+	print("\n\n\n                         На пальмовой набережной он получил всё, что ему причиталось\n");
+	//printf("random = %i\n", random());
+	//printf("max random = %i\n", RAND_MAX);
+	printf("\n\npress any key, Luc\n");
+	getchar();
+	}
+
 updated=0;
 HALF_X=10; // полуразмеры карты от центра карты по измерениям: (10,10) by default
 HALF_Y=10; 

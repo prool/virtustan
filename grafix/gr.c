@@ -7,6 +7,7 @@
 #include	<stdio.h>
 #include	<stdlib.h>
 #include	<string.h>
+#include	<time.h>
 #include	<math.h>
 #include	<GL/glext.h>
 
@@ -467,6 +468,8 @@ cursor_i=0;
 cursor_j=0;
 oldx=0;
 oldy=0;
+
+srandom(time(0));
 
 for (i=0;i<MAXSTR;i++) head_str[i]='*';
 head_str[MAXSTR-1]=0;
