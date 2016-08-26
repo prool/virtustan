@@ -501,18 +501,21 @@ if (x>y) return x;
 return y;
 }
 
-void print_object(int o)
-{
-if (o==0) return;
+int print_object(int o)
+// Return value: -1 - default item (invalid item number); else return 0
+{int i;
+i=0;
+if (o==0) return 0;
 printf("%s",ZHELT1);
 switch (o)
 	{
 	case 1: print("Маленький камешек"); break;
 	case 2: print("Кости"); break;
 	case 3: print("Семя"); break;
-	default: print("Черный шарик");
+	default: print("Черный шарик"); i=-1;
 	}
 printf("%s\n",NORM_COLOR);
+return i;
 }
 
 void inv(void)
@@ -1490,6 +1493,16 @@ file_no+=i;
 ls();
 }
 
+void olist (void)
+{int i;
+// print list of objects
+for (i=1;;i++)
+	{
+	printf("%i ", i);
+	if (print_object(i)==-1) break;
+	}
+}
+
 void reset(void) // reset terminal
 {
 printf("%cc",ESC); // ESC c - reset terminal
@@ -1682,6 +1695,7 @@ while(1)
 	else if (!strcmp(cmd,"уже")) {HALF_X--; look(); }
 	else if (!strcmp(cmd,"выше")) {HALF_Y++; look(); }
 	else if (!strcmp(cmd,"ниже")) {HALF_Y--; look(); }
+	else if (!strcmp(cmd,"olist")) olist();
 	else 	{// No internal command. External command:
 		if (exec(cmd))
 			{

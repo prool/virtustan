@@ -37,8 +37,11 @@ swap - swap objects in inventory and in room
 dup - duplicate object
 create - create object
 destroy - destroy object
+
 room edit commands: resetroom, roomcolor, roombg, roomsymbol, roomsymbolcode, roomtype, roomdescr
 save - save world
+olist - objects list
+
 env - print environment
 date - print date & time
 holyday - print holyday
