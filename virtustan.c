@@ -4,6 +4,26 @@
 
 #include "virtustan.h"
 
+#define KIOCSOUND	0x4B2F	/* start sound generation (0 for off) */
+#define KDMKTONE	0x4B30	/* generate tone */
+
+void tone(int fd, int hertz, int hundredths) {
+ unsigned int ticks = hundredths * HZ / 100;
+ /* ticks & 0xffff не будет работать, если ticks — 0xf0000;
+  * вместо этого нужно округлить до наибольшего допустимого значения */
+ if (ticks > 0xffff) ticks = 0xffff;
+ /* еще одна ошибка округления */
+ if (hundredths && ticks == 0) ticks = 1;
+ ioctl(fd, KDMKTONE, (ticks << 16 | (1193180/hertz)));
+}
+
+void beep(void)
+{
+int hertz = 60;
+ioctl(STDOUT_FILENO, KIOCSOUND, 1193180/hertz);
+//tone(STDOUT_FILENO, 60, 100);
+}
+
 void esc(int code)
 {
 printf("\033[%im", code);
@@ -1696,6 +1716,7 @@ while(1)
 	else if (!strcmp(cmd,"выше")) {HALF_Y++; look(); }
 	else if (!strcmp(cmd,"ниже")) {HALF_Y--; look(); }
 	else if (!strcmp(cmd,"olist")) olist();
+	else if (!strcmp(cmd,"beep")) beep();
 	else 	{// No internal command. External command:
 		if (exec(cmd))
 			{
