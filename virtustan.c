@@ -529,7 +529,7 @@ if (o==0) return 0;
 printf("%s",ZHELT1);
 switch (o)
 	{
-	case 1: print("Маленький камешек"); break;
+	case 1: print("Гранитный камешек"); break;
 	case 2: print("Кости"); break;
 	case 3: print("Семя"); break;
 	default: print("Черный шарик"); i=-1;
@@ -856,8 +856,8 @@ else
 
 int try_move_to(int x, int y)
 {
-if (world[x][y].room_type==-1) return 2;
 if ((x>MAX_X-1)||(y>MAX_Y-1)||(x<0)||(y<0)) return 1;
+if (world[x][y].room_type==-1) return 2;
 return 0;
 }
 
@@ -1717,6 +1717,21 @@ while(1)
 	else if (!strcmp(cmd,"ниже")) {HALF_Y--; look(); }
 	else if (!strcmp(cmd,"olist")) olist();
 	else if (!strcmp(cmd,"beep")) beep();
+	else if ((cmd[0]>='0') && (cmd[0]<='9'))
+			{char c;
+			// digit command
+			i=atoi(cmd);
+			c=cmd[strlen(cmd)-1];
+			printf("digit %i, last symbol '%c'\n", i, c);
+			switch (c)
+				{
+				case 'n': while (i--) move_(0,+1); break;
+				case 's': while (i--) move_(0,-1); break;
+				case 'w': while (i--) move_(-1,0); break;
+				case 'e': while (i--) move_(+1,0); break;
+				default: printf("Unknown multiply command\n");
+				}
+			}
 	else 	{// No internal command. External command:
 		if (exec(cmd))
 			{
