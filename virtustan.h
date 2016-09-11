@@ -152,6 +152,7 @@ void computation_boundaries(void);
 void rogalik(void);
 void rogalik_help(void);
 void realtime (void);
+void realtime_old (void);
 void print_holyday(void);
 void skript(void);
 char plant_symbol(int, int);

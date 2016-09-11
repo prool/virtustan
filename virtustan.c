@@ -1664,6 +1664,7 @@ while(1)
 	else if (!strcmp(cmd,"cls")) clearscreen();
 	else if (!strcmp(cmd,"date")) date();
 	else if (!strcmp(cmd,"rt")) realtime();
+	else if (!strcmp(cmd,"rto")) realtime_old();
 	else if (!strcmp(cmd,"inv")) inv();
 	else if (!strcmp(cmd,"get")) get();
 	else if (!strcmp(cmd,"drop")) drop();
@@ -1745,12 +1746,138 @@ while(1)
 log_("Virtustan application finished");
 return 0;
 }
-
+/******************************************************************************************************/
 #define CLR for(jj=0;jj<MAX_J; jj++) putch(' ');putch('\r')
 
+#define MAX_L 50
+#define MAX_C 150
+
 void realtime (void)
+{int i,j,c,quit, to_os;
+int oldf;
+int cur_l, cur_c;
+long int ll;
+
+char screen [MAX_L] [MAX_C];
+char screen_old [MAX_L] [MAX_C];
+
+cur_l=0; cur_c=0;
+
+//printf("lines %i columns %i\n",lines,COLUMNS);
+if (lines>MAX_L) {printf("realtime module: error 1. array is small on lines\n"); return; }
+if (COLUMNS>MAX_C) {printf("realtime module: error 2. array is small on columns\n"); return; }
+
+for (i=0;i<MAX_L;i++) for (j=0;j<MAX_C;j++) screen[i][j]='.';
+
+for (i=0;i<MAX_L;i++) for (j=0;j<MAX_C;j++) screen_old[i][j]=screen[i][j];
+
+to_os=0;
+
+ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
+
+/*  Set stdin (file descriptor=0) to NOraw mode and echo */
+ioctl(0, TCGETA, &tstdin);
+tstdin.c_lflag &= ~(ICANON|ECHO);
+ioctl(0, TCSETA, &tstdin);
+
+oldf = fcntl(STDIN_FILENO, F_GETFL, 0);
+fcntl(STDIN_FILENO, F_SETFL, oldf | O_NONBLOCK);
+
+// скрыть курсор
+putchar(27);
+printf("[?25l");
+
+		screen[cur_l][cur_c]='@';
+
+quit=0;
+while(!quit)
+	{
+	// refresh screen
+	clearscreen();
+	gotoxy(0,0);
+	printf("lines %i columns %i\n",lines,COLUMNS);
+	for (i=0;i<(lines-2);i++)
+		{
+		for (j=0;j<COLUMNS;j++)
+			{
+			/*
+			if (j==0) printf("0");
+			else if (j==(COLUMNS-1)) printf("!");
+			else
+				if (i==0) printf("-");
+				else if (i==(lines-3)) printf("=");
+				else printf(".");
+			*/
+			printf("%c", screen_old[i][j]);
+			}
+		}
+	while (1) // main realtime loop
+		{
+		usleep(10000);
+		// обновляем screen
+		ll=unixtime();
+		i=ll%10;
+		screen[0][COLUMNS-1]='0'+i;
+		// вывод разницы
+		for (i=0;i<MAX_L;i++) for (j=0;j<MAX_C;j++)
+			{
+			if (screen[i][j]!=screen_old[i][j])
+				{
+				setpos(i+2,j+1);
+				printf("%c", screen[i][j]);
+				}
+			}
+		// screen_old <- screen
+		for (i=0;i<MAX_L;i++) for (j=0;j<MAX_C;j++) screen_old[i][j]=screen[i][j];
+		
+		c=getchar();
+
+		if (c==27 /* ESC */) {	c=getchar();
+				if (c==91)
+					{
+					c=getchar();
+					if (c==66)	goto l_s;
+					else if (c==65)	goto l_n;
+					else if (c==68)	goto l_w;
+					else if (c==67)	goto l_e;
+					}
+		}
+
+		if (c=='q') {quit=1; break;}
+		if (c=='r') break;
+		if (c=='Q') {quit=1; to_os=1; break;}
+		if (c=='e') {l_e:if (cur_c<(COLUMNS-1))
+					{screen[cur_l][cur_c]='.'; cur_c++; screen[cur_l][cur_c]='@';} 
+				 else screen[cur_l][cur_c]='*';
+				 }
+		else if (c=='w') {l_w:if (cur_c>0)
+					{screen[cur_l][cur_c]='.'; cur_c--; screen[cur_l][cur_c]='@';} 
+				 else screen[cur_l][cur_c]='*';
+				 }
+		else if (c=='s') {l_s:if (cur_l<(lines-3))
+					{screen[cur_l][cur_c]='.'; cur_l++; screen[cur_l][cur_c]='@';} 
+				 else screen[cur_l][cur_c]='*';
+				 }
+		else if (c=='n') {l_n:if (cur_l>0)
+					{screen[cur_l][cur_c]='.'; cur_l--; screen[cur_l][cur_c]='@';} 
+				 else screen[cur_l][cur_c]='*';
+				 }
+		}
+	}
+ioctl(0, TCGETA, &tstdin);
+tstdin.c_lflag |= (ICANON|ECHO);
+ioctl(0, TCSETA, &tstdin);
+fcntl(STDIN_FILENO, F_SETFL, oldf);
+setpos(lines-2,1);
+printf("\n\nexit from realtime\n");
+// показать курсор
+putchar(27);
+printf("[?25h");
+if (to_os) exit(0);
+}
+
+void realtime_old (void)
 {char c; int i, j; int x,y;
-struct termio tstdin;
 int oldf;
 int online_help=0;
 int cursor_blink=0;
