@@ -1749,8 +1749,8 @@ return 0;
 /******************************************************************************************************/
 #define CLR for(jj=0;jj<MAX_J; jj++) putch(' ');putch('\r')
 
-#define MAX_L 50
-#define MAX_C 150
+#define MAX_L 57
+#define MAX_C 217
 
 void realtime (void)
 {int i,j,c,quit, to_os;
@@ -1760,20 +1760,25 @@ long int ll;
 
 char screen [MAX_L] [MAX_C];
 char screen_old [MAX_L] [MAX_C];
+char screen_color [MAX_L] [MAX_C];
+char screen_color_old [MAX_L] [MAX_C];
+char screen_bg [MAX_L] [MAX_C];
+char screen_bg_old [MAX_L] [MAX_C];
 
 cur_l=0; cur_c=0;
+ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
 
 //printf("lines %i columns %i\n",lines,COLUMNS);
-if (lines>MAX_L) {printf("realtime module: error 1. array is small on lines\n"); return; }
-if (COLUMNS>MAX_C) {printf("realtime module: error 2. array is small on columns\n"); return; }
+if (lines>MAX_L) {printf("realtime module: array is small: lines=%i MAX_L=%i\n",lines,MAX_L); return; }
+if (COLUMNS>MAX_C) {printf("realtime module: array is small: COLUMNS=%i MAX_C=%i\n",COLUMNS,MAX_C); return; }
 
-for (i=0;i<MAX_L;i++) for (j=0;j<MAX_C;j++) screen[i][j]='.';
+for (i=0;i<MAX_L;i++) for (j=0;j<MAX_C;j++) {screen[i][j]='.'; screen_color[i][j]=DEFAULT_COLOR; screen_bg[i][j]=DEFAULT_BG;}
 
-for (i=0;i<MAX_L;i++) for (j=0;j<MAX_C;j++) screen_old[i][j]=screen[i][j];
+for (i=0;i<MAX_L;i++) for (j=0;j<MAX_C;j++)
+	{screen_old[i][j]=screen[i][j]; screen_color_old[i][j]=screen_color[i][j]; screen_bg_old[i][j]=screen_bg[i][j];}
 
 to_os=0;
 
-ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
 
 /*  Set stdin (file descriptor=0) to NOraw mode and echo */
 ioctl(0, TCGETA, &tstdin);
@@ -1808,6 +1813,8 @@ while(!quit)
 				else if (i==(lines-3)) printf("=");
 				else printf(".");
 			*/
+			esc(screen_bg_old[i][j]);
+			setcolor(screen_color_old[i][j]);
 			printf("%c", screen_old[i][j]);
 			}
 		}
@@ -1818,17 +1825,22 @@ while(!quit)
 		ll=unixtime();
 		i=ll%10;
 		screen[0][COLUMNS-1]='0'+i;
+		//setpos(1,1); printf("debug: (%i,%i)", cur_l, cur_c); // debug print
 		// вывод разницы
 		for (i=0;i<MAX_L;i++) for (j=0;j<MAX_C;j++)
 			{
-			if (screen[i][j]!=screen_old[i][j])
+			if ( (screen[i][j]!=screen_old[i][j]) || (screen_color[i][j]!=screen_color_old[i][j]) ||
+			     (screen_bg[i][j]!=screen_bg_old[i][j]))
 				{
 				setpos(i+2,j+1);
+				esc(screen_bg[i][j]);
+				setcolor(screen_color[i][j]);
 				printf("%c", screen[i][j]);
 				}
 			}
 		// screen_old <- screen
-		for (i=0;i<MAX_L;i++) for (j=0;j<MAX_C;j++) screen_old[i][j]=screen[i][j];
+		for (i=0;i<MAX_L;i++) for (j=0;j<MAX_C;j++) {screen_old[i][j]=screen[i][j];
+			screen_color_old[i][j]=screen_color[i][j]; screen_bg_old[i][j]=screen_bg[i][j];}
 		
 		c=getchar();
 
@@ -1873,7 +1885,7 @@ printf("\n\nexit from realtime\n");
 // показать курсор
 putchar(27);
 printf("[?25h");
-if (to_os) exit(0);
+if (to_os) {reset(); exit(0);}
 }
 
 void realtime_old (void)
