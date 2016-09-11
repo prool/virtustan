@@ -1772,7 +1772,7 @@ ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
 if (lines>MAX_L) {printf("realtime module: array is small: lines=%i MAX_L=%i\n",lines,MAX_L); return; }
 if (COLUMNS>MAX_C) {printf("realtime module: array is small: COLUMNS=%i MAX_C=%i\n",COLUMNS,MAX_C); return; }
 
-for (i=0;i<MAX_L;i++) for (j=0;j<MAX_C;j++) {screen[i][j]='.'; screen_color[i][j]=DEFAULT_COLOR; screen_bg[i][j]=DEFAULT_BG;}
+for (i=0;i<MAX_L;i++) for (j=0;j<MAX_C;j++) {screen[i][j]='.'; screen_color[i][j]=0; screen_bg[i][j]=0;}
 
 for (i=0;i<MAX_L;i++) for (j=0;j<MAX_C;j++)
 	{screen_old[i][j]=screen[i][j]; screen_color_old[i][j]=screen_color[i][j]; screen_bg_old[i][j]=screen_bg[i][j];}
@@ -1813,8 +1813,8 @@ while(!quit)
 				else if (i==(lines-3)) printf("=");
 				else printf(".");
 			*/
-			esc(screen_bg_old[i][j]);
-			setcolor(screen_color_old[i][j]);
+			if (screen_bg_old[i][j]) esc(screen_bg_old[i][j]);
+			if (screen_color_old[i][j]) setcolor(screen_color_old[i][j]);
 			printf("%c", screen_old[i][j]);
 			}
 		}
@@ -1825,6 +1825,8 @@ while(!quit)
 		ll=unixtime();
 		i=ll%10;
 		screen[0][COLUMNS-1]='0'+i;
+		screen_color[0][COLUMNS-1]=2;
+		screen_bg[0][COLUMNS-1]=41;
 		//setpos(1,1); printf("debug: (%i,%i)", cur_l, cur_c); // debug print
 		// вывод разницы
 		for (i=0;i<MAX_L;i++) for (j=0;j<MAX_C;j++)
@@ -1833,9 +1835,10 @@ while(!quit)
 			     (screen_bg[i][j]!=screen_bg_old[i][j]))
 				{
 				setpos(i+2,j+1);
-				esc(screen_bg[i][j]);
-				setcolor(screen_color[i][j]);
+				if (screen_bg[i][j]) esc(screen_bg[i][j]);
+				if (screen_color[i][j]) setcolor(screen_color[i][j]);
 				printf("%c", screen[i][j]);
+				if (screen_color[i][j]) setcolor(0);
 				}
 			}
 		// screen_old <- screen
