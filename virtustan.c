@@ -1757,6 +1757,7 @@ void realtime (void)
 int oldf;
 int cur_l, cur_c;
 long int ll;
+char podkursor_save[3];
 
 char screen [MAX_L] [MAX_C];
 char screen_old [MAX_L] [MAX_C];
@@ -1773,6 +1774,9 @@ if (lines>MAX_L) {printf("realtime module: array is small: lines=%i MAX_L=%i\n",
 if (COLUMNS>MAX_C) {printf("realtime module: array is small: COLUMNS=%i MAX_C=%i\n",COLUMNS,MAX_C); return; }
 
 for (i=0;i<MAX_L;i++) for (j=0;j<MAX_C;j++) {screen[i][j]='.'; screen_color[i][j]=0; screen_bg[i][j]=0;}
+
+i=0; j=0; screen[i][j]='0'; screen_color[i][j]=2; screen_bg[i][j]=0;
+i=2; j=2; screen[i][j]='#'; screen_color[i][j]=2; screen_bg[i][j]=0;
 
 for (i=0;i<MAX_L;i++) for (j=0;j<MAX_C;j++)
 	{screen_old[i][j]=screen[i][j]; screen_color_old[i][j]=screen_color[i][j]; screen_bg_old[i][j]=screen_bg[i][j];}
@@ -1792,7 +1796,11 @@ fcntl(STDIN_FILENO, F_SETFL, oldf | O_NONBLOCK);
 putchar(27);
 printf("[?25l");
 
-		screen[cur_l][cur_c]='@';
+podkursor_save[0]=screen[cur_l][cur_c];
+podkursor_save[1]=screen_color[cur_l][cur_c];
+podkursor_save[2]=screen_bg[cur_l][cur_c];
+
+screen[cur_l][cur_c]='@';
 
 quit=0;
 while(!quit)
@@ -1816,6 +1824,7 @@ while(!quit)
 			if (screen_bg_old[i][j]) esc(screen_bg_old[i][j]);
 			if (screen_color_old[i][j]) setcolor(screen_color_old[i][j]);
 			printf("%c", screen_old[i][j]);
+			if (screen_color[i][j]) setcolor(0);
 			}
 		}
 	while (1) // main realtime loop
@@ -1862,19 +1871,51 @@ while(!quit)
 		if (c=='r') break;
 		if (c=='Q') {quit=1; to_os=1; break;}
 		if (c=='e') {l_e:if (cur_c<(COLUMNS-1))
-					{screen[cur_l][cur_c]='.'; cur_c++; screen[cur_l][cur_c]='@';} 
+					{
+					screen[cur_l][cur_c]=podkursor_save[0];
+					screen_color[cur_l][cur_c]=podkursor_save[1];
+					screen_bg[cur_l][cur_c]=podkursor_save[2];
+					cur_c++;
+					podkursor_save[0]=screen[cur_l][cur_c];
+					podkursor_save[1]=screen_color[cur_l][cur_c];
+					podkursor_save[2]=screen_bg[cur_l][cur_c];
+					screen[cur_l][cur_c]='@';} 
 				 else screen[cur_l][cur_c]='*';
 				 }
 		else if (c=='w') {l_w:if (cur_c>0)
-					{screen[cur_l][cur_c]='.'; cur_c--; screen[cur_l][cur_c]='@';} 
+					{
+					screen[cur_l][cur_c]=podkursor_save[0];
+					screen_color[cur_l][cur_c]=podkursor_save[1];
+					screen_bg[cur_l][cur_c]=podkursor_save[2];
+					cur_c--;
+					podkursor_save[0]=screen[cur_l][cur_c];
+					podkursor_save[1]=screen_color[cur_l][cur_c];
+					podkursor_save[2]=screen_bg[cur_l][cur_c];
+					screen[cur_l][cur_c]='@';} 
 				 else screen[cur_l][cur_c]='*';
 				 }
 		else if (c=='s') {l_s:if (cur_l<(lines-3))
-					{screen[cur_l][cur_c]='.'; cur_l++; screen[cur_l][cur_c]='@';} 
+					{
+					screen[cur_l][cur_c]=podkursor_save[0];
+					screen_color[cur_l][cur_c]=podkursor_save[1];
+					screen_bg[cur_l][cur_c]=podkursor_save[2];
+					cur_l++;
+					podkursor_save[0]=screen[cur_l][cur_c];
+					podkursor_save[1]=screen_color[cur_l][cur_c];
+					podkursor_save[2]=screen_bg[cur_l][cur_c];
+					screen[cur_l][cur_c]='@';} 
 				 else screen[cur_l][cur_c]='*';
 				 }
 		else if (c=='n') {l_n:if (cur_l>0)
-					{screen[cur_l][cur_c]='.'; cur_l--; screen[cur_l][cur_c]='@';} 
+					{
+					screen[cur_l][cur_c]=podkursor_save[0];
+					screen_color[cur_l][cur_c]=podkursor_save[1];
+					screen_bg[cur_l][cur_c]=podkursor_save[2];
+					cur_l--;
+					podkursor_save[0]=screen[cur_l][cur_c];
+					podkursor_save[1]=screen_color[cur_l][cur_c];
+					podkursor_save[2]=screen_bg[cur_l][cur_c];
+					screen[cur_l][cur_c]='@';} 
 				 else screen[cur_l][cur_c]='*';
 				 }
 		}
