@@ -1620,7 +1620,8 @@ while(1)
 	cc=strchr(cmd,'\n');
 	if (cc) *cc=0;
 	if (cmd[0]==0) continue;
-	if ((!strcmp(cmd,"q")) || (!strcmp(cmd,"quit")) || (!strcmp(cmd,"exit")) || (!strcmp(cmd,"конец"))) 
+	if ((!strcmp(cmd,"q")) || (!strcmp(cmd,"q")) || (!strcmp(cmd,"quit")) || (!strcmp(cmd,"exit")) ||
+		(!strcmp(cmd,"конец"))) 
 		{
 		if (updated==0) break;
 		print("Мир был изменен! Сохраните мир командой save. Или выйдите командой непосредственного выхода Quit\n");
@@ -1751,6 +1752,7 @@ return 0;
 
 #define MAX_L 57
 #define MAX_C 217
+#define CURSOR_COLOR 14
 
 void realtime (void)
 {int i,j,c,quit, to_os;
@@ -1801,6 +1803,7 @@ podkursor_save[1]=screen_color[cur_l][cur_c];
 podkursor_save[2]=screen_bg[cur_l][cur_c];
 
 screen[cur_l][cur_c]='@';
+screen_color[cur_l][cur_c]=CURSOR_COLOR;
 
 quit=0;
 while(!quit)
@@ -1808,7 +1811,7 @@ while(!quit)
 	// refresh screen
 	clearscreen();
 	gotoxy(0,0);
-	printf("lines %i columns %i\n",lines,COLUMNS);
+	printf("Virtustan realtime mode. lines=%i columns=%i ? - help\n",lines,COLUMNS);
 	for (i=0;i<(lines-2);i++)
 		{
 		for (j=0;j<COLUMNS;j++)
@@ -1864,6 +1867,22 @@ while(!quit)
 					else if (c==65)	goto l_n;
 					else if (c==68)	goto l_w;
 					else if (c==67)	goto l_e;
+					else if (c==0x35)
+						{
+						c=getchar();
+						if (c==0x7E)
+							{ // PgUp
+							podkursor_save[0]='U';
+							}
+						}
+					else if (c==0x36)
+						{
+						c=getchar();
+						if (c==0x7E)
+							{ // PgDn
+							podkursor_save[0]='D';
+							}
+						}
 					}
 		}
 
@@ -1879,7 +1898,9 @@ while(!quit)
 					podkursor_save[0]=screen[cur_l][cur_c];
 					podkursor_save[1]=screen_color[cur_l][cur_c];
 					podkursor_save[2]=screen_bg[cur_l][cur_c];
-					screen[cur_l][cur_c]='@';} 
+					screen[cur_l][cur_c]='@';
+					screen_color[cur_l][cur_c]=CURSOR_COLOR;
+					} 
 				 else screen[cur_l][cur_c]='*';
 				 }
 		else if (c=='w') {l_w:if (cur_c>0)
@@ -1891,7 +1912,9 @@ while(!quit)
 					podkursor_save[0]=screen[cur_l][cur_c];
 					podkursor_save[1]=screen_color[cur_l][cur_c];
 					podkursor_save[2]=screen_bg[cur_l][cur_c];
-					screen[cur_l][cur_c]='@';} 
+					screen[cur_l][cur_c]='@';
+					screen_color[cur_l][cur_c]=CURSOR_COLOR;
+					} 
 				 else screen[cur_l][cur_c]='*';
 				 }
 		else if (c=='s') {l_s:if (cur_l<(lines-3))
@@ -1903,7 +1926,9 @@ while(!quit)
 					podkursor_save[0]=screen[cur_l][cur_c];
 					podkursor_save[1]=screen_color[cur_l][cur_c];
 					podkursor_save[2]=screen_bg[cur_l][cur_c];
-					screen[cur_l][cur_c]='@';} 
+					screen[cur_l][cur_c]='@';
+					screen_color[cur_l][cur_c]=CURSOR_COLOR;
+					} 
 				 else screen[cur_l][cur_c]='*';
 				 }
 		else if (c=='n') {l_n:if (cur_l>0)
@@ -1915,9 +1940,24 @@ while(!quit)
 					podkursor_save[0]=screen[cur_l][cur_c];
 					podkursor_save[1]=screen_color[cur_l][cur_c];
 					podkursor_save[2]=screen_bg[cur_l][cur_c];
-					screen[cur_l][cur_c]='@';} 
+					screen[cur_l][cur_c]='@';
+					screen_color[cur_l][cur_c]=CURSOR_COLOR;
+					} 
 				 else screen[cur_l][cur_c]='*';
 				 }
+		else if (c==' ') podkursor_save[0]='#';
+		else if (c=='?')	{
+					setpos(1,1);
+					printf("\n\nlines %i columns %i\n\n",lines,COLUMNS);
+					printf("\n\nHelp:\n\n");
+					printf("n s w e or arrows - move\n");
+					printf("r - refresh screen\n");
+					printf("q - quit to app., Q - quit to OS shell\n");
+					printf("? - this help\n\n");
+					printf("Press any key for exit from help\n");
+					while (getchar()==-1) usleep(10000);
+					break;
+					}
 		}
 	}
 ioctl(0, TCGETA, &tstdin);
