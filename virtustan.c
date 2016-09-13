@@ -1873,6 +1873,7 @@ while(!quit)
 						if (c==0x7E)
 							{ // PgUp
 							podkursor_save[0]='U';
+							podkursor_save[1]++;
 							}
 						}
 					else if (c==0x36)
@@ -1881,6 +1882,7 @@ while(!quit)
 						if (c==0x7E)
 							{ // PgDn
 							podkursor_save[0]='D';
+							podkursor_save[2]++;
 							}
 						}
 					}
