@@ -1620,7 +1620,7 @@ while(1)
 	cc=strchr(cmd,'\n');
 	if (cc) *cc=0;
 	if (cmd[0]==0) continue;
-	if ((!strcmp(cmd,"q")) || (!strcmp(cmd,"q")) || (!strcmp(cmd,"quit")) || (!strcmp(cmd,"exit")) ||
+	if ((!strcmp(cmd,"Q")) || (!strcmp(cmd,"q")) || (!strcmp(cmd,"quit")) || (!strcmp(cmd,"exit")) ||
 		(!strcmp(cmd,"конец"))) 
 		{
 		if (updated==0) break;
@@ -1885,6 +1885,11 @@ while(!quit)
 							podkursor_save[2]++;
 							}
 						}
+					else if (c==0x46)
+						{
+						podkursor_save[0]='E';
+						podkursor_save[2]=40;
+						}
 					}
 		}
 
@@ -1954,6 +1959,7 @@ while(!quit)
 					printf("\n\nHelp:\n\n");
 					printf("n s w e or arrows - move\n");
 					printf("r - refresh screen\n");
+					printf("PgUp - color++\nPgDn - background++\nEnd - background=40\n");
 					printf("q - quit to app., Q - quit to OS shell\n");
 					printf("? - this help\n\n");
 					printf("Press any key for exit from help\n");
