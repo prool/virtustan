@@ -2,6 +2,8 @@
 // by Prool
 // www.prool.kharkov.org
 
+#define CONFIG_FILE "virtustan.cfg"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -25,6 +27,7 @@
 #define MAX_Y 200 // 60
 
 #define MAXLEN 255
+#define PROOL_MAX_STRLEN 255
 #define MAXLEN_CMD 4096
 #define MAXUTF 1024
 
@@ -92,6 +95,7 @@
 
 // static variables
 
+int have_config;
 int updated; // =1 if world is update
 int i_c, j_c; // cursor location for realtime mode
 int MAX_I, MAX_J;
@@ -112,6 +116,7 @@ struct
 	world[MAX_X][MAX_Y];
 
 char base_path [MAXLEN];
+char logfilename [MAXLEN];
 
 int inv_o=0; // inventory
 

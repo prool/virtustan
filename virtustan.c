@@ -1257,9 +1257,8 @@ void log_(char *str)
 {
 FILE *fp;
 
-#define LOGFILE "virtustan-app.log"
-fp=fopen(LOGFILE,"a");
-if (!fp) {printf("Can't open logfile `%s'\n",LOGFILE); return;}
+fp=fopen(logfilename,"a");
+if (!fp) {printf("Can't open logfile `%s'\n",logfilename); return;}
 fprintf(fp,"%s %s\n",ptime(), str);
 fflush(0);
 fclose(fp);
@@ -1309,9 +1308,16 @@ switch(color_mode)
 	case 0: printf("normal color\n"); break;
 	case NO_COLOR: printf("no color\n"); break;
 	case CONTRAST: printf("contrast color\n"); break;
-	delault: printf("ЖОПА\n");
+	default: printf("ЖОПА\n");
 	}
 setcolor(0);
+switch(have_config)
+	{
+	case 0: printf("No config file\n"); break;
+	case 1: printf("Have config file '%s' in current dir\n", CONFIG_FILE); break;
+	case 2: printf("Have priority config file '%s' in up dir\n", CONFIG_FILE); break;
+	default: printf("Config internal logic error!\n");
+	}
 if (updated) print("\nМир был изменен!\n");
 }
 
@@ -1418,6 +1424,50 @@ while(1)
 	if (entry==0) break;
 	if (i++ == file_no) {if (chdir(entry->d_name)==0) file_no=0; return;}
 	}
+}
+
+void create_file(void)
+{
+char str[MAXLEN]; char *cc;
+FILE *fp;
+
+str[0]=0;
+cc=0;
+
+printf("Filename > ");
+cc=fgets(str,MAXLEN,stdin);
+
+cc=strchr(str,'\r'); if (cc) *cc=0;
+cc=strchr(str,'\n'); if (cc) *cc=0;
+
+//printf("Try create file '%s'\n", str);
+
+if (str[0]==0) {printf("create file: error: empty filename\n"); return;}
+
+fp=fopen(str,"r");
+if (fp)
+	{
+	printf("File '%s' already exits! Use 'delfile' if need\n", str);
+	return;
+	}
+
+fp=fopen(str,"w");
+
+if (fp==0) {printf("create file: error: can't create file\n"); return;}
+
+printf("Enter lines for file\n. - end of input\n");
+
+while(1)
+	{
+	printf(" > ");
+	cc=fgets(str,MAXLEN,stdin);
+	if (*cc=='.') break;
+	//printf("inputted string = '%s'\n", str);
+	fprintf(fp,"%s",str);
+	}
+
+fclose(fp);
+
 }
 
 void pwd(void)
@@ -1545,9 +1595,55 @@ start_time=unixtime();
 
 getcwd(base_path, MAXLEN);
 
+strcpy(logfilename, base_path);
+strcat(logfilename, "/virtustan-app.log");
+
 //printf("base path =%s\n", base_path);
 
 srandom(unixtime());
+
+// prool: config file processing
+
+FILE *fconfig;
+char string[PROOL_MAX_STRLEN];
+char config_filename_2[PROOL_MAX_STRLEN];
+char buffer_string[PROOL_MAX_STRLEN];
+
+strcpy(config_filename_2, "../");
+strcat(config_filename_2, CONFIG_FILE);
+
+fconfig=fopen(config_filename_2,"r");
+if (fconfig)
+	{
+	printf("Using %s\n", config_filename_2);
+	have_config=2;
+	}
+else 	{ fconfig=fopen(CONFIG_FILE, "r");
+	if (fconfig)
+			{	
+			printf("Using %s\n", CONFIG_FILE);
+			have_config=1;
+			}
+	}
+if (fconfig)
+	{
+	while (!feof(fconfig))
+		{char *pp;
+		string[0]=0;
+		fgets(string,PROOL_MAX_STRLEN,fconfig);
+		pp=strchr(string,'\n');
+		if (pp) *pp=0;
+		// printf("`%s'\n", string); // debug print
+		if (!strcmp(string,"test")) printf("TEST OK!\n");
+		}
+	fclose(fconfig);
+	}
+else
+	{
+	printf("%s not found\n", CONFIG_FILE);
+	have_config=0;
+	}
+// end of config file processing
 
 if (random()<(RAND_MAX/9))
 	{// fortune
@@ -1578,7 +1674,7 @@ printf("%sUse `help' command for help and `quit' for quit.%s\n", BEL1, NORM_COLO
 
 print_holyday();
 
-log_("Virtustan application started");
+log_("Virtustan application started. http://prool.kharkov.org https://github.com/prool/virtustan");
 
 //printf("init started\n");
 Codetable=UTF;
@@ -1697,6 +1793,7 @@ while(1)
 	else if (!strcmp(cmd,"cd/")) chdir("/");
 	else if (!strcmp(cmd,"pwd")) pwd();
 	else if (!strcmp(cmd,"delfile")) delete_file();
+	else if (!strcmp(cmd,"createfile")) create_file();
 	else if (!strcmp(cmd,"cat")) cat();
 	else if (!strcmp(cmd,"hcat")) hexcat();
 	else if (!strcmp(cmd,"stat")) filestatus();
@@ -1737,7 +1834,7 @@ while(1)
 	else 	{// No internal command. External command:
 		if (exec(cmd))
 			{
-			printf("\nBad command or file name `%s'\n\n(", cmd);
+			printf("\nBad command or file name `%s'\n\n( ", cmd);
 			i=0;
 			while(cmd[i]) printf("%02X ", cmd[i++]);
 			printf(")\n\nUse help for help. Use quit for quit\nИспользуйте команду помощь для получения помощи, а команду конец для выхода из программы\n");
@@ -1760,6 +1857,7 @@ int oldf;
 int cur_l, cur_c;
 long int ll;
 char podkursor_save[3];
+int tick_status;
 
 char screen [MAX_L] [MAX_C];
 char screen_old [MAX_L] [MAX_C];
@@ -1770,6 +1868,8 @@ char screen_bg_old [MAX_L] [MAX_C];
 
 cur_l=0; cur_c=0;
 ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
+
+tick_status=0;
 
 //printf("lines %i columns %i\n",lines,COLUMNS);
 if (lines>MAX_L) {printf("realtime module: array is small: lines=%i MAX_L=%i\n",lines,MAX_L); return; }
@@ -1839,6 +1939,17 @@ while(!quit)
 		screen[0][COLUMNS-1]='0'+i;
 		screen_color[0][COLUMNS-1]=2;
 		screen_bg[0][COLUMNS-1]=41;
+		// ticks
+		if (tick_status==i)
+			{
+			tick_status++;
+			tick_status=tick_status%10;
+			/*
+			if (screen[1][1]++=='~') screen[1][1]='/';
+			screen_color[1][1]++;
+			screen_bg[1][1]++;
+			*/
+			}
 		//setpos(1,1); printf("debug: (%i,%i)", cur_l, cur_c); // debug print
 		// вывод разницы
 		for (i=0;i<MAX_L;i++) for (j=0;j<MAX_C;j++)
