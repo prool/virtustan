@@ -1573,6 +1573,30 @@ for (i=1;;i++)
 	}
 }
 
+void random_flood(void)
+{int i,j;
+
+for (i=0; i<MAX_X; i++) for (j=0; j<MAX_Y; j++)
+{
+if (random()<(RAND_MAX/100))
+	{
+	if (world[i][j].descr==0)
+		{
+		world[i][j].symbol='R';
+		/*
+		world[i][j].descr=0;
+		world[i][j].room_type=0;
+		world[i][j].color=DEFAULT_COLOR;
+		world[i][j].bg=DEFAULT_BG;
+		world[i][j].object=0;
+		world[i][j].mob=0;
+		world[i][j].timer=0;
+		*/
+		}
+	}
+}
+}
+
 void reset(void) // reset terminal
 {
 printf("%cc",ESC); // ESC c - reset terminal
@@ -1768,6 +1792,7 @@ while(1)
 	else if (!strcmp(cmd,"swap")) swap();
 	else if (!strcmp(cmd,"dup")) dup_();
 	else if (!strcmp(cmd,"create")) create();
+	else if (!strcmp(cmd,"random")) random_flood();
 	else if (!strcmp(cmd,"destroy")) destroy();
 	else if (!strcmp(cmd,"roomcolor")) roomcolor();
 	else if (!strcmp(cmd,"roombg")) roombg();
