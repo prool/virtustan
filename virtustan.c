@@ -1574,7 +1574,7 @@ for (i=1;;i++)
 }
 
 void random_flood(void)
-{int i,j;
+{int i, j, r;
 
 for (i=0; i<MAX_X; i++) for (j=0; j<MAX_Y; j++)
 {
@@ -1583,6 +1583,8 @@ if (random()<(RAND_MAX/100))
 	if (world[i][j].descr==0)
 		{
 		world[i][j].symbol='R';
+		r=random() % 127;
+		if (r>=32) world[i][j].symbol=r;
 		/*
 		world[i][j].descr=0;
 		world[i][j].room_type=0;
@@ -1936,7 +1938,7 @@ while(!quit)
 	// refresh screen
 	clearscreen();
 	gotoxy(0,0);
-	printf("Virtustan realtime mode. lines=%i columns=%i ? - help\n",lines,COLUMNS);
+	printf("Virtustan realtime mode ? - help\n");
 	for (i=0;i<(lines-2);i++)
 		{
 		for (j=0;j<COLUMNS;j++)
@@ -2102,6 +2104,7 @@ while(!quit)
 					while (getchar()==-1) usleep(10000);
 					break;
 					}
+		else {if (c!=-1) screen[cur_l][cur_c]='#';}
 		}
 	}
 ioctl(0, TCGETA, &tstdin);
