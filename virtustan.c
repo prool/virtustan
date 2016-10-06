@@ -744,7 +744,13 @@ void resetroom (void)
 
 void till (void)
 {
-if (world[global_x][global_y].descr==0)
+if (world[global_x][global_y].object)
+	{
+	print("Здесь пахать нельзя. Здесь лежит ");
+	print_object (world[global_x][global_y].object);
+	return;
+	}
+if ((world[global_x][global_y].descr==0) && (world[global_x][global_y].object==0))
 	{
 	world[global_x][global_y].descr="Вспахано";
 	world[global_x][global_y].room_type=TILLED;
