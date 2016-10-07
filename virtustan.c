@@ -1963,7 +1963,7 @@ while(!quit)
 			if (screen_bg_old[i][j]) esc(screen_bg_old[i][j]);
 			if (screen_color_old[i][j]) setcolor(screen_color_old[i][j]);
 			printf("%c", screen_old[i][j]);
-			if (screen_color[i][j]) setcolor(0);
+			if (screen_color_old[i][j]) setcolor(0);
 			}
 		}
 	while (1) // main realtime loop
@@ -2019,7 +2019,7 @@ while(!quit)
 						c=getchar();
 						if (c==0x7E)
 							{ // PgUp
-							podkursor_save[0]='U';
+							//podkursor_save[0]='U';
 							podkursor_save[1]++;
 							}
 						}
@@ -2028,13 +2028,13 @@ while(!quit)
 						c=getchar();
 						if (c==0x7E)
 							{ // PgDn
-							podkursor_save[0]='D';
+							//podkursor_save[0]='D';
 							podkursor_save[2]++;
 							}
 						}
 					else if (c==0x46)
 						{
-						podkursor_save[0]='E';
+						//podkursor_save[0]='E';
 						podkursor_save[2]=40;
 						}
 					}
@@ -2107,12 +2107,23 @@ while(!quit)
 					printf("n s w e or arrows - move\n");
 					printf("r - refresh screen\n");
 					printf("PgUp - color++\nPgDn - background++\nEnd - background=40\n");
+					printf("R - random\n");
 					printf("q - quit to app., Q - quit to OS shell\n");
 					printf("? - this help\n\n");
 					printf("Press any key for exit from help\n");
 					while (getchar()==-1) usleep(10000);
 					break;
 					}
+		else if (c=='R')
+				{// random
+				for (i=0;i<(lines-2);i++)
+				{
+				for (j=0;j<COLUMNS;j++)
+				{
+				if (random()<(RAND_MAX/100))screen[i][j]='*';
+				}
+				}
+				}
 		else {if (c!=-1) screen[cur_l][cur_c]='#';}
 		}
 	}
