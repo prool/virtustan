@@ -271,7 +271,7 @@ ioctl(0, TCSETA, &tstdin);
 oldf = fcntl(STDIN_FILENO, F_GETFL, 0);
 fcntl(STDIN_FILENO, F_SETFL, oldf | O_NONBLOCK);
 
-printf("Q - quit\n");
+printf("Q - quit M - mouse mode on Z - mouse mode off\n");
 
 while(1)
 	{
@@ -279,8 +279,9 @@ while(1)
 	c=getchar(); putchar('.');
 	if (c!=-1) printf ("test2. Code=%02X\r\n",(unsigned char)c);
 	fflush(0);
-	if (c=='Q')
+	switch (c)
 		{
+		case 'Q':
 		ioctl(0, TCGETA, &tstdin);
 		printf("tstdin.c_lflag=%X\n", tstdin.c_lflag);
     		tstdin.c_lflag |= (ICANON|ECHO);
@@ -288,6 +289,8 @@ while(1)
     		ioctl(0, TCSETA, &tstdin);
 		fcntl(STDIN_FILENO, F_SETFL, oldf);
 		return;
+		case 'M': printf("\nMouse mode on%c[?9h\n",ESC); break;
+		case 'Z': printf("\nMouse mode off%c[?9l\n",ESC); break;
 		}
 	}
 
