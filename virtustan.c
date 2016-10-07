@@ -1911,7 +1911,7 @@ tick_status=0;
 if (lines>MAX_L) {printf("realtime module: array is small: lines=%i MAX_L=%i\n",lines,MAX_L); return; }
 if (COLUMNS>MAX_C) {printf("realtime module: array is small: COLUMNS=%i MAX_C=%i\n",COLUMNS,MAX_C); return; }
 
-for (i=0;i<MAX_L;i++) for (j=0;j<MAX_C;j++) {screen[i][j]='.'; screen_color[i][j]=0; screen_bg[i][j]=0;}
+for (i=0;i<MAX_L;i++) for (j=0;j<MAX_C;j++) {screen[i][j]=' '; screen_color[i][j]=0; screen_bg[i][j]=0;}
 
 i=0; j=0; screen[i][j]='0'; screen_color[i][j]=2; screen_bg[i][j]=0;
 i=2; j=2; screen[i][j]='#'; screen_color[i][j]=2; screen_bg[i][j]=0;
