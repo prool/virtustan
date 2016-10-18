@@ -93,6 +93,11 @@
 #define peek2(SEG,OFFSET) 0
 #define putch(a) putchar(a)
 
+// for realtime() module
+#define MAX_L 57
+#define MAX_C 217
+#define CURSOR_COLOR 14
+
 // static variables
 
 int have_config;

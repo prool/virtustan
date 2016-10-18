@@ -7,6 +7,15 @@
 #define KIOCSOUND	0x4B2F	/* start sound generation (0 for off) */
 #define KDMKTONE	0x4B30	/* generate tone */
 
+// static vars for realtime() module
+char screen [MAX_L] [MAX_C];
+char screen_old [MAX_L] [MAX_C];
+char screen_color [MAX_L] [MAX_C];
+char screen_color_old [MAX_L] [MAX_C];
+char screen_bg [MAX_L] [MAX_C];
+char screen_bg_old [MAX_L] [MAX_C];
+int cur_l, cur_c;
+
 void tone(int fd, int hertz, int hundredths) {
  unsigned int ticks = hundredths * HZ / 100;
  /* ticks & 0xffff не будет работать, если ticks — 0xf0000;
@@ -1625,6 +1634,10 @@ int main (int argc, char *argv[], char *envp[])
 unsigned char cmd[MAXLEN_CMD];
 char *cc;
 int i, j;
+FILE *fconfig;
+char string[PROOL_MAX_STRLEN];
+char config_filename_2[PROOL_MAX_STRLEN];
+char buffer_string[PROOL_MAX_STRLEN];
 
 start_time=unixtime();
 
@@ -1638,11 +1651,6 @@ strcat(logfilename, "/virtustan-app.log");
 srandom(unixtime());
 
 // prool: config file processing
-
-FILE *fconfig;
-char string[PROOL_MAX_STRLEN];
-char config_filename_2[PROOL_MAX_STRLEN];
-char buffer_string[PROOL_MAX_STRLEN];
 
 strcpy(config_filename_2, "../");
 strcat(config_filename_2, CONFIG_FILE);
@@ -1719,6 +1727,24 @@ Codetable=UTF;
 global_x=30; global_y=40;
 
 init_world();
+
+// init realtime()
+for (i=0;i<MAX_L;i++) for (j=0;j<MAX_C;j++) {screen[i][j]=' '; screen_color[i][j]=0; screen_bg[i][j]=0;}
+cur_l=0; cur_c=0;
+
+//i=0; j=0; screen[i][j]='0'; screen_color[i][j]=2; screen_bg[i][j]=0;
+
+#if 1
+for (i=0;i<MAX_L;i++) for (j=0;j<MAX_C;j++)
+	{int ii, jj;
+	ii=j;
+	jj=MAX_Y-1-i;
+	if ((ii<MAX_X) && (jj<MAX_Y))
+		{
+		if (world[ii][jj].symbol) screen[i][j]=world[ii][jj].symbol;
+		}
+	}
+#endif
 
 HALF_X = COLUMNS/4-1;
 HALF_Y = lines/2-3;
@@ -1883,26 +1909,13 @@ return 0;
 /******************************************************************************************************/
 #define CLR for(jj=0;jj<MAX_J; jj++) putch(' ');putch('\r')
 
-#define MAX_L 57
-#define MAX_C 217
-#define CURSOR_COLOR 14
-
 void realtime (void)
 {int i,j,c,quit, to_os;
 int oldf;
-int cur_l, cur_c;
 long int ll;
 char podkursor_save[3];
 int tick_status;
 
-char screen [MAX_L] [MAX_C];
-char screen_old [MAX_L] [MAX_C];
-char screen_color [MAX_L] [MAX_C];
-char screen_color_old [MAX_L] [MAX_C];
-char screen_bg [MAX_L] [MAX_C];
-char screen_bg_old [MAX_L] [MAX_C];
-
-cur_l=0; cur_c=0;
 ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
 
 tick_status=0;
@@ -1911,10 +1924,10 @@ tick_status=0;
 if (lines>MAX_L) {printf("realtime module: array is small: lines=%i MAX_L=%i\n",lines,MAX_L); return; }
 if (COLUMNS>MAX_C) {printf("realtime module: array is small: COLUMNS=%i MAX_C=%i\n",COLUMNS,MAX_C); return; }
 
-for (i=0;i<MAX_L;i++) for (j=0;j<MAX_C;j++) {screen[i][j]=' '; screen_color[i][j]=0; screen_bg[i][j]=0;}
-
+#if 0
 i=0; j=0; screen[i][j]='0'; screen_color[i][j]=2; screen_bg[i][j]=0;
 i=2; j=2; screen[i][j]='#'; screen_color[i][j]=2; screen_bg[i][j]=0;
+#endif
 
 for (i=0;i<MAX_L;i++) for (j=0;j<MAX_C;j++)
 	{screen_old[i][j]=screen[i][j]; screen_color_old[i][j]=screen_color[i][j]; screen_bg_old[i][j]=screen_bg[i][j];}
@@ -1947,7 +1960,7 @@ while(!quit)
 	// refresh screen
 	clearscreen();
 	gotoxy(0,0);
-	printf("Virtustan realtime mode ? - help\n");
+	printf("Virtustan realtime mode. cur_l=%i cur_c=%i ? - help\n", cur_l, cur_c);
 	for (i=0;i<(lines-2);i++)
 		{
 		for (j=0;j<COLUMNS;j++)
@@ -1986,7 +1999,8 @@ while(!quit)
 			screen_bg[1][1]++;
 			*/
 			}
-		//setpos(1,1); printf("debug: (%i,%i)", cur_l, cur_c); // debug print
+		setpos(1,1); printf("debug: (%02i,%02i) (%i,%i,%i) ? - Help                                       ",
+		cur_l, cur_c, podkursor_save[0],podkursor_save[1],podkursor_save[2]); // debug print
 		// вывод разницы
 		for (i=0;i<MAX_L;i++) for (j=0;j<MAX_C;j++)
 			{
@@ -2040,9 +2054,15 @@ while(!quit)
 					}
 		}
 
-		if (c=='q') {quit=1; break;}
 		if (c=='r') break;
 		if (c=='Q') {quit=1; to_os=1; break;}
+		if (c=='q')		{
+					quit=1;
+					screen[cur_l][cur_c]=podkursor_save[0];
+					screen_color[cur_l][cur_c]=podkursor_save[1];
+					screen_bg[cur_l][cur_c]=podkursor_save[2];
+					break;
+					}
 		if (c=='e') {l_e:if (cur_c<(COLUMNS-1))
 					{
 					screen[cur_l][cur_c]=podkursor_save[0];
@@ -2099,13 +2119,16 @@ while(!quit)
 					} 
 				 else screen[cur_l][cur_c]='*';
 				 }
-		else if (c==' ') podkursor_save[0]='#';
+		else if (c==' ') podkursor_save[0]++;
+		else if (c=='0') podkursor_save[0]=' ';
 		else if (c=='?')	{
 					setpos(1,1);
 					printf("\n\nlines %i columns %i\n\n",lines,COLUMNS);
 					printf("\n\nHelp:\n\n");
 					printf("n s w e or arrows - move\n");
 					printf("r - refresh screen\n");
+					printf("0 - clear cell\n");
+					printf("Spacebar - symbol++\n");
 					printf("PgUp - color++\nPgDn - background++\nEnd - background=40\n");
 					printf("R - random\n");
 					printf("q - quit to app., Q - quit to OS shell\n");
