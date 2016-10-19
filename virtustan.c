@@ -1731,20 +1731,7 @@ init_world();
 // init realtime()
 for (i=0;i<MAX_L;i++) for (j=0;j<MAX_C;j++) {screen[i][j]=' '; screen_color[i][j]=0; screen_bg[i][j]=0;}
 cur_l=0; cur_c=0;
-
 //i=0; j=0; screen[i][j]='0'; screen_color[i][j]=2; screen_bg[i][j]=0;
-
-#if 1
-for (i=0;i<MAX_L;i++) for (j=0;j<MAX_C;j++)
-	{int ii, jj;
-	ii=j;
-	jj=MAX_Y-1-i;
-	if ((ii<MAX_X) && (jj<MAX_Y))
-		{
-		if (world[ii][jj].symbol) screen[i][j]=world[ii][jj].symbol;
-		}
-	}
-#endif
 
 HALF_X = COLUMNS/4-1;
 HALF_Y = lines/2-3;
@@ -2091,7 +2078,7 @@ while(!quit)
 					} 
 				 else screen[cur_l][cur_c]='*';
 				 }
-		else if (c=='s') {l_s:if (cur_l<(lines-3))
+		else if (c=='s') {l_s:if (cur_l<(lines-2)) // нижняя граница
 					{
 					screen[cur_l][cur_c]=podkursor_save[0];
 					screen_color[cur_l][cur_c]=podkursor_save[1];
@@ -2131,6 +2118,7 @@ while(!quit)
 					printf("Spacebar - symbol++\n");
 					printf("PgUp - color++\nPgDn - background++\nEnd - background=40\n");
 					printf("R - random\n");
+					printf("G - get data from main world S - save data to main world\n");
 					printf("q - quit to app., Q - quit to OS shell\n");
 					printf("? - this help\n\n");
 					printf("Press any key for exit from help\n");
@@ -2145,6 +2133,39 @@ while(!quit)
 				{
 				if (random()<(RAND_MAX/100))screen[i][j]='*';
 				}
+				}
+				}
+		else if (c=='G')
+				{
+				for (i=0;i<MAX_L;i++) for (j=0;j<MAX_C;j++)
+				{int ii, jj;
+				ii=j;
+				jj=MAX_Y-1-i;
+				if ((ii<MAX_X) && (jj<MAX_Y))
+					{
+					if (world[ii][jj].symbol) screen[i][j]=world[ii][jj].symbol;
+					screen_color[i][j]=world[ii][jj].color;
+					if (world[ii][jj].bg) screen_bg[i][j]=world[ii][jj].bg;
+					}
+				}
+				podkursor_save[0]=screen[cur_l][cur_c];
+				podkursor_save[1]=screen_color[cur_l][cur_c];
+				podkursor_save[2]=screen_bg[cur_l][cur_c];
+					screen[cur_l][cur_c]='@';
+					screen_color[cur_l][cur_c]=CURSOR_COLOR;
+				}
+		else if (c=='S')
+				{
+				for (i=0;i<MAX_L;i++) for (j=0;j<MAX_C;j++)
+				{int ii, jj;
+				ii=j;
+				jj=MAX_Y-1-i;
+				if ((ii<MAX_X) && (jj<MAX_Y))
+					{
+					if(screen[i][j]) world[ii][jj].symbol=screen[i][j];
+					world[ii][jj].color=screen_color[i][j];
+					if (screen_bg[i][j]) world[ii][jj].bg=screen_bg[i][j];
+					}
 				}
 				}
 		else {if (c!=-1) screen[cur_l][cur_c]='#';}
