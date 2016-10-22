@@ -2160,6 +2160,9 @@ while(!quit)
 				{int ii, jj;
 				ii=j;
 				jj=MAX_Y-1-i;
+					screen[cur_l][cur_c]=podkursor_save[0];
+					screen_color[cur_l][cur_c]=podkursor_save[1];
+					screen_bg[cur_l][cur_c]=podkursor_save[2];
 				if ((ii<MAX_X) && (jj<MAX_Y))
 					{
 					if(screen[i][j]) world[ii][jj].symbol=screen[i][j];

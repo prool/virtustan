@@ -1,4 +1,4 @@
-// world file for Virtustan application. created Tue Oct 18 23:16:40 2016
+// world file for Virtustan application. created Fri Oct 21 16:31:56 2016
 // www.prool.kharkov.org
 world[0][0].color=3;
 world[0][1].color=3;
@@ -118,6 +118,10 @@ world[0][57].symbol=124;
 world[0][58].color=3;
 world[0][58].symbol=124;
 world[0][59].color=3;
+world[0][195].symbol=33;
+world[0][196].symbol=33;
+world[0][197].symbol=33;
+world[0][198].symbol=33;
 world[0][199].descr="Начало координат";
 world[0][199].color=14;
 world[0][199].symbol=48;
@@ -736,4 +740,6 @@ world[59][58].color=3;
 world[59][58].symbol=124;
 world[59][59].descr="Я Угол Первый";
 world[59][59].color=3;
+world[127][199].bg=41;
+world[127][199].symbol=52;
 // end of world file
