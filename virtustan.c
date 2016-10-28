@@ -1178,7 +1178,15 @@ if (age<SEKADI) return '.';
 if (age<SEKADI*2) return ',';
 if (age<SEKADI*3) return '|';
 if (age<SEKADI*4) return 'V';
-return 'W';
+if (age<SEKADI*5) return 'W';
+	world[x][y].descr="Сухое дерево";
+	world[x][y].room_type=0;
+	world[x][y].symbol='Y';
+	world[x][y].color=3; // brown
+	world[x][y].bg=DEFAULT_BG;
+	world[x][y].object=0;
+	world[x][y].timer=0;
+return 'Y';
 }
 
 void env(char *envp[])
@@ -1622,6 +1630,11 @@ void reset(void) // reset terminal
 printf("%cc",ESC); // ESC c - reset terminal
 }
 
+void point (void)
+{
+printf("point!\n");
+}
+
 void version (void)
 {
 printf("Virtustan application\nCopyleft by Prool, 2015-2016\nThis program comes with ABSOLUTELY NO WARRANTY; for details type `gpl3'.\
@@ -1783,6 +1796,7 @@ while(1)
 	else if (!strcmp(cmd,"codetable")) printf("Current codetable is %s\n",CodetableName[Codetable]);
 	else if (!strcmp(cmd,"look")) look();
 	else if (!strcmp(cmd,"см")) look();
+	else if (!strcmp(cmd,".")) look();
 	else if (!strcmp(cmd,"n")) move_(0,+1);
 	else if (!strcmp(cmd,UP_ARROW)) move_(0,+1);
 	else if (!strcmp(cmd,"N")) move_(0,MAX_Y-1-global_y);
