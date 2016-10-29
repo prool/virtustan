@@ -7,6 +7,9 @@
 #define KIOCSOUND	0x4B2F	/* start sound generation (0 for off) */
 #define KDMKTONE	0x4B30	/* generate tone */
 
+// static variables
+int step;
+
 // static vars for realtime() module
 char screen [MAX_L] [MAX_C];
 char screen_old [MAX_L] [MAX_C];
@@ -375,7 +378,7 @@ while(!feof(fp))
 	str[0]=0;
 	cc=fgets(str,MAXLEN,fp);
 	if (cc==NULL) break;
-	if (*cc=='#') continue; // this is comment
+	//if (*cc=='#') continue; // this is comment
 	if (*cc==']')
 		{// this is command
 		if (!memcmp(cc,"]COLOR",strlen("]COLOR"))) setcolor(atoi(cc+strlen("]COLOR")));
@@ -845,7 +848,7 @@ else	{
 void look(void)
 {int i;
 map();
-printf("%s(%i,%i)%s\n",GOLUB1,global_x,global_y,NORM_COLOR);
+printf("%s(%i,%i)%s step=%i roomtype=%i\n",GOLUB1,global_x,global_y,NORM_COLOR, step, world[global_x][global_y].room_type);
 if (world[global_x][global_y].descr) print(world[global_x][global_y].descr);
 else
 	{
@@ -1128,6 +1131,59 @@ for (i=22/*33*/; i<128; i++)
 	if (!(i%16)) printf("\n");
 	}
 printf("\n");
+}
+
+void filler_do(int x,int y,int x1,int y1)
+{
+if (x1<0) return;
+if (y1<0) return;
+if (x1>=MAX_X) return;
+if (y1>=MAX_Y) return;
+world[x1][y1].room_type=FILLER2_ROOM;
+world[x1][y1].timer=UPDATED_ROOM;
+world[x1][y1].symbol=world[x][y].symbol;
+}
+
+void tempora_fugit(void)
+{int x,y;
+// array world[MAX_X][MAX_Y];
+for (x=0;x<MAX_X;x++)
+for (y=0;y<MAX_Y;y++)
+	{
+	// что-то делаем
+	if (world[x][y].timer!=UPDATED_ROOM)
+	{
+	switch (world[x][y].room_type)
+	{
+	case INC_ROOM: world[x][y].symbol++; break;
+	case FILLER_ROOM:
+			world[x][y].room_type=FILLER2_ROOM;
+			filler_do(x,y,x+1,y);
+			filler_do(x,y,x-1,y);
+			filler_do(x,y,x,y+1);
+			filler_do(x,y,x,y-1);
+			/*
+			filler_do(x,y,x-1,y-1);
+			filler_do(x,y,x-1,y+1);
+			filler_do(x,y,x+1,y-1);
+			filler_do(x,y,x+1,y+1);
+			*/
+			world[x][y].timer=UPDATED_ROOM;
+			break;
+	case FILLER2_ROOM: world[x][y].room_type=FILLER_ROOM;
+			world[x][y].timer=UPDATED_ROOM;
+			break;
+	case FILLER3_ROOM: world[x][y].room_type=0;
+			world[x][y].timer=UPDATED_ROOM;
+			break;
+	}
+	}
+	}
+for (x=0;x<MAX_X;x++)
+for (y=0;y<MAX_Y;y++)
+	{
+	if (world[x][y].timer==UPDATED_ROOM) world[x][y].timer=0;
+	}
 }
 
 void map(void)
@@ -1623,6 +1679,7 @@ if (random()<(RAND_MAX/100))
 		}
 	}
 }
+look();
 }
 
 void reset(void) // reset terminal
@@ -1653,6 +1710,7 @@ char config_filename_2[PROOL_MAX_STRLEN];
 char buffer_string[PROOL_MAX_STRLEN];
 
 start_time=unixtime();
+step=0;
 
 getcwd(base_path, MAXLEN);
 
@@ -1766,6 +1824,7 @@ if (argc==2)
 
 while(1)
 	{
+	step++;
 	printf("virtustan app> ");
 	fgets(cmd,MAXLEN_CMD,stdin); // нафига я тут использовал fgets, а не gets ? наверное из-за проверки длины
 	switch (Codetable)
@@ -1903,6 +1962,7 @@ while(1)
 			printf(")\n\nUse help for help. Use quit for quit\nИспользуйте команду помощь для получения помощи, а команду конец для выхода из программы\n");
 			}
 		}
+	tempora_fugit();
 	}
 log_("Virtustan application finished");
 return 0;

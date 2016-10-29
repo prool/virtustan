@@ -93,6 +93,8 @@
 #define peek2(SEG,OFFSET) 0
 #define putch(a) putchar(a)
 
+#define UPDATED_ROOM 777
+
 // for realtime() module
 #define MAX_L 57
 #define MAX_C 217

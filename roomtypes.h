@@ -4,3 +4,9 @@
 #define TILLED	1	// вспахано
 #define SOWED	2	// засеяно
 // далее будет вода, непроходимо (стена или забор), горы, лес, пустыня, луг, помещение, болото, пещера
+
+// Спецтипы
+#define INC_ROOM 100
+#define FILLER_ROOM 101 // распространитель, состояние 1
+#define FILLER2_ROOM 102 // filler, состояние 2
+#define FILLER3_ROOM 103 // filler, состояние 3
