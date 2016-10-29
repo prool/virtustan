@@ -9,6 +9,9 @@
 
 // static variables
 int step;
+int langton;
+int langton_direct;
+int langton_x, langton_y;
 
 // static vars for realtime() module
 char screen [MAX_L] [MAX_C];
@@ -1139,6 +1142,15 @@ if (x1<0) return;
 if (y1<0) return;
 if (x1>=MAX_X) return;
 if (y1>=MAX_Y) return;
+if (world[x1][y1].descr) return;
+if (world[x1][y1].room_type==-1) return; /*
+	char symbol;
+	char color; // color of foreground
+	char bg; // color of background
+	int object; // object in room
+	int mob; // mob in room
+	long int timer; */
+
 world[x1][y1].room_type=FILLER2_ROOM;
 world[x1][y1].timer=UPDATED_ROOM;
 world[x1][y1].symbol=world[x][y].symbol;
@@ -1146,7 +1158,10 @@ world[x1][y1].symbol=world[x][y].symbol;
 
 void tempora_fugit(void)
 {int x,y;
+int langton_table_x[4] = {0, 1,  0, -1};
+int langton_table_y[4] = {1, 0, -1,  0};
 // array world[MAX_X][MAX_Y];
+
 for (x=0;x<MAX_X;x++)
 for (y=0;y<MAX_Y;y++)
 	{
@@ -1162,12 +1177,12 @@ for (y=0;y<MAX_Y;y++)
 			filler_do(x,y,x-1,y);
 			filler_do(x,y,x,y+1);
 			filler_do(x,y,x,y-1);
-			/*
+#if 1
 			filler_do(x,y,x-1,y-1);
 			filler_do(x,y,x-1,y+1);
 			filler_do(x,y,x+1,y-1);
 			filler_do(x,y,x+1,y+1);
-			*/
+#endif
 			world[x][y].timer=UPDATED_ROOM;
 			break;
 	case FILLER2_ROOM: world[x][y].room_type=FILLER_ROOM;
@@ -1183,6 +1198,29 @@ for (x=0;x<MAX_X;x++)
 for (y=0;y<MAX_Y;y++)
 	{
 	if (world[x][y].timer==UPDATED_ROOM) world[x][y].timer=0;
+	}
+
+// Langton ant
+if (langton)
+	{
+	if (world[langton_x][langton_y].room_type==0)
+		{ // 0 = langton black
+		// 90 grad left
+		langton_direct++;if (langton_direct==4) langton_direct=0;
+		// set color black
+		world[langton_x][langton_y].room_type=LANGTON_WHITE;
+		world[langton_x][langton_y].symbol=' ';
+		}
+	else	{ // !0 = langton white
+		// 90 grad right
+		langton_direct--;if (langton_direct==-1) langton_direct=3;
+		// set color white
+		world[langton_x][langton_y].room_type=0;
+		world[langton_x][langton_y].symbol='#';
+		}
+	// Langton move
+	langton_x+=langton_table_x[langton_direct];
+	langton_y+=langton_table_y[langton_direct];
 	}
 }
 
@@ -1711,6 +1749,8 @@ char buffer_string[PROOL_MAX_STRLEN];
 
 start_time=unixtime();
 step=0;
+langton=0;
+langton_direct=0;
 
 getcwd(base_path, MAXLEN);
 
@@ -1938,6 +1978,7 @@ while(1)
 	else if (!strcmp(cmd,"ниже")) {HALF_Y--; look(); }
 	else if (!strcmp(cmd,"olist")) olist();
 	else if (!strcmp(cmd,"beep")) beep();
+	else if (!strcmp(cmd,"langton")) {langton=1;langton_x=global_x;langton_y=global_y;}
 	else if ((cmd[0]>='0') && (cmd[0]<='9'))
 			{char c;
 			// digit command

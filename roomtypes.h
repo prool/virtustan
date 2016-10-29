@@ -10,3 +10,5 @@
 #define FILLER_ROOM 101 // распространитель, состояние 1
 #define FILLER2_ROOM 102 // filler, состояние 2
 #define FILLER3_ROOM 103 // filler, состояние 3
+
+#define LANGTON_WHITE 200
