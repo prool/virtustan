@@ -1750,7 +1750,7 @@ char buffer_string[PROOL_MAX_STRLEN];
 start_time=unixtime();
 step=0;
 langton=0;
-langton_direct=0;
+langton_direct=1;
 
 getcwd(base_path, MAXLEN);
 
@@ -2091,11 +2091,6 @@ while(!quit)
 		screen[0][COLUMNS-1]='0'+i;
 		screen_color[0][COLUMNS-1]=2;
 		screen_bg[0][COLUMNS-1]=41;
-		// ticks
-		if (tick_status==i)
-			{
-			tick_status++;
-			tick_status=tick_status%10;
 #if 1 // Langton ant
 if (langton)
 	{
@@ -2115,9 +2110,15 @@ if (langton)
 	// Langton move
 	langton_x+=langton_table_x[langton_direct];
 	langton_y+=langton_table_y[langton_direct];
+	if ((langton_x<0) || (langton_x>=MAX_L) || (langton_y<0) || (langton_y>=MAX_C)) langton=0;
 	}
 
 #endif
+		// ticks
+		if (tick_status==i)
+			{
+			tick_status++;
+			tick_status=tick_status%10;
 #if 1
 			if (screen[1][1]++=='~') screen[1][1]='!';
 			//screen_color[1][1]++;
