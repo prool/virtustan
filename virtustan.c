@@ -12,6 +12,8 @@ int step;
 int langton;
 int langton_direct;
 int langton_x, langton_y;
+int langton_table_x[4] = {0, 1,  0, -1};
+int langton_table_y[4] = {1, 0, -1,  0};
 
 // static vars for realtime() module
 char screen [MAX_L] [MAX_C];
@@ -1158,8 +1160,6 @@ world[x1][y1].symbol=world[x][y].symbol;
 
 void tempora_fugit(void)
 {int x,y;
-int langton_table_x[4] = {0, 1,  0, -1};
-int langton_table_y[4] = {1, 0, -1,  0};
 // array world[MAX_X][MAX_Y];
 
 for (x=0;x<MAX_X;x++)
@@ -2021,6 +2021,7 @@ int tick_status;
 ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
 
 tick_status=0;
+langton=0;
 
 //printf("lines %i columns %i\n",lines,COLUMNS);
 if (lines>MAX_L) {printf("realtime module: array is small: lines=%i MAX_L=%i\n",lines,MAX_L); return; }
@@ -2095,11 +2096,33 @@ while(!quit)
 			{
 			tick_status++;
 			tick_status=tick_status%10;
-			/*
-			if (screen[1][1]++=='~') screen[1][1]='/';
-			screen_color[1][1]++;
-			screen_bg[1][1]++;
-			*/
+#if 1 // Langton ant
+if (langton)
+	{
+	if (screen[langton_x][langton_y]==' ')
+		{ // 0 = langton black
+		// 90 grad left
+		langton_direct++;if (langton_direct==4) langton_direct=0;
+		// set color black
+		screen[langton_x][langton_y]='#';
+		}
+	else	{ // !0 = langton white
+		// 90 grad right
+		langton_direct--;if (langton_direct==-1) langton_direct=3;
+		// set color white
+		screen[langton_x][langton_y]=' ';
+		}
+	// Langton move
+	langton_x+=langton_table_x[langton_direct];
+	langton_y+=langton_table_y[langton_direct];
+	}
+
+#endif
+#if 1
+			if (screen[1][1]++=='~') screen[1][1]='!';
+			//screen_color[1][1]++;
+			//screen_bg[1][1]++;
+#endif
 			}
 		setpos(1,1); printf("debug: (%02i,%02i) (%i,%i,%i) ? - Help                                       ",
 		cur_l, cur_c, podkursor_save[0],podkursor_save[1],podkursor_save[2]); // debug print
@@ -2232,7 +2255,7 @@ while(!quit)
 					printf("0 - clear cell\n");
 					printf("Spacebar - symbol++\n");
 					printf("PgUp - color++\nPgDn - background++\nEnd - background=40\n");
-					printf("R - random\n");
+					printf("R - random L - Langton ant\n");
 					printf("G - get data from main world S - save data to main world\n");
 					printf("q - quit to app., Q - quit to OS shell\n");
 					printf("? - this help\n\n");
@@ -2286,9 +2309,16 @@ while(!quit)
 					}
 				}
 				}
+		else if (c=='L')
+				{
+				langton=1;
+				langton_x=cur_l;
+				langton_y=cur_c;
+				}
 		else {if (c!=-1) screen[cur_l][cur_c]='#';}
 		}
 	}
+langton=0;
 ioctl(0, TCGETA, &tstdin);
 tstdin.c_lflag |= (ICANON|ECHO);
 ioctl(0, TCSETA, &tstdin);
