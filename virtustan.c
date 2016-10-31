@@ -1978,7 +1978,15 @@ while(1)
 	else if (!strcmp(cmd,"ниже")) {HALF_Y--; look(); }
 	else if (!strcmp(cmd,"olist")) olist();
 	else if (!strcmp(cmd,"beep")) beep();
-	else if (!strcmp(cmd,"langton")) {langton=1;langton_x=global_x;langton_y=global_y;}
+	else if (!strcmp(cmd,"langton")) { 	if (langton==0)
+							{langton=1;langton_x=global_x;langton_y=global_y;
+							printf("Langton ant started\n");
+							}
+						else
+							{langton=0;
+							printf("Langton ant stopped\n");
+							}
+					 }
 	else if ((cmd[0]>='0') && (cmd[0]<='9'))
 			{char c;
 			// digit command
