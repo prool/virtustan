@@ -1450,6 +1450,7 @@ int i=0;
 int counter=1;
 char c;
 int line=0;
+struct stat struktura;
 
 dir = opendir(".");
 
@@ -1463,8 +1464,15 @@ while(1)
 	{
 	entry=readdir(dir);
 	if (entry==0) break;
-	if (i++ == file_no) printf("%2i. %s%s%s\n", counter++, REVERSE, entry->d_name, NORM_COLOR);
-	else printf("%2i. %s\n", counter++, entry->d_name);
+	if (i++ == file_no) printf("%2i. %s%s%s", counter++, REVERSE, entry->d_name, NORM_COLOR);
+	else printf("%2i. %s", counter++, entry->d_name);
+	if (!stat(entry->d_name, &struktura))
+		{
+		if (struktura.st_mode&0100000U) {/*printf("=regular file\n");*/}
+		else if (struktura.st_mode&040000U) printf("/"); // directory
+		else {/*print("=не файл и не каталог\n");*/}
+		}
+	printf("\n");
 	if (++line>=(lines-1))
 		{line=0;c=pressanykey();
 		if (c=='q') {printf("QUIT\n");break;}else printf("\r                          \r");}
