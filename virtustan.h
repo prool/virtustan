@@ -172,6 +172,7 @@ int exec (char *);
 int htoi(const char  *s);
 void printfile(char *filename);
 void printfile_basepath(char *filename);
+void pwd(void);
 
 // defines for proolskript interpteter
 

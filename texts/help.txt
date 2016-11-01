@@ -11,10 +11,11 @@ source - print source
 ls - ls
 dir-up, dir-down, dir-move - смена выделенного файла
 cd - change directory
-cd.. - cd ..
+cd.. or .. - cd ..
 cd/ - cd /
 pwd - print work directory
 delfile - delete file
+createfile - create new file from stdin
 cat - вывод выделенного файла на экран
 hcat - hex вывод выделенного файла на экран
 stat - вывод статистики о выделенном файле
@@ -60,8 +61,8 @@ sow, сеять - сеять
 harvest, убирать - убирать урожай
 q, quit, exit, конец - exit
 
-]COLOR14
+]]COLOR14 закоментарено (для включения надо убрать одну ] )
 Sites: prool.kharkov.org virtustan.kharkov.org github.com/prool/virtustan
 Prool's email proolix dog gmail.com
 Prool's phone +380 (066) 297-7515
-]COLOR0
+]]COLOR0

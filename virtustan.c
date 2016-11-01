@@ -1542,8 +1542,9 @@ while(1)
 	{
 	entry=readdir(dir);
 	if (entry==0) break;
-	if (i++ == file_no) {if (chdir(entry->d_name)==0) file_no=0; return;}
+	if (i++ == file_no) {if (chdir(entry->d_name)==0) file_no=0; pwd(); return;}
 	}
+pwd();
 }
 
 void create_file(void)
@@ -1951,7 +1952,7 @@ while(1)
 	else if (!strcmp(cmd,L_DOWN)) dir_down();
 	else if (!strcmp(cmd,"dir-move")) dir_move();
 	else if (!strcmp(cmd,"cd")) cmd_chdir();
-	else if (!strcmp(cmd,"cd..")) chdir("..");
+	else if ((!strcmp(cmd,"cd..")) || (!strcmp(cmd,".."))) {chdir(".."); pwd();}
 	else if (!strcmp(cmd,"cd/")) chdir("/");
 	else if (!strcmp(cmd,"pwd")) pwd();
 	else if (!strcmp(cmd,"delfile")) delete_file();
