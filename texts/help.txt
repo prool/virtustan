@@ -26,7 +26,7 @@ test3 - test of UTF-8
 test4 - test of cyrillic in UTF-8
 cls - clearscreen
 reset - reset terminal
-look, см - look
+look, см, . - look
 score, сч, счет - счет (очки, запасы, прочее)
 шире, уже, выше, ниже - смена размеров показываемого поля
 directions: 1 step: n, s, w, e (от слов north, south, etc) or arrow+enter
