@@ -167,7 +167,7 @@ drawText(HELP_TXT,strlen(HELP_TXT),text_x,text_y);
 #endif
 
 #if 1 // out FTGL text
-FTGLfont *font = ftglCreatePixmapFont("/usr/share/fonts/truetype/ttf-dejavu/DejaVuSansMono.ttf");
+FTGLfont *font = ftglCreatePixmapFont("/usr/share/fonts/truetype/dejavu/DejaVuSansMono.ttf");
 if(!font) { printf("FTGL font error\n"); return; }
 ftglSetFontFaceSize(font, 20, 20);
 glRasterPos2f(-0.99f, 0.93f);
@@ -303,8 +303,8 @@ glEnd();
 glColor3f(1.0,1.0,0.0); ///зададим цвет которым будем рисовать
 // FTGL from: https://www.linux.org.ru/forum/development/6091539
 glRasterPos2f(-0.99f, 0.93f);
-//FTGLPixmapFont("/usr/share/fonts/truetype/ttf-dejavu/DejaVuSansMono.ttf");
-FTGLfont *font = ftglCreatePixmapFont("/usr/share/fonts/truetype/ttf-dejavu/DejaVuSansMono.ttf");
+//FTGLPixmapFont("/usr/share/fonts/truetype/dejavu/DejaVuSansMono.ttf");
+FTGLfont *font = ftglCreatePixmapFont("/usr/share/fonts/truetype/dejavu/DejaVuSansMono.ttf");
 /* If something went wrong, bail out. */
 if(!font) { printf("FTGL font error\n"); return; }
 /* Set the font size and render a small text. */
