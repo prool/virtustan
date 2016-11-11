@@ -96,8 +96,8 @@
 #define UPDATED_ROOM 777
 
 // for realtime() module
-#define MAX_L 57
-#define MAX_C 217
+#define MAX_L 79 /* 57 */
+#define MAX_C 257 /* 217 */
 #define CURSOR_COLOR 14
 
 // static variables
