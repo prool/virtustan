@@ -173,6 +173,7 @@ int htoi(const char  *s);
 void printfile(char *filename);
 void printfile_basepath(char *filename);
 void pwd(void);
+void setcolor(int color);
 
 // defines for proolskript interpteter
 

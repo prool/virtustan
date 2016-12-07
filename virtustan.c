@@ -63,27 +63,32 @@ else if (color<=7) printf("\033[3%im", color);
 else printf("\033[1;3%im", color-7);
 }
 
-void date(void)
+void uptime_(void)
 {long uptime; char *tmstr;
-
-puts(ptime());
-printf("unixtime = %li\n", unixtime());
 uptime=unixtime()-start_time;
-if (uptime<=60)printf("uptime %li sec", uptime);
+if (uptime<=60)printf("Uptime %li sec", uptime);
 else
 	{
 	uptime=uptime/60;
-	if (uptime<=60) printf ("uptime %li min", uptime);
+	if (uptime<=60) printf ("Uptime %li min", uptime);
 	else
 		{
 		uptime=uptime/60;
-		if (uptime<=24) printf("uptime %li hour", uptime);
-		else printf("uptime %li days", uptime/24);
+		if (uptime<=24) printf("Uptime %li hour", uptime);
+		else printf("Uptime %li days", uptime/24);
 		}
 	}
 	tmstr = asctime(localtime(&start_time));
 	*(tmstr + strlen(tmstr) - 1) = '\0';
 printf(" since %s\n", tmstr);
+}
+
+void date(void)
+{long uptime; char *tmstr;
+
+puts(ptime());
+printf("unixtime = %li\n", unixtime());
+uptime_();
 print_holyday();
 print("Время года: ");
 switch(sezon)
@@ -2023,6 +2028,9 @@ while(1)
 	tempora_fugit();
 	}
 log_("Virtustan application finished");
+printf("%sVirtustan application finished. Final statistics:%s\n", BEL1, NORM_COLOR);
+printf("Steps %i\n", step);
+uptime_();
 return 0;
 }
 /******************************************************************************************************/
