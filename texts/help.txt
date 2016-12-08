@@ -29,9 +29,12 @@ reset - reset terminal
 look, см, . - look
 score, сч, счет - счет (очки, запасы, прочее)
 шире, уже, выше, ниже - смена размеров показываемого поля
+
 directions: 1 step: n, s, w, e (от слов north, south, etc) or arrow+enter
 N steps: digit and direction, f.e.  10n
 maximum steps: N, S, W, E
+gohome - go home
+
 inv - print inventory
 get - get object
 drop - drop object

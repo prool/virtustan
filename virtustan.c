@@ -1744,6 +1744,13 @@ void point (void)
 printf("point!\n");
 }
 
+void go_home(void)
+{
+//global_x=50; global_y=50;
+//global_x=0; global_y=MAX_Y-1;
+global_x=30; global_y=40;
+}
+
 void version (void)
 {
 printf("Virtustan application\nCopyleft by Prool, 2015-2016\nThis program comes with ABSOLUTELY NO WARRANTY; for details type `gpl3'.\
@@ -1847,9 +1854,7 @@ log_("Virtustan application started. http://prool.kharkov.org https://github.com
 //printf("init started\n");
 Codetable=UTF;
 
-//global_x=50; global_y=50;
-//global_x=0; global_y=MAX_Y-1;
-global_x=30; global_y=40;
+go_home();
 
 init_world();
 
@@ -1922,6 +1927,7 @@ while(1)
 	else if (!strcmp(cmd,"e")) move_(+1,0);
 	else if (!strcmp(cmd,RIGHT_ARROW)) move_(+1,0);
 	else if (!strcmp(cmd,"E")) move_(MAX_X-1-global_x,0);
+	else if (!strcmp(cmd,"gohome")) {go_home(); look();}
 	else if (!strcmp(cmd,"map")) map();
 	else if (!strcmp(cmd,"vorotaob")) printfile("texts/vorotaob.txt");
 	else if (!strcmp(cmd,"gpl3")) printfile("LICENSE");
