@@ -8,6 +8,8 @@ int tron;
 
 char *slovarb[]=
 {
+"You see exits leading", "Выходы",
+"password", "пароль",
 "shortsword", "короткий меч",
 "sword", "меч",
 "bow", "лук",
