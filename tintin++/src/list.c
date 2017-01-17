@@ -45,7 +45,7 @@ DO_COMMAND(do_list)
 
 	if (*arg1 == 0 || *arg2 == 0)
 	{
-		show_message(ses, LIST_VARIABLE, "#SYNTAX: #LIST {variable} {ADD|CLE|CRE|DEL|FIN|GET|INS|SET|SIZ|SOR} {argument}");
+		show_error(ses, LIST_VARIABLE, "#SYNTAX: #LIST {variable} {ADD|CLE|CRE|DEL|FIN|GET|INS|SET|SIZ|SOR} {argument}");
 	}
 	else
 	{
@@ -67,7 +67,7 @@ DO_COMMAND(do_list)
 			{
 				node = set_nest_node(root, arg1, "");
 			}
-			array_table[cnt].array(ses, node, arg);
+			array_table[cnt].array(ses, node, arg, arg1);
 		}
 	}
 	return ses;
@@ -116,7 +116,8 @@ DO_ARRAY(array_clear)
 
 		list->root = NULL;
 	}
-	set_nest_node(ses->list[LIST_VARIABLE], list->left, "");
+
+	set_nest_node(ses->list[LIST_VARIABLE], var, "");
 
 	return ses;
 }
@@ -184,7 +185,7 @@ DO_ARRAY(array_delete)
 
 			if (atoi(arg1) == 0 || index == -1)
 			{
-				tintin_printf2(ses, "#LIST DEL: Invalid index: %s", arg1);
+				return show_error(ses, LIST_VARIABLE, "#LIST DEL: Invalid index: %s", arg1);
 
 				return ses;
 			}
@@ -199,7 +200,7 @@ DO_ARRAY(array_delete)
 	}
 	else
 	{
-		show_message(ses, LIST_VARIABLE, "#LIST DEL: {%s} is not a list.", list->left);
+		show_error(ses, LIST_VARIABLE, "#LIST DEL: {%s} is not a list.", var);
 	}
 	return ses;
 }
@@ -214,8 +215,7 @@ DO_ARRAY(array_find)
 
 	if (*arg2 == 0)
 	{
-		show_message(ses, LIST_VARIABLE, "#SYNTAX: #LIST {variable} FIND {string} {variable}");
-		return ses;
+		return show_error(ses, LIST_VARIABLE, "#SYNTAX: #LIST {variable} FIND {string} {variable}");
 	}
 
 	if (list->root)
@@ -254,8 +254,7 @@ DO_ARRAY(array_get)
 
 	if (*arg2 == 0)
 	{
-		show_message(ses, LIST_VARIABLE, "#SYNTAX: #LIST {variable} GET {index} {variable}");
-		return ses;
+		return show_error(ses, LIST_VARIABLE, "#SYNTAX: #LIST {variable} GET {index} {variable}");
 	}
 
 	if (list->root)
@@ -297,9 +296,7 @@ DO_ARRAY(array_insert)
 
 	if (atoi(arg1) == 0)
 	{
-		tintin_printf2(ses, "#LIST INS: Invalid index: %s", arg1);
-
-		return ses;
+		return show_error(ses, LIST_VARIABLE, "#LIST INS: Invalid index: %s", arg1);
 	}
 
 	if (index == -1 || atoi(arg1) < 0)
@@ -327,18 +324,17 @@ DO_ARRAY(array_size)
 
 	if (*arg1 == 0)
 	{
-		show_message(ses, LIST_VARIABLE, "#SYNTAX: #LIST {variable} SIZE {variable}");
-		return ses;
+		return show_error(ses, LIST_VARIABLE, "#SYNTAX: #LIST {variable} SIZE {variable}");
 	}
 
 	if (list->root)
 	{
 		set_nest_node(ses->list[LIST_VARIABLE], arg1, "%d", list->root->used);
-
-		return ses;
 	}
-	set_nest_node(ses->list[LIST_VARIABLE], arg1, "0");
-
+	else
+	{
+		set_nest_node(ses->list[LIST_VARIABLE], arg1, "0");
+	}
 	return ses;
 }
 
@@ -355,9 +351,7 @@ DO_ARRAY(array_set)
 
 		if (atoi(arg1) == 0 || index == -1)
 		{
-			tintin_printf2(ses, "#LIST SET: Invalid index: %s", arg1);
-
-			return ses;
+			return show_error(ses, LIST_VARIABLE, "#LIST SET: Invalid index: %s", arg1);
 		}
 
 		RESTRING(list->root->list[index]->right, arg2);
@@ -365,7 +359,7 @@ DO_ARRAY(array_set)
 		return ses;
 	}
 
-	show_message(ses, LIST_VARIABLE, "#LIST SET: {%s} is not a list.", list->left);
+	show_error(ses, LIST_VARIABLE, "#LIST SET: {%s} is not a list.", var);
 
 	return ses;
 }
@@ -407,7 +401,7 @@ DO_ARRAY(array_sort)
 				sprintf(arg3, "{%d} {%s}", cnt + 1, arg2);
 			}
 
-			array_insert(ses, list, arg3);
+			array_insert(ses, list, arg3, var);
 
 			if (*str == COMMAND_SEPARATOR)
 			{

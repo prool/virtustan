@@ -66,11 +66,11 @@ int is_color_code(char *str)
 		{
 			return TRUE;
 		}
-		else if (str[1] == 'g' && str[1] <= '9' && str[2] >= '0' && str[2] <= '9' && str[3] >= '0' && str[3] <= '9')
+		else if (str[1] == 'g' && str[2] >= '0' && str[2] <= '9' && str[3] >= '0' && str[3] <= '9')
 		{
 			return TRUE;
 		}
-		else if (str[1] == 'G' && str[1] <= '9' && str[2] >= '0' && str[2] <= '9' && str[3] >= '0' && str[3] <= '9')
+		else if (str[1] == 'G' && str[2] >= '0' && str[2] <= '9' && str[3] >= '0' && str[3] <= '9')
 		{
 			return TRUE;
 		}
@@ -322,23 +322,22 @@ void show_message(struct session *ses, int index, char *format, ...)
 	vasprintf(&buffer, format, args);
 	va_end(args);
 
-	if (HAS_BIT(ses->flags, SES_FLAG_VERBOSELINE))
+	root = ses->list[index];
+
+	if (HAS_BIT(root->flags, LIST_FLAG_LOG))
+	{
+		if (ses->logfile)
+		{
+			logit(ses, buffer, ses->logfile, TRUE);
+		}
+	}
+
+	if (gtd->noise_level)
 	{
 		tintin_puts2(ses, buffer);
 
 		goto end;
 	}
-
-	if (index == -1)
-	{
-		if (ses->input_level == 0)
-		{
-			tintin_puts2(ses, buffer);
-		}
-		goto end;
-	}
-
-	root = ses->list[index];
 
 	if (HAS_BIT(root->flags, LIST_FLAG_DEBUG))
 	{
@@ -349,13 +348,40 @@ void show_message(struct session *ses, int index, char *format, ...)
 
 	if (HAS_BIT(root->flags, LIST_FLAG_MESSAGE))
 	{
-		if (ses->input_level == 0)
+		if (gtd->input_level == 0)
 		{
 			tintin_puts2(ses, buffer);
-
-			goto end;
 		}
 	}
+
+	end:
+
+	free(buffer);
+
+	pop_call();
+	return;
+}
+
+struct session *show_error(struct session *ses, int index, char *format, ...)
+{
+	struct listroot *root;
+	char *buffer;
+	va_list args;
+
+	push_call("show_error(%p,%p,%p)",ses,index,format);
+
+	va_start(args, format);
+	vasprintf(&buffer, format, args);
+	va_end(args);
+
+	if (gtd->noise_level)
+	{
+		tintin_puts2(ses, buffer);
+
+		goto end;
+	}
+
+	root = ses->list[index];
 
 	if (HAS_BIT(root->flags, LIST_FLAG_LOG))
 	{
@@ -364,12 +390,25 @@ void show_message(struct session *ses, int index, char *format, ...)
 			logit(ses, buffer, ses->logfile, TRUE);
 		}
 	}
+
+	if (HAS_BIT(root->flags, LIST_FLAG_DEBUG))
+	{
+		tintin_puts2(ses, buffer);
+
+		goto end;
+	}
+
+	if (HAS_BIT(root->flags, LIST_FLAG_MESSAGE))
+	{
+		tintin_puts2(ses, buffer);
+	}
+
 	end:
 
 	free(buffer);
 
 	pop_call();
-	return;
+	return ses;
 }
 
 void show_debug(struct session *ses, int index, char *format, ...)
@@ -448,7 +487,7 @@ void socket_printf(struct session *ses, size_t length, char *format, ...)
 
 	if (HAS_BIT(ses->flags, SES_FLAG_CONNECTED))
 	{
-		write(ses->socket, buf, length);
+		write_line_mud(ses, buf, length);
 	}
 }
 
@@ -468,16 +507,14 @@ void tintin_printf2(struct session *ses, char *format, ...)
 
 void tintin_printf(struct session *ses, char *format, ...)
 {
-	char *buffer;
+	char buffer[BUFFER_SIZE];
 	va_list args;
 
 	va_start(args, format);
-	vasprintf(&buffer, format, args);
+	vsprintf(buffer, format, args);
 	va_end(args);
 
 	tintin_puts(ses, buffer);
-
-	free(buffer);
 }
 
 /*
@@ -486,46 +523,52 @@ void tintin_printf(struct session *ses, char *format, ...)
 
 void tintin_puts3(struct session *ses, char *string)
 {
-	char output[STRING_SIZE];
+	char *output;
+
+	push_call("tintin_puts3(%p,%p)",ses,string);
 
 	if (ses == NULL)
 	{
 		ses = gtd->ses;
 	}
 
-	if (!HAS_BIT(gtd->ses->flags, SES_FLAG_VERBOSE) && gtd->quiet)
+	if (!HAS_BIT(gtd->ses->flags, SES_FLAG_VERBOSE) && gtd->quiet && gtd->noise_level == 0)
 	{
+		pop_call();
 		return;
 	}
 
 	if (strip_vt102_strlen(ses, ses->more_output) != 0)
 	{
-		sprintf(output, "\n%s", string);
+		output = str_dup_printf("\n%s", string);
 	}
 	else
 	{
-		sprintf(output, "%s", string);
+		output = str_dup_printf("%s", string);
 	}
 
 	add_line_buffer(ses, output, FALSE);
 
-	if (ses != gtd->ses)
+	if (ses == gtd->ses)
 	{
-		return;
+		if (!HAS_BIT(ses->flags, SES_FLAG_READMUD) && IS_SPLIT(ses))
+		{
+			save_pos(ses);
+			goto_rowcol(ses, ses->bot_row, 1);
+		}
+
+		printline(ses, &output, FALSE);
+
+		if (!HAS_BIT(ses->flags, SES_FLAG_READMUD) && IS_SPLIT(ses))
+		{
+			restore_pos(ses);
+		}
 	}
 
-	if (!HAS_BIT(ses->flags, SES_FLAG_READMUD) && IS_SPLIT(ses))
-	{
-		save_pos(ses);
-		goto_rowcol(ses, ses->bot_row, 1);
-	}
+	str_free(output);
 
-	printline(ses, output, FALSE);
-
-	if (!HAS_BIT(ses->flags, SES_FLAG_READMUD) && IS_SPLIT(ses))
-	{
-		restore_pos(ses);
-	}
+	pop_call();
+	return;
 }
 
 /*
@@ -544,7 +587,7 @@ void tintin_puts2(struct session *ses, char *string)
 		ses = gtd->ses;
 	}
 
-	if (!HAS_BIT(gtd->ses->flags, SES_FLAG_VERBOSE) && gtd->quiet)
+	if (!HAS_BIT(gtd->ses->flags, SES_FLAG_VERBOSE) && gtd->quiet && gtd->noise_level == 0)
 	{
 		pop_call();
 		return;
@@ -569,7 +612,7 @@ void tintin_puts2(struct session *ses, char *string)
 			goto_rowcol(ses, ses->bot_row, 1);
 		}
 
-		printline(ses, output, FALSE);
+		printline(ses, &output, FALSE);
 
 		if (!HAS_BIT(ses->flags, SES_FLAG_READMUD) && IS_SPLIT(ses))
 		{

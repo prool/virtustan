@@ -49,7 +49,7 @@ DO_COMMAND(do_highlight)
 	}
 	else if (*arg1 && *arg2 == 0)
 	{
-		if (show_node_with_wild(ses, arg1, LIST_HIGHLIGHT) == FALSE)
+		if (show_node_with_wild(ses, arg1, ses->list[LIST_HIGHLIGHT]) == FALSE)
 		{
 			show_message(ses, LIST_HIGHLIGHT, "#HIGHLIGHT: NO MATCH(ES) FOUND FOR {%s}.", arg1);
 		}
@@ -85,6 +85,9 @@ void check_all_highlights(struct session *ses, char *original, char *line)
 	struct listnode *node;
 	char *pto, *ptl, *ptm;
 	char match[BUFFER_SIZE], color[BUFFER_SIZE], reset[BUFFER_SIZE], output[BUFFER_SIZE], plain[BUFFER_SIZE];
+	int len;
+
+	push_call("check_all_highlights(%p,%p,%p)",ses,original,line);
 
 	for (root->update = 0 ; root->update < root->used ; root->update++)
 	{
@@ -110,17 +113,17 @@ void check_all_highlights(struct session *ses, char *original, char *line)
 
 				strip_vt102_codes(match, plain);
 
-				ptm = strstr(pto, match);
-
-				if (!HAS_BIT(node->flags, NODE_FLAG_META))
+				if (HAS_BIT(node->flags, NODE_FLAG_META))
 				{
-					if (ptm == NULL)
-					{
-						break;
-					}
+					ptm = strstr(pto, match);
 
-					ptl = strstr(ptl, match);
-					ptl = ptl + strlen(match);
+					len = strlen(match);
+				}
+				else
+				{
+					ptm = strip_vt102_strstr(pto, match, &len);
+
+					ptl = strstr(ptl, match) + strlen(match);
 				}
 
 				*ptm = 0;
@@ -129,7 +132,7 @@ void check_all_highlights(struct session *ses, char *original, char *line)
 
 				cat_sprintf(output, "%s%s%s\033[0m%s", pto, color, plain, reset);
 
-				pto = ptm + strlen(match);
+				pto = ptm + len;
 
 				show_debug(ses, LIST_HIGHLIGHT, "#DEBUG HIGHLIGHT {%s}", node->left);
 			}
@@ -140,6 +143,8 @@ void check_all_highlights(struct session *ses, char *original, char *line)
 			strcpy(original, output);
 		}
 	}
+	pop_call();
+	return;
 }
 
 int get_highlight_codes(struct session *ses, char *string, char *result)
@@ -151,6 +156,13 @@ int get_highlight_codes(struct session *ses, char *string, char *result)
 	if (*string == '<')
 	{
 		substitute(ses, string, result, SUB_COL);
+
+		return TRUE;
+	}
+
+	if (*string == '\\')
+	{
+		substitute(ses, string, result, SUB_ESC);
 
 		return TRUE;
 	}

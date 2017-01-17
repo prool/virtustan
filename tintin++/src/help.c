@@ -55,6 +55,7 @@ struct help_type help_table[] =
 		"\n"
 		"       ^ force match of start of line.\n"
 		"       $ force match of end of line.\n"
+		"       \\ escape one character.\n"
 		"  %1-%99 lazy match of any text, available at %1-%99.\n"
 		"      %0 should be avoided in triggers, and if left alone lists all matches.\n"
 		"     { } embed a raw regular expression, available at %1-%99 + 1.\n"
@@ -214,11 +215,12 @@ struct help_type help_table[] =
 	},
 	{
 		"CLASS",
-		"<178>Command<078>: #class <178>{<078>name<178>}<078> <178>{<078>open<178>|<078>close<178>|<078>read filename<178>|<078>write filename<178>|<078>kill<178>}<078>\n"
+		"<178>Command<078>: #class <178>{<078>name<178>}<078> <178>{<078>open<178>|<078>close<178>|<078>list<178>|<078>read filename<178>|<078>write filename<178>|<078>kill<178>}<078>\n"
 		"\n"
 		"         The {open} option will open a class, closing a previously opened\n"
 		"         class. All triggers added afterwards are assigned to this class.\n"
 		"         The {close} option will close the given class.\n"
+		"         The {list} option will show the given list of the class.\n"
 		"         The {read} option will open the class, read, and close afterwards.\n"
 		"         The {write} option will write all triggers of the given class to file.\n"
 		"         The {kill} option will delete all triggers of the given class.\n"
@@ -374,8 +376,8 @@ struct help_type help_table[] =
 		"ELSE",
 		"<178>Command<078>: #else <178>{<078>commands<178>}<078>\n"
 		"\n"
-		"         The else statement should follow an #IF or #ELSEIF statement and is only\n"
-		"         called if the proceeding #IF or #ELSEIF is false.\n"
+		"         The else statement should follow an #IF or #ELSEIF statement and is\n"
+		"         only called if the proceeding #IF or #ELSEIF is false.\n"
 		"\n"
 		"<178>Example<078>: #if {1d2 == 1} {smile};#else {grin}\n"
 	},
@@ -383,9 +385,9 @@ struct help_type help_table[] =
 		"ELSEIF",
 		"<178>Command<078>: #elseif <178>{<078>conditional<178>}<078> <178>{<078>commands<178>}<078>\n"
 		"\n"
-		"         The elseif statement should follow an #IF or #ELSEIF statement and is only\n"
-		"         called when the statement is true and the proceeding #IF and #ELSEIF statements\n"
-		"         are false.\n"
+		"         The elseif statement should follow an #IF or #ELSEIF statement and is\n"
+		"         only called when the statement is true and the proceeding #IF and\n"
+		"         #ELSEIF statements are false.\n"
 		"\n"
 		"<178>Example<078>: #if {1d3 == 1} {smirk};#elseif {1d2 == 1} {snicker}\n"
 	},
@@ -411,7 +413,7 @@ struct help_type help_table[] =
 		"         \\x7D will send the '}' character.\n"
 		"\n"
 		"         Ending a line with \\ will stop tintin from appending a line feed.\n"
-		"         To escape arguments in an alias use %%0 %%1 %%2 etc.\n"
+		"         To escape arguments in an alias or action use %%0 %%1 %%2 etc.\n"
 	},
 	{
 		"EVENT",
@@ -419,9 +421,10 @@ struct help_type help_table[] =
 		"\n"
 		"         Events allow you to create triggers for predetermined client events.\n"
 		"         Use #event without an argument to see a list of possible events with\n"
-		"         a brief description. Use #event %* to see the current list of available\n"
-		"         events you can use.\n"
+		"         a brief description. Use #event %* to see the current list of defined\n"
+		"         events.\n"
 		"\n"
+		"         CHAT MESSAGE          %0 default %1 plain\n"
 		"         DATE                  %1 month - %3 day   %4 hour : %5 minute\n"
 		"         DAY                   %3 day\n"
 		"         END OF PATH\n"
@@ -451,6 +454,7 @@ struct help_type help_table[] =
 		"         SEND OUTPUT           %0 raw text\n"
 		"         SESSION ACTIVATED     %0 name\n"
 		"         SESSION CONNECTED     %0 name %1 host %2 ip %3 port\n"
+		"         SESSION CREATED       %0 name %1 host %2 ip %3 port\n"
 		"         SESSION DEACTIVATED   %0 name\n"
 		"         SESSION DISCONNECTED  %0 name %1 host %2 ip %3 port\n"
 		"         SESSION TIMED OUT     %0 name %1 host %2 ip %3 port\n"
@@ -493,7 +497,7 @@ struct help_type help_table[] =
 		"         no integer operations and a maximum of 20 arguments. If you use format\n"
 		"         inside an alias or action you must escape the %0-9 like: %+4s.\n"
 		"\n"
-		"<178>Example<078>: #format {test} {%+9s} {string}  pad string with up to 9 spaces\n"
+		"         #format {test} {%+9s} {string}  pad string with up to 9 spaces\n"
 		"         #format {test} {%-9s} {string}  post pad string with up to 9 spaces\n"
 		"         #format {test} {%.8s} {string}  copy at most 8 characters\n"
 		"         #format {test} {%a}   {number}  print corresponding ascii character\n"
@@ -509,8 +513,10 @@ struct help_type help_table[] =
 		"         #format {test} {%r}   {string}  reverse text, hiya = ayih\n"
 		"         #format {test} {%s}   {string}  print given string\n"
 		"         #format {test} {%t}   {format}  display time with strftime format\n"
+		"                                         optional {{format}{time}} syntax\n"
 		"         #format {test} {%u}   {string}  uppercase text\n"
-		"         #format {test} {%w}   {string}  wordwrap text\n"
+		"         #format {list} {%w}   {string}  store wordwrapped text in {list}\n"
+		"                                         optional {{string}{width}} syntax\n"
 		"         #format {test} {%A}     {char}  print corresponding ascii value\n"
 		"         #format {cols} {%C}         {}  store the screen width in {cols}\n"
 		"         #format {test} {%L}   {string}  store the string length in {test}\n"
@@ -566,7 +572,7 @@ struct help_type help_table[] =
 		"<068>      #<078>         Code by Peter Unold, Bill Reis, David A. Wagner,         <068>#\n"
 		"<068>      #<078>      Rob Ellsworth, Jeremy C. Jack, and Igor van den Hoven.      <068>#\n"
 		"<068>      #<078>                                                                  <068>#\n"
-		"<068>      #<078>                             1992, 2012                           <068>#\n"
+		"<068>      #<078>                             1992-2017                            <068>#\n"
 		"<068>      #<068>##################################################################<068>#<088>\n"
 	},
 */
@@ -614,7 +620,7 @@ struct help_type help_table[] =
 		"         The highlight command is used to allow you to highlight strings of text\n"
 		"         from the mud.  Available ANSI color names are:\n"
 		"\n"
-		"         reset, light, faint, underscore, blink, reverse, dim,\n"
+		"         reset, light, dark, underscore, blink, reverse\n"
 		"\n"
 		"         black, red, green, yellow, blue, magenta, cyan, white,\n"
 		"         b black, b red, b green, b yellow, b blue, b magenta, b cyan, b white\n"
@@ -716,7 +722,7 @@ struct help_type help_table[] =
 	},
 	{
 		"LINE",
-		"<178>Command<078>: #line <178>{<078>gag<178>|<078>log<178>|<078>logverbatim<178>}<078> <178>{<078>argument<178>}<078>\n"
+		"<178>Command<078>: #line <178>{<078>option<178>}<078> <178>{<078>argument<178>}<078>\n"
 		"\n"
 		"         #line log {filename} {[text]}          Log the current or given line to\n"
 		"                                                file.\n"
@@ -728,14 +734,18 @@ struct help_type help_table[] =
 		"         #line ignore {argument}                Argument is executed without\n"
 		"                                                any triggers being checked.\n"
 		"\n"
-		"         #line strip {argument}                 Strips the argument next\n"
-		"                                                executes it a command.\n"
+		"         #line quiet {argument}                 Argument is executed with\n"
+		"                                                suppression of system messages.\n"
+		"\n"
+		"         #line strip {argument}                 Strips the argument of color\n"
+		"                                                codes next executes it as a\n"
+		"                                                command.\n"
 		"\n"
 		"         #line substitute {options} {argument}  Substitutes the given options:\n"
 		"                                                variables, functions, colors,\n"
-		"                                                escapes, secure, eol, lnf, in\n"
-		"                                                the given argument next executes\n"
-		"                                                it as a command.\n"
+		"                                                escapes, secure, in the given\n"
+		"                                                argument next executes it as a\n"
+		"                                                command.\n"
 		"\n"
 		"         #line verbose {argument}               Argument is executed verbose.\n"
 		"\n"
@@ -748,7 +758,7 @@ struct help_type help_table[] =
 		"\n"
 		"         #list {var} {add} {item}               Add {item} to the list\n"
 		"         #list {var} {clear}                    Empty the given list\n"
-		"         #list {var} {create} {item}            Create a list using {item}\n"
+		"         #list {var} {create} {item}            Create a list using {items}\n"
 		"         #list {var} {delete} {index} {number}  Delete the item at {index},\n"
 		"                                                the {number} is optional.\n"
 		"         #list {var} {insert} {index} {string}  Insert {string} at given index\n"
@@ -776,6 +786,23 @@ struct help_type help_table[] =
 	},
 
 	{
+		"LOCAL",
+		"<178>Command<078>: #local <178>{<078>variable name<178>}<078> <178>{<078>text to fill variable<178>}<078>\n"
+		"\n"
+		"         The local command sets a local variable. Unlike a regular variable\n"
+		"         a local variable will only stay in memory for the duration of the\n"
+		"         event that created it. They are accessed in the same way as a\n"
+		"         regular variable.\n"
+		"\n"
+		"         Commands that store information to a variable will use a local variable\n"
+		"         if it exists.\n"
+		"\n"
+		"         Avoid setting the result variable as local in a function.\n"
+		"\n"
+		"<178>Example<078>: #alias {swap} {#local x %0;#replace x {e} {u};#showme $x}\n"
+	},
+
+	{
 		"LOG",
 		"<178>Command<078>: #log <178>{<078>append<178>|<078>overwrite<178>}<078> <178>{<078>filename<178>}<078>\n"
 		"\n"
@@ -792,10 +819,12 @@ struct help_type help_table[] =
 		"         or decrementing by 1 each time through.  The value of the loop counter\n"
 		"         is stored in the provided variable, which you can use in the commands.\n"
 		"\n"
-		"<178>Example<078>: #loop 1 3 loop {get all $loop.corpse}\n"
+		"<178>Example<078>: #loop 1 3 loop {get all $loop\\.corpse}\n"
 		"         This equals 'get all 1.corpse;get all 2.corpse;get all 3.corpse'.\n"
 		"\n"
-		"<178>Example<078>: #loop 3 1 cnt {drop $cnt.key}\n"
+		"         The . needs to be escaped so it's not treated as part of the variable.\n"
+		"\n"
+		"<178>Example<078>: #loop 3 1 cnt {drop $cnt\\.key}\n"
 		"         This equals 'drop 3.key;drop 2.key;drop 1.key'.\n"
 	},
 	{
@@ -841,7 +870,7 @@ struct help_type help_table[] =
 		"\n"
 		"         #map destroy: Deletes the map.\n"
 		"\n"
-		"         #map delete <direction>: Deletes the room in the given direction.\n"
+		"         #map delete <direction|vnum>: Deletes the room in the given direction.\n"
 		"\n"
 		"         #map dig <direction|vnum> [new|<vnum>]: Creates an exit in the given\n"
 		"                  direction. If no valid direction is given or no existing room\n"
@@ -865,15 +894,16 @@ struct help_type help_table[] =
 		"                  intersection is found. The route is stored in #path and can\n"
 		"                  subsequently be used with #walk\n"
 		"\n"
-		"         #map find <name> <exits> <desc> <area> <note> <terrain>\n"
+		"         #map find <name> <exits> <desc> <area> <note> <terrain> <flag>\n"
 		"                  searches for the given room name. If found the shortest path\n"
 		"                  from your current location to the destination is calculated.\n"
 		"                  The route is stored in #path and can subsequently be used with\n"
 		"                  the various #path commands. If <exits> is provided all exits\n"
-		"                  must be matched, if <roomdesc>, <roomarea> or <roomnote> is\n"
-		"                  provided these are matched as well against the room to be\n"
-		"                  found. These options are also available to the goto, and link\n"
-		"                  commands.\n"
+		"                  must be matched, if <roomdesc>, <roomarea> or <roomnote> or\n"
+		"                  <roomterrain> or <roomflag> is provided these are matched as\n"
+		"                  well against the room to be found.\n"
+		"                  These options are also available to the goto, run, delete, at\n"
+		"                  and link commands.\n"
 		"\n"
 		"         #map flag asciigraphics: Draws a smaller but more detailed map that\n"
 		"                  displays the ne se sw nw exits and room symbols.\n"
@@ -936,11 +966,13 @@ struct help_type help_table[] =
 		"                  Use {variable} {<variable>} to save the output to a variable.\n"
 		"                  {roomname} {<name>}, {roomarea} {<area>}, etc, are valid too.\n"
 		"\n"
-		"         #map map {<x>x<y>} {filename} {a}: shows a map of surrounding rooms.\n"
+		"         #map map {<x>x<y>} {filename} {a|v}: shows a map of surrounding rooms.\n"
 		"                  The {horizontal x vertical} argument i.e 80x25 is optional,\n"
 		"                  and so is the filename argument to log the map output to\n"
 		"                  file. The {a} argument causes data to be appended so it can\n"
 		"                  easily be tailed with the tail -f <file> shell command.\n"
+		"                  The {v} argument causes the map to be stored as a variable,\n"
+		"                  with filename being used as the variable name.\n"
 		"\n"
 		"         #map move <direction>: This does the same as an actual movement\n"
 		"                  command, updating your location on the map and creating new\n"
@@ -1018,7 +1050,9 @@ struct help_type help_table[] =
 		"         !               0            logical not\n"
 		"         ~               0            bitwise not\n"
 		"         *               1            integer multiply\n"
+		"         **              1            integer power\n"
 		"         /               1            integer divide\n"
+		"         //              1            integer sqrt // 2 or cbrt // 3\n"
 		"         %               1            integer modulo\n"
 		"         d               1            integer random dice roll\n"
 		"         +               2            integer addition\n"
@@ -1125,7 +1159,7 @@ struct help_type help_table[] =
 		"         direction.  The reverse direction of north is south, etc.\n"
 		"\n"
 		"         The third argument is a spatial coordinate. In general, each cardinal\n"
-		"         direction should have a unique value which is a power of two (e.g. 1, 2,\n"
+		"         direction should have a unique value which is a power of two (1, 2,\n"
 		"         4, 8, 16, 32, 64, etc). The exception is for compound directions, whose\n"
 		"         value should be the sum of the values for each component direction. For\n"
 		"         example, if the third value for 'n' is 1, and 'e' is 2, then you would\n"
@@ -1176,6 +1210,7 @@ struct help_type help_table[] =
 		"\n"
 		"       ^ force match of start of string.\n"
 		"       $ force match of end of string.\n"
+		"       \\ escape one character.\n"
 		"  %1-%99 lazy match of any text, available at &1-&99.\n"
 		"      %0 should be avoided in triggers, and if left alone &0 lists all matches.\n"
 		"     { } embed a raw regular expression, available at last &1-&99 + 1.\n"
@@ -1218,13 +1253,14 @@ struct help_type help_table[] =
 	},
 	{
 		"RUN",
-		"<178>Command<078>: #run <178>{<078>session name<178>}<078> <178>{<078>shell command<178>}<078>\n"
+		"<178>Command<078>: #run <178>{<078>name<178>}<078> <178>{<078>shell command<178>} {<078>file<178>}<078>\n"
 		"\n"
 		"         The run command works much like the system command except that it\n"
 		"         runs the command in a pseudo terminal. The run command also creates\n"
 		"         a session that treats the given shell command as a mud server. This\n"
 		"         allows you to run ssh, as well as any other shell application, with\n"
-		"         full tintin scripting capabilities\n"
+		"         full tintin scripting capabilities. If a file name is given the file\n"
+		"         is loaded prior to execution.\n"
 		"\n"
 		"<178>Example<078>: #run {somewhere} {ssh someone@somewhere.com}\n"
 		"<178>Example<078>: #run {something} {tail -f chats.log}\n"
@@ -1286,6 +1322,9 @@ struct help_type help_table[] =
 		"         #{name}:  Switches to a session with the given name.\n"
 		"         #{name} {command}:  Executes a command with the given session without\n"
 		"                             changing the active session.\n"
+		"         @<name>{text}:      Parse text in the given session, substituting the\n"
+		"                             variables and functions, and print the result in\n"
+		"                             the current active session.\n"
 		"\n"
 		"         The startup session is named 'gts' and can be used for relog scripts.\n"
 		"\n"
@@ -1359,6 +1398,13 @@ struct help_type help_table[] =
 		"<178>Comment<078>: You can remove split mode with the #unsplit command.\n"
 	},
 	{
+		"SSL",
+		"<178>Command<078>: #ssl <178>{<078>name<178>} {<078>host<178>} {<078>port<178>} {<078>file<178>}\n"
+		"\n"
+		"         Starts a secure socket telnet session with the given name, host, port,\n"
+		"         and optional file name.\n"
+	},
+	{
 		"STATEMENTS",
 		"         TinTin++ knows the following statements.\n"
 		"<078>\n"
@@ -1428,6 +1474,9 @@ struct help_type help_table[] =
 		"         and each 'case' command found will be compared to the conditional\n"
 		"         argument of the switch and executed if there is a match.\n"
 		"\n"
+		"         When comparing strings the switch and case arguments must be enclosed\n"
+		"         in quote characters.\n"
+		"\n"
 		"         If the 'default' command is found and no 'case' statement has been\n"
 		"         matched the default command's argument is executed.\n"
 		"\n"
@@ -1484,9 +1533,9 @@ struct help_type help_table[] =
 		"<178>Example<078>: #alias {target} {#var target %0}\n"
 		"         #alias {x}      {flame $target}\n"
 		"\n"
-		"         The name of a variable must exist of only letters and numbers in\n"
-		"         order to be substituted.  If you do not meet these requirements do\n"
-		"         not panic, simply encapsulate the variable in braces:\n"
+		"         The name of a variable must exist of only letters, numbers and\n"
+		"         underscores in order to be substituted.  If you do not meet these\n"
+		"         requirements do not panic, simply encapsulate the variable in braces:\n"
 		"\n"
 		"<178>Example<078>: #variable {cool website} {http://tintin.sourceforge.net}\n"
 		"         #chat I was on ${cool website} yesterday!.\n"
@@ -1550,7 +1599,6 @@ struct help_type help_table[] =
 		""
 	}
 };
-
 
 DO_COMMAND(do_prool) // prool
 {

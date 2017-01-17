@@ -57,6 +57,7 @@ DO_COMMAND(do_math)
 {
 	char left[BUFFER_SIZE], right[BUFFER_SIZE];
 	struct listnode *node;
+	double result;
 
 	arg = sub_arg_in_braces(ses, arg, left, GET_NST, SUB_VAR|SUB_FUN);
 
@@ -64,11 +65,13 @@ DO_COMMAND(do_math)
 
 	if (*left == 0 || *right == 0)
 	{
-		tintin_printf2(ses, "#SYNTAX: #MATH {variable} {expression}.");
+		show_error(ses, LIST_VARIABLE, "#SYNTAX: #MATH {variable} {expression}.");
 	}
 	else
 	{
-		node = set_nest_node(ses->list[LIST_VARIABLE], left, "%.*f", precision, get_number(ses, right));
+		result = get_number(ses, right);
+
+		node = set_nest_node(ses->list[LIST_VARIABLE], left, "%.*f", precision, result);
 
 		show_message(ses, LIST_VARIABLE, "#MATH: VARIABLE {%s} HAS BEEN SET TO {%s}.", left, node->right);
 	}
@@ -253,7 +256,7 @@ int mathexp_tokenize(struct session *ses, char *str, int seed)
 					case '"':
 						if (pta != buf3)
 						{
-//							show_message(ses, -1, "MATH EXP: \" FOUND INSIDE A NUMBER");
+//							show_message(ses, LIST_VARIABLE, "MATH EXP: \" FOUND INSIDE A NUMBER");
 							return FALSE;
 						}
 						*pta++ = *pti++;
@@ -263,7 +266,7 @@ int mathexp_tokenize(struct session *ses, char *str, int seed)
 					case '(':
 						if (pta != buf3)
 						{
-//							show_message(ses, -1, "#MATH EXP: PARANTESES FOUND INSIDE A NUMBER");
+//							show_message(ses, LIST_VARIABLE, "#MATH EXP: PARANTESES FOUND INSIDE A NUMBER");
 							return FALSE;
 						}
 						*pta++ = *pti++;
@@ -283,7 +286,7 @@ int mathexp_tokenize(struct session *ses, char *str, int seed)
 						*pta++ = *pti++;
 						if (point >= 0)
 						{
-//							show_message(ses, -1, "#MATH EXP: MORE THAN ONE POINT FOUND INSIDE A NUMBER");
+//							show_message(ses, LIST_VARIABLE, "#MATH EXP: MORE THAN ONE POINT FOUND INSIDE A NUMBER");
 							precision = 0;
 							return FALSE;
 						}
@@ -355,7 +358,36 @@ int mathexp_tokenize(struct session *ses, char *str, int seed)
 						break;
 
 					case '*':
+						*pta++ = *pti++;
+
+						switch (*pti)
+						{
+							case '*':
+								*pta++ = *pti++;
+								MATH_NODE(FALSE, EXP_PR_INTMUL, EXP_VARIABLE);
+								break;
+							
+							default:
+								MATH_NODE(FALSE, EXP_PR_INTMUL, EXP_VARIABLE);
+								break;
+						}
+						break;
+	
 					case '/':
+						*pta++ = *pti++;
+
+						switch (*pti)
+						{
+							case '/':
+								*pta++ = *pti++;
+								MATH_NODE(FALSE, EXP_PR_INTMUL, EXP_VARIABLE);
+								break;
+							default:
+								MATH_NODE(FALSE, EXP_PR_INTMUL, EXP_VARIABLE);
+								break;
+						}
+						break;
+
 					case '%':
 						*pta++ = *pti++;
 						MATH_NODE(FALSE, EXP_PR_INTMUL, EXP_VARIABLE);
@@ -475,7 +507,7 @@ int mathexp_tokenize(struct session *ses, char *str, int seed)
 						break;
 
 					default:
-//						show_message(ses, -1, "#MATH EXP: UNKNOWN OPERATOR: %c", *pti);
+//						show_message(ses, LIST_VARIABLE, "#MATH EXP: UNKNOWN OPERATOR: %c", *pti);
 						return FALSE;
 				}
 				break;
@@ -484,7 +516,7 @@ int mathexp_tokenize(struct session *ses, char *str, int seed)
 
 	if (level != 0)
 	{
-//		show_message(ses, -1, "#MATH EXP: UNMATCHED PARENTHESES, LEVEL: %d", level);
+//		show_message(ses, LIST_VARIABLE, "#MATH EXP: UNMATCHED PARENTHESES, LEVEL: %d", level);
 		return FALSE;
 	}
 
@@ -559,7 +591,7 @@ void mathexp_compute(struct session *ses, struct link_data *node)
 		case 'd':
 			if (tintoi(node->next->str3) <= 0)
 			{
-//				show_message(ses, -1, "#MATHEXP: INVALID DICE: %s", node->next->str3);
+//				show_message(ses, LIST_VARIABLE, "#MATHEXP: INVALID DICE: %s", node->next->str3);
 				value = 0;
 			}
 			else
@@ -568,30 +600,53 @@ void mathexp_compute(struct session *ses, struct link_data *node)
 			}
 			break;
 		case '*':
-			value = tintoi(node->prev->str3) * tintoi(node->next->str3);
+			switch (node->str3[1])
+			{
+				case '*':
+					value = pow(tintoi(node->prev->str3), tintoi(node->next->str3));
+					break;
+				default:
+					value = tintoi(node->prev->str3) * tintoi(node->next->str3);
+					break;
+			}
 			break;
 		case '/':
-			if (tintoi(node->next->str3) == 0)
+			switch (node->str3[1])
 			{
-//				show_message(ses, -1, "#MATH ERROR: DIVISION ZERO.");
-				value = tintoi(node->prev->str3);
-			}
-			else
-			{
-				if (precision)
-				{
-					value = tintoi(node->prev->str3) / tintoi(node->next->str3);
-				}
-				else
-				{
-					value = (long long) tintoi(node->prev->str3) / (long long) tintoi(node->next->str3);
-				}
+				case '/':
+					if (tintoi(node->next->str3) == 3)
+					{
+						value = cbrt(tintoi(node->prev->str3));
+					}
+					else
+					{
+						value = sqrt(tintoi(node->prev->str3));
+					}
+					break;
+				default:
+					if (tintoi(node->next->str3) == 0)
+					{
+//						show_message(ses, LIST_VARIABLE, "#MATH ERROR: DIVISION ZERO.");
+						value = tintoi(node->prev->str3);
+					}
+					else
+					{
+						if (precision)
+						{
+							value = tintoi(node->prev->str3) / tintoi(node->next->str3);
+						}
+						else
+						{
+							value = (long long) tintoi(node->prev->str3) / (long long) tintoi(node->next->str3);
+						}
+					}
+					break;
 			}
 			break;
 		case '%':
 			if (tintoi(node->next->str3) == 0)
 			{
-//				show_message(ses, -1, "#MATH ERROR: MODULO ZERO.");
+//				show_message(ses, LIST_VARIABLE, "#MATH ERROR: MODULO ZERO.");
 				value = tintoi(node->prev->str3);
 			}
 			else
@@ -678,7 +733,7 @@ void mathexp_compute(struct session *ses, struct link_data *node)
 			value = (tineval(ses, node->prev->str3, node->next->str3) == 0);
 			break;
 		default:
-//			show_message(ses, -1, "#COMPUTE EXP: UNKNOWN OPERATOR: %c%c", node->str3[0], node->str3[1]);
+//			show_message(ses, LIST_VARIABLE, "#COMPUTE EXP: UNKNOWN OPERATOR: %c%c", node->str3[0], node->str3[1]);
 			value = 0;
 			break;
 	}

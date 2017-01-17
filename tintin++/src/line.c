@@ -36,7 +36,7 @@ DO_COMMAND(do_line)
 
 	if (*left == 0)
 	{
-		tintin_printf(ses, "#SYNTAX: #LINE {<OPTION>} {argument}.");
+		show_error(ses, LIST_COMMAND, "#SYNTAX: #LINE {<OPTION>} {argument}.");
 	}
 	else
 	{
@@ -75,7 +75,7 @@ DO_LINE(line_log)
 	char left[BUFFER_SIZE], right[BUFFER_SIZE], temp[BUFFER_SIZE];
 	FILE *logfile;
 
-	arg = sub_arg_in_braces(ses, arg, left, GET_ONE, SUB_VAR|SUB_FUN);
+	arg = sub_arg_in_braces(ses, arg, left, GET_ONE, SUB_VAR|SUB_FUN|SUB_ESC);
 	arg = sub_arg_in_braces(ses, arg, temp, GET_ALL, SUB_VAR|SUB_FUN);
 
 	if ((logfile = fopen(left, "a")))
@@ -86,7 +86,7 @@ DO_LINE(line_log)
 
 			if (ftell(logfile) == 0)
 			{
-				write_html_header(logfile);
+				write_html_header(ses, logfile);
 			}
 		}
 
@@ -109,7 +109,7 @@ DO_LINE(line_log)
 	}
 	else
 	{
-		tintin_printf(ses, "#ERROR: #LINE LOG {%s} - COULDN'T OPEN FILE.", left);
+		show_error(ses, LIST_COMMAND, "#ERROR: #LINE LOG {%s} - COULDN'T OPEN FILE.", left);
 	}
 	return ses;
 }
@@ -131,7 +131,7 @@ DO_LINE(line_logverbatim)
 
 			if (ftell(logfile) == 0)
 			{
-				write_html_header(logfile);
+				write_html_header(ses, logfile);
 			}
 		}
 
@@ -141,7 +141,7 @@ DO_LINE(line_logverbatim)
 	}
 	else
 	{
-		tintin_printf(ses, "#ERROR: #LINE LOGVERBATIM {%s} - COULDN'T OPEN FILE.", left);
+		show_error(ses, LIST_COMMAND, "#ERROR: #LINE LOGVERBATIM {%s} - COULDN'T OPEN FILE.", left);
 	}
 	return ses;
 }
@@ -154,14 +154,14 @@ DO_LINE(line_strip)
 
 	if (*left == 0)
 	{
-		tintin_printf(ses, "#SYNTAX: #LINE {STRIP} {command}.");
+		show_error(ses, LIST_COMMAND, "#SYNTAX: #LINE {STRIP} {command}.");
 
 		return ses;
 	}
 
 	strip_vt102_codes(left, strip);
 
-	ses = script_driver(ses, -1, strip);
+	ses = script_driver(ses, LIST_COMMAND, strip);
 
 	return ses;
 }
@@ -176,9 +176,7 @@ DO_LINE(line_substitute)
 
 	if (*right == 0)
 	{
-		tintin_printf(ses, "#SYNTAX: #LINE {SUBSTITUTE} {argument} {command}.");
-
-		return ses;
+		return show_error(ses, LIST_COMMAND, "#SYNTAX: #LINE {SUBSTITUTE} {argument} {command}.");
 	}
 
 	arg = left;
@@ -203,32 +201,27 @@ DO_LINE(line_substitute)
 
 	substitute(ses, right, subs, flags);
 
-	ses = script_driver(ses, -1, subs);
+	ses = script_driver(ses, LIST_COMMAND, subs);
 
 	return ses;
 }
 
 DO_LINE(line_verbose)
 {
-	struct session *sesptr;
 	char left[BUFFER_SIZE];
 
 	arg = get_arg_in_braces(ses, arg, left,  TRUE);
 
 	if (*left == 0)
 	{
-		tintin_printf(ses, "#SYNTAX: #LINE {VERBOSE} {command}.");
-
-		return ses;
+		return show_error(ses, LIST_COMMAND, "#SYNTAX: #LINE {VERBOSE} {command}.");
 	}
 
-	sesptr = ses;
+	gtd->noise_level++;
 
-	SET_BIT(sesptr->flags, SES_FLAG_VERBOSELINE);
+	ses = script_driver(ses, LIST_COMMAND, left);
 
-	ses = script_driver(ses, -1, left);
-
-	DEL_BIT(sesptr->flags, SES_FLAG_VERBOSELINE);
+	gtd->noise_level--;
 
 	return ses;
 }
@@ -242,18 +235,37 @@ DO_LINE(line_ignore)
 
 	if (*left == 0)
 	{
-		tintin_printf(ses, "#SYNTAX: #LINE {IGNORE} {command}.");
-
-		return ses;
+		return show_error(ses, LIST_COMMAND, "#SYNTAX: #LINE {IGNORE} {command}.");
 	}
 
 	sesptr = ses;
 
 	SET_BIT(sesptr->flags, SES_FLAG_IGNORELINE);
 
-	ses = script_driver(ses, -1, left);
+	ses = script_driver(ses, LIST_COMMAND, left);
 
 	DEL_BIT(sesptr->flags, SES_FLAG_IGNORELINE);
 
 	return ses;
 }
+
+DO_LINE(line_quiet)
+{
+	char left[BUFFER_SIZE];
+
+	arg = get_arg_in_braces(ses, arg, left,  TRUE);
+
+	if (*left == 0)
+	{
+		return show_error(ses, LIST_COMMAND, "#SYNTAX: #LINE {QUIET} {command}.");
+	}
+
+	gtd->quiet++;
+
+	ses = script_driver(ses, LIST_COMMAND, left);
+
+	gtd->quiet--;
+
+	return ses;
+}
+	

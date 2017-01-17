@@ -96,18 +96,21 @@ void abort_handler(int signal)
 	fflush(NULL);
 
 	exit(-1);
+}
 
+void interrupt_handler(int signal)
+{
 	if (gtd->ses->connect_retry > utime())
 	{
 		gtd->ses->connect_retry = 0;
 	}
 	else if (HAS_BIT(gtd->ses->telopts, TELOPT_FLAG_SGA) && !HAS_BIT(gtd->ses->telopts, TELOPT_FLAG_ECHO))
 	{
-		socket_printf(gtd->ses, 1, "%c", 3);
+		socket_printf(gtd->ses, 1, "%c", 4);
 	}
 	else
 	{
-		do_zap(gtd->ses, "");
+		cursor_delete_or_exit(gtd->ses, "");
 	}
 }
 
@@ -115,15 +118,15 @@ void suspend_handler(int signal)
 {
 	printf("\033[r\033[%d;%dH", gtd->ses->rows, 1);
 
-	fflush(stdout);
+	fflush(NULL);
 
 	restore_terminal();
 
 	kill(0, SIGSTOP);
 
-	dirty_screen(gtd->ses);
-
 	init_terminal();
+
+	dirty_screen(gtd->ses);
 
 	tintin_puts(NULL, "#RETURNING BACK TO TINTIN++.");
 }
@@ -158,12 +161,13 @@ void trap_handler(int signal)
 int main(int argc, char **argv)
 {
 	int greeting = TRUE;
+	char filename[256];
+
+printf("--------------------\nMod by Prool. 2014-2016. https://github.com/prool/virtustan http://prool.kharkov.org proolix@gmail.com\n"); // prool
 
 	#ifdef SOCKS
 		SOCKSinit(argv[0]);
 	#endif
-
-printf("--------------------\nMod by Prool. 2014-2015. https://github.com/prool/virtustan http://prool.kharkov.org proolix@gmail.com\n"); // prool
 
 	if (signal(SIGTERM, trap_handler) == BADSIG)
 	{
@@ -184,8 +188,8 @@ printf("--------------------\nMod by Prool. 2014-2015. https://github.com/prool/
 	{
 		syserr("signal SIGTERM");
 	}
-
-	if (signal(SIGINT, abort_handler) == BADSIG)
+/*
+	if (signal(SIGINT, interrupt_handler) == BADSIG)
 	{
 		syserr("signal SIGINT");
 	}
@@ -194,7 +198,7 @@ printf("--------------------\nMod by Prool. 2014-2015. https://github.com/prool/
 	{
 		syserr("signal SIGSTOP");
 	}
-
+*/
 	if (signal(SIGPIPE, pipe_handler) == BADSIG)
 	{
 		syserr("signal SIGPIPE");
@@ -205,16 +209,6 @@ printf("--------------------\nMod by Prool. 2014-2015. https://github.com/prool/
 		syserr("signal SIGWINCH");
 	}
 
-/*
-	if (getenv("HOME") != NULL)
-	{
-		char filename[256];
-
-		sprintf(filename, "%s/%s", getenv("HOME"), HISTORY_FILE);
-
-		read_history(gts, filename);
-	}
-*/
 
 	srand(time(NULL));
 
@@ -235,6 +229,17 @@ printf("--------------------\nMod by Prool. 2014-2015. https://github.com/prool/
 
 	init_tintin(greeting);
 
+	sprintf(filename, "%s/%s", gtd->home, TINTIN_DIR);
+
+	if (mkdir(filename, 0777) || errno == EEXIST)
+	{
+		sprintf(filename, "%s/%s/%s", gtd->home, TINTIN_DIR, HISTORY_FILE);
+
+		if (access(filename, F_OK ) != -1)
+		{
+			history_read(gts, filename);
+		}
+	}
 
 	if (argc > 1)
 	{
@@ -247,7 +252,9 @@ printf("--------------------\nMod by Prool. 2014-2015. https://github.com/prool/
 			switch (c)
 			{
 				case 'e':
-					gtd->ses = script_driver(gtd->ses, -1, optarg);
+					gtd->quiet++;
+					gtd->ses = script_driver(gtd->ses, LIST_COMMAND, optarg);
+					gtd->quiet--;
 					break;
 
 				case 'G':
@@ -294,6 +301,8 @@ printf("--------------------\nMod by Prool. 2014-2015. https://github.com/prool/
 			gtd->ses = do_read(gtd->ses, argv[optind]);
 		}
 	}
+
+
 	check_all_events(gts, SUB_ARG|SUB_SEC, 0, 2, "PROGRAM START", CLIENT_NAME, CLIENT_VERSION);
 	check_all_events(gts, SUB_ARG|SUB_SEC, 0, 2, "SCREEN RESIZE", ntos(gts->cols), ntos(gts->rows));
 
@@ -301,7 +310,6 @@ printf("--------------------\nMod by Prool. 2014-2015. https://github.com/prool/
 
 	return 0;
 }
-
 
 void init_tintin(int greeting)
 {
@@ -339,6 +347,7 @@ void init_tintin(int greeting)
 
 	gtd->input_off      = 1;
 
+	gtd->home           = strdup(getenv("HOME") ? getenv("HOME") : ".");
 	gtd->term           = strdup(getenv("TERM") ? getenv("TERM") : "UNKNOWN");
 
 	for (index = 0 ; index < 100 ; index++)
@@ -361,16 +370,18 @@ void init_tintin(int greeting)
 
 	init_screen_size(gts);
 
+	init_local(gts);
+
 	printf("\033="); // set application keypad mode
 
-	gts->input_level++;
+	gtd->input_level++;
 
 	do_configure(gts, "{AUTO TAB}         {5000}");
 	do_configure(gts, "{BUFFER SIZE}     {20000}");
 	do_configure(gts, "{COLOR PATCH}       {OFF}");
 	do_configure(gts, "{COMMAND COLOR}   {<078>}");
 	do_configure(gts, "{COMMAND ECHO}       {ON}");
-	do_configure(gts, "{CONNECT RETRY}      {15}");
+	do_configure(gts, "{CONNECT RETRY}       {0}");
 	do_configure(gts, "{CHARSET}         {ASCII}");
 	do_configure(gts, "{HISTORY SIZE}     {1000}");
 	do_configure(gts, "{LOG}               {RAW}");
@@ -386,7 +397,7 @@ void init_tintin(int greeting)
 	do_configure(gts, "{WORDWRAP}           {ON}");
 	do_configure(gts, "{256 COLORS}       {AUTO}");
 
-	gts->input_level--;
+	gtd->input_level--;
 
 	insert_node_list(gts->list[LIST_PATHDIR],  "n",  "s",  "1");
 	insert_node_list(gts->list[LIST_PATHDIR],  "e",  "w",  "2");
@@ -429,16 +440,15 @@ void quitmsg(char *message)
 
 	check_all_events(gts, SUB_ARG|SUB_SEC, 0, 0, "PROGRAM TERMINATION");
 
-/*
 	if (gtd->history_size)
 	{
 		char filename[BUFFER_SIZE];
 
-		sprintf(filename, "%s/%s", getenv("HOME"), HISTORY_FILE);
+		sprintf(filename, "%s/%s/%s", gtd->home, TINTIN_DIR, HISTORY_FILE);
 
 		history_write(gts, filename);
 	}
-*/
+
 	restore_terminal();
 
 	clean_screen(gts);

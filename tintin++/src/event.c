@@ -1,4 +1,4 @@
-/******************************************************************************
+/*****************************************************************************
 *   TinTin++                                                                  *
 *   Copyright (C) 2007 (See CREDITS file)                                     *
 *                                                                             *
@@ -48,7 +48,7 @@ DO_COMMAND(do_event)
 	}
 	else if (*arg2 == 0)
 	{
-		if (show_node_with_wild(ses, arg1, LIST_EVENT) == FALSE)
+		if (show_node_with_wild(ses, arg1, ses->list[LIST_EVENT]) == FALSE)
 		{
 			show_message(ses, LIST_ALIAS, "#EVENT: NO MATCH(ES) FOUND FOR {%s}.", arg1);
 		}
@@ -66,7 +66,7 @@ DO_COMMAND(do_event)
 				return ses;
 			}
 		}
-		tintin_printf(ses, "#EVENT {%s} IS NOT AN EXISTING EVENT.", capitalize(arg1));
+		show_error(ses, LIST_EVENT, "#EVENT {%s} IS NOT AN EXISTING EVENT.", arg1);
 	}
 	return ses;
 }
@@ -82,23 +82,23 @@ int check_all_events(struct session *ses, int flags, int args, int vars, char *f
 {
 	struct session *ses_ptr;
 	struct listnode *node;
-	char buf[BUFFER_SIZE];
+	char name[BUFFER_SIZE], buf[BUFFER_SIZE];
 	va_list list;
 	int cnt;
 
-	push_call("check_all_events(%p,%d,%d,%d, ...)",ses,flags,args,vars);
-
 	va_start(list, fmt);
 
-	vsprintf(buf, fmt, list);
+	vsprintf(name, fmt, list);
 
 	va_end(list); 
+
+	push_call("check_all_events(%p,%d,%d,%d,%s, ...)",ses,flags,args,vars,name);
 
 	for (ses_ptr = ses ? ses : gts ; ses_ptr ; ses_ptr = ses_ptr->next)
 	{
 		if (!HAS_BIT(ses_ptr->list[LIST_EVENT]->flags, LIST_FLAG_IGNORE))
 		{
-			node = search_node_list(ses_ptr->list[LIST_EVENT], buf);
+			node = search_node_list(ses_ptr->list[LIST_EVENT], name);
 
 			if (node)
 			{
@@ -132,6 +132,7 @@ int check_all_events(struct session *ses, int flags, int args, int vars, char *f
 				}
 			}
 		}
+
 		if (ses)
 		{
 			pop_call();

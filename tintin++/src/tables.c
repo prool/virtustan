@@ -69,6 +69,7 @@ struct command_type command_table[] =
 	{    "killall",           do_kill,              TOKEN_TYPE_COMMAND },
 	{    "line",              do_line,              TOKEN_TYPE_COMMAND },
 	{    "list",              do_list,              TOKEN_TYPE_COMMAND },
+	{    "local",             do_local,             TOKEN_TYPE_COMMAND },
 	{    "log",               do_log,               TOKEN_TYPE_COMMAND },
 	{    "loop",              do_nop,               TOKEN_TYPE_LOOP    },
 	{    "macro",             do_macro,             TOKEN_TYPE_COMMAND },
@@ -93,6 +94,7 @@ struct command_type command_table[] =
 	{    "showme",            do_showme,            TOKEN_TYPE_COMMAND },
 	{    "snoop",             do_snoop,             TOKEN_TYPE_COMMAND },
 	{    "split",             do_split,             TOKEN_TYPE_COMMAND },
+	{    "ssl",               do_ssl,               TOKEN_TYPE_COMMAND },
 	{    "substitute",        do_substitute,        TOKEN_TYPE_COMMAND },
 	{    "switch",            do_nop,               TOKEN_TYPE_SWITCH  },
 	{    "system",            do_system,            TOKEN_TYPE_COMMAND },
@@ -128,6 +130,7 @@ struct list_type list_table[LIST_MAX] =
 	{    "ACTION",            "ACTIONS",            PRIORITY,    3,  LIST_FLAG_MESSAGE|LIST_FLAG_READ|LIST_FLAG_WRITE|LIST_FLAG_CLASS|LIST_FLAG_INHERIT },
 	{    "ALIAS",             "ALIASES",            PRIORITY,    3,  LIST_FLAG_MESSAGE|LIST_FLAG_READ|LIST_FLAG_WRITE|LIST_FLAG_CLASS|LIST_FLAG_INHERIT },
 	{    "CLASS",             "CLASSES",            ALPHA,       2,  LIST_FLAG_MESSAGE|LIST_FLAG_READ|LIST_FLAG_INHERIT                                 },
+	{    "COMMAND",           "COMMANDS",           APPEND,      1,  LIST_FLAG_MESSAGE                                                                  },
 	{    "CONFIG",            "CONFIGURATIONS",     ALPHA,       2,  LIST_FLAG_MESSAGE|LIST_FLAG_READ|LIST_FLAG_WRITE|LIST_FLAG_INHERIT                 },
 	{    "DELAY",             "DELAYS",             ALPHA,       3,  LIST_FLAG_MESSAGE|LIST_FLAG_READ                                                   },
 	{    "EVENT",             "EVENTS",             ALPHA,       2,  LIST_FLAG_MESSAGE|LIST_FLAG_READ|LIST_FLAG_WRITE|LIST_FLAG_CLASS|LIST_FLAG_INHERIT },
@@ -141,7 +144,7 @@ struct list_type list_table[LIST_MAX] =
 	{    "PROMPT",            "PROMPTS",            PRIORITY,    3,  LIST_FLAG_MESSAGE|LIST_FLAG_READ|LIST_FLAG_WRITE|LIST_FLAG_CLASS|LIST_FLAG_INHERIT },
 	{    "SUBSTITUTE",        "SUBSTITUTIONS",      PRIORITY,    3,  LIST_FLAG_MESSAGE|LIST_FLAG_READ|LIST_FLAG_WRITE|LIST_FLAG_CLASS|LIST_FLAG_INHERIT },
 	{    "TAB",               "TABS",               ALPHA,       1,  LIST_FLAG_MESSAGE|LIST_FLAG_READ|LIST_FLAG_WRITE|LIST_FLAG_CLASS|LIST_FLAG_INHERIT },
-	{    "TABCYCLE",          "TABCYCLE",           APPEND,      1,  LIST_FLAG_MESSAGE|LIST_FLAG_HIDE                                                   },
+//	{    "TABCYCLE",          "TABCYCLE",           APPEND,      1,  LIST_FLAG_MESSAGE|LIST_FLAG_HIDE                                                   },
 	{    "TICKER",            "TICKERS",            ALPHA,       3,  LIST_FLAG_MESSAGE|LIST_FLAG_READ|LIST_FLAG_WRITE|LIST_FLAG_CLASS|LIST_FLAG_INHERIT },
 	{    "VARIABLE",          "VARIABLES",          ALPHA,       2,  LIST_FLAG_MESSAGE|LIST_FLAG_READ|LIST_FLAG_WRITE|LIST_FLAG_CLASS|LIST_FLAG_INHERIT|LIST_FLAG_NEST }
 };
@@ -374,6 +377,10 @@ struct color_type color_table[] =
 	{    "blink",         "<588>" },
 	{    "reverse",       "<788>" },
 
+	{    "no-underscore", "\e[24m"},
+	{    "no-blink",      "\e[25m"},
+	{    "no-reverse",    "\e[27m"},
+		
 	{    "black",         "<808>" },
 	{    "red",           "<818>" },
 	{    "green",         "<828>" },
@@ -409,6 +416,7 @@ struct class_type class_table[] =
 {
 	{    "OPEN",              class_open             },
 	{    "CLOSE",             class_close            },
+	{    "LIST",              class_list             },
 	{    "READ",              class_read             },
 	{    "WRITE",             class_write            },
 	{    "KILL",              class_kill             },
@@ -438,6 +446,7 @@ struct chat_type chat_table[] =
 	{     "PASTE",            chat_paste,          0, 1, "Paste a block of text to a buddy"               },
 	{     "PEEK",             chat_peek,           1, 0, "Show a buddy's public connections"              },
 	{     "PING",             chat_ping,           1, 0, "Display a buddy's response time"                },
+	{     "PREFIX",           chat_prefix,         1, 0, "Prefix before each chat message"                },
 	{     "PRIVATE",          chat_private,        1, 0, "Do not share a buddy's IP address"              },
 	{     "PUBLIC",           chat_public,         1, 0, "Share a buddy's IP address"                     },
 	{     "REPLY",            chat_reply,          1, 0, "Reply to last private message"                  },
@@ -821,6 +830,7 @@ struct timer_type timer_table[] =
 
 struct event_type event_table[] =
 {
+	{    "CHAT MESSAGE",                           "Triggers on any chat related message."   },
 	{    "DATE",                                   "Triggers on the given date."             },
 	{    "DAY",                                    "Triggers each day or given day."         },
 	{    "HOUR",                                   "Triggers each hour or given hour."       },
@@ -843,6 +853,7 @@ struct event_type event_table[] =
 	{    "SEND OUTPUT",                            "Triggers when sending output."           },
 	{    "SESSION ACTIVATED",                      "Triggers when a session is activated."   },
 	{    "SESSION CONNECTED",                      "Triggers when a new session connects."   },
+	{    "SESSION CREATED",                        "Triggers when a new session is created." },
 	{    "SESSION DEACTIVATED",                    "Triggers when a session is deactivated." },
 	{    "SESSION DISCONNECTED",                   "Triggers when a session disconnects."    },
 	{    "SESSION TIMED OUT",                      "Triggers when a session doesn't connect."},
@@ -880,6 +891,7 @@ struct line_type line_table[] =
 	{    "IGNORE",            line_ignore            },
 	{    "LOG",               line_log               },
 	{    "LOGVERBATIM",       line_logverbatim       },
+	{    "QUIET",             line_quiet             },
 	{    "STRIP",             line_strip             },
 	{    "SUBSTITUTE",        line_substitute        },
 	{    "VERBOSE",           line_verbose           },

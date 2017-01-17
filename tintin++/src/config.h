@@ -38,6 +38,9 @@
 /* Define to 1 if you have the `gettimeofday' function. */
 #define HAVE_GETTIMEOFDAY 1
 
+/* Define to 1 if you have the <gnutls/gnutls.h> header file. */
+/* #undef HAVE_GNUTLS_H */
+
 /* Define to 1 if you have the `inet_ntoa' function. */
 #define HAVE_INET_NTOA 1
 
@@ -141,6 +144,10 @@
 
 /* Define to 1 if you have the `strstr' function. */
 #define HAVE_STRSTR 1
+
+/* Define to 1 if you have the <stropts.h> header file. */
+
+#define HAVE_STROPTS_H 1
 
 /* Define to 1 if you have the <sys/dir.h> header file, and it defines `DIR'.
    */

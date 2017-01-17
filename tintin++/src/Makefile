@@ -37,9 +37,7 @@ LDFLAGS =
 
 INCS = 
 
-# by prool:
-#LIBS = -lpcre -lutil -lnsl -lpthread -lz 
-LIBS = -lpcre -lutil -lpthread -lz 
+LIBS = -lm -lpcre -lutil -lnsl -lpthread -lz 
 
 # If you prefer to be able to enter ISO latin-1 characters instead
 # of being able to use the meta key for special emacs-like commands
@@ -66,7 +64,7 @@ OFILES = action.o alias.o files.o help.o highlight.o strhash.o input.o log.o \
          math.o split.o debug.o tinexp.o mapper.o tables.o buffer.o prompt.o \
          class.o  event.o utils.o chat.o macro.o  config.o gag.o variable.o \
          list.o forkpty.o cursor.o memory.o system.o line.o tokenize.o \
-         data.o nest.o advertise.o
+         data.o nest.o advertise.o ssl.o
 
 
 default: all

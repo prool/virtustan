@@ -35,47 +35,81 @@ struct advertisement_type
 	char                  * desc;
 };
 
-#define YEAR2030	1893456000	/*  1 Jan 2030 */
-
 struct advertisement_type advertisement_table[] =
 {
 	{
-		1388166000, /* 27 Dec 2013 */
-		YEAR2030,
+		1388166000, /* 2013 */
+		1600000000, /* 2020 */
 		100,
 		"\n"
-		"<138>                     VMUD  -  http://mud.kharkov.org\n"
+		"<138>                     Lost Souls  -  http://lostsouls.org\n"
 		"\n"
-		"<078>Virtustan MUD rulez!\n"
+		"<078>\"Our world is fallen, boy.  Aedaris is a ruin.  My grandfather, he told me\n"
+		"<078>of days, not so long gone, when everything you see was part of a great empire.\n"
+		"<078>Peaceful, he said.  Full of wonders.  They called it eternal.  Funny, eh, boy?\n"
+		"<078>They thought it'd last forever, and it went crazy and tore itself apart.  But\n"
+		"<078>they left behind a few things for us, didn't they?  Ha!  Yes, lots for us.  Now\n"
+		"<078>give that wizard-stick here before you blow your fool horns off, and get to\n"
+		"<078>work.  Daylight's soon, and these faeries aren't going to skin themselves.\"\n"
+		"<078>Lost Souls: chaos in the wreckage of empire.  Be clever if you want to live.\n"
 		"\n"
-                "<178>To connect to VMUD enter: #ses s1 mud.kharkov.org 3000 or 8888\n"
+                "<178>To connect to Lost Souls enter: #session ls lostsouls.org 23\n"
+                "\n"
+	},
+
+	{
+		1388166000, /* 2013 */
+		1600000000, /* 2020 */
+		100,
+		"\n"
+		"<138>               Carrion Fields  -  http://carrionfields.net\n"
+		"\n"
+		"<078>Adventure, politics and bloody war await you in this life of swords, sorcery,\n"
+		"<078>deception, and honor.  We have 17 customizable classes with which to explore a\n"
+		"<078>massively rich world of over 270 areas.  RP is mandatory, but help is always\n"
+		"<078>available on the newbie channel.  Intuitive game mechanics provide a fun and\n"
+		"<078>fulfilling PK environment.  Carrion Fields is 100% free to play and free of\n"
+		"<078>paid perks as well.  By what name do you wish to be mourned?\n"
+		"\n"
+                "<178>To connect to Carrion Fields enter: #session cf carrionfields.net 4449\n"
                 "\n"
 		                
 	},
 
 	{
-		1388166000, /* 27 Dec 2013 */
-		YEAR2030,
+		1388166000, /* 2013 */
+		1600000000, /* 2020 */
 		100,
 		"\n"
-		"<138>                   Zerkalo  -  http://zerkalo.kharkov.org\n"
+		"<138>                   Alter Aeon  -  http://www.alteraeon.com\n"
 		"\n"
-		"<078>Zerkalo MUD rulez!\n"
+		"<078>Alter Aeon is a custom multiclass MUD, where each of the character\n"
+		"<078>classes can be combined to make very unique characters.  This huge\n"
+		"<078>fantasy themed game has hundreds of areas and quests, spanning\n"
+		"<078>several continents and outer planar regions.  There are custom spells,\n"
+		"<078>skills, minions, player run shops, boats, PvP, and many other features\n"
+		"<078>for nearly every kind of player.  The game is very friendly to new players\n"
+		"<078>and has extensive support for the blind and visually impaired.\n"
 		"\n"
-		"<178>To connect to Zerkalo MUD enter: #ses s1 zerkalo.kharkov.org 4000\n"
+		"<178>To connect to Alter Aeon enter: #session aa alteraeon.com 3000\n"
 		"\n"
 	},
 
 	{
-		1388166000, /* 27 Dec 2013 */
-		YEAR2030,
+		1388166000, /* 2013 */
+		1600000000, /* 2020 */
 		100,
 		"\n"
-		"<138>                Byliny  -  http://mud.ru\n"
+		"<138>                Threshold RPG  -  http://www.thresholdrpg.com\n"
 		"\n"
-		"<078>Byliny rulez\n"
+		"<078>Join us as Threshold RPG, one of the oldest RP enforced games on the\n"
+		"<078>internet. Add to thirteen years of player created history and make your own\n"
+		"<078>mark on the world today. Join a hundred other players who are vying for\n"
+		"<078>political and religious power in complex systems that reward skill, effort,\n"
+		"<078>and social interactions. Threshold RPG is a custom code-base written in\n"
+		"<078>LPC and features a completely unique and original world.\n"
 		"\n"
-		"<178>To connect to Byliny enter: #ses s1 byliny.kharkov.ru 4000 or bylins.su\n"
+		"<178>To connect to Threshold RPG enter: #session thresh thresholdrpg.com 23\n"
 		"\n"
 	},
 

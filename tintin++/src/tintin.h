@@ -35,6 +35,8 @@
 #include <stdarg.h>
 #include <termios.h>
 #include <pcre.h>
+#include <errno.h>
+#include <math.h>
 
 /******************************************************************************
 *   Autoconf patching by David Hedbor                                         *
@@ -76,6 +78,21 @@
 #include <net/errno.h>
 #endif
 
+#ifdef HAVE_GNUTLS_H
+#include <gnutls/gnutls.h>
+#include <gnutls/x509.h>
+#else
+#define gnutls_session_t int
+#endif
+
+#ifdef HAVE_SYS_TYPES_H
+#include <sys/types.h>
+#endif
+
+#ifdef HAVE_SYS_STAT_H
+#include <sys/stat.h>
+#endif
+
 #ifndef __TINTIN_H__
 #define __TINTIN_H__
 
@@ -114,15 +131,16 @@
 
 #define COMMAND_SEPARATOR              ';'
 
-#define HISTORY_FILE         ".tt_history"
+#define TINTIN_DIR               ".tintin"
+#define HISTORY_FILE         "history.txt"
 
-#define STRING_SIZE                  45000
-#define BUFFER_SIZE                  30000
+#define STRING_SIZE                  65536
+#define BUFFER_SIZE                  32768
 #define NUMBER_SIZE                    100
 #define LIST_SIZE                        2
 
 #define CLIENT_NAME              "TinTin++"
-#define CLIENT_VERSION           "2.01.0  "
+#define CLIENT_VERSION           "2.01.2  "
 
 #define ESCAPE                          27
 
@@ -161,20 +179,20 @@
 #define LIST_ACTION                      0
 #define LIST_ALIAS                       1
 #define LIST_CLASS                       2
-#define LIST_CONFIG                      3
-#define LIST_DELAY                       4
-#define LIST_EVENT                       5
-#define LIST_FUNCTION                    6
-#define LIST_GAG                         7
-#define LIST_HIGHLIGHT                   8
-#define LIST_HISTORY                     9
-#define LIST_MACRO                      10
-#define LIST_PATH                       11
-#define LIST_PATHDIR                    12
-#define LIST_PROMPT                     13
-#define LIST_SUBSTITUTE                 14
-#define LIST_TAB                        15
-#define LIST_TABCYCLE                   16
+#define LIST_COMMAND                     3
+#define LIST_CONFIG                      4
+#define LIST_DELAY                       5
+#define LIST_EVENT                       6
+#define LIST_FUNCTION                    7
+#define LIST_GAG                         8
+#define LIST_HIGHLIGHT                   9
+#define LIST_HISTORY                    10
+#define LIST_MACRO                      11
+#define LIST_PATH                       12
+#define LIST_PATHDIR                    13
+#define LIST_PROMPT                     14
+#define LIST_SUBSTITUTE                 15
+#define LIST_TAB                        16
 #define LIST_TICKER                     17
 #define LIST_VARIABLE                   18
 #define LIST_MAX                        19
@@ -208,14 +226,6 @@ enum operators
 	TOKEN_TYPE_WHILE,
 	TOKEN_TYPE_BROKEN_WHILE
 };
-
-
-/*
-	generic define for show_message
-*/
-
-#define LIST_MESSAGE                    -1
-
 
 /*
 	Various flags
@@ -311,7 +321,7 @@ enum operators
 #define SES_FLAG_CONNECTED            (1 << 11)
 #define SES_FLAG_REPEATENTER          (1 << 12)
 #define SES_FLAG_VERBOSE              (1 << 13)
-#define SES_FLAG_VERBOSELINE          (1 << 14)
+//#define SES_FLAG_VERBOSELINE          (1 << 14)
 #define SES_FLAG_LOGLEVEL             (1 << 15)
 #define SES_FLAG_LOGPLAIN             (1 << 16)
 #define SES_FLAG_LOGHTML              (1 << 17)
@@ -381,7 +391,8 @@ enum operators
 #define MAP_SEARCH_AREA               3
 #define MAP_SEARCH_NOTE               4
 #define MAP_SEARCH_TERRAIN            5
-#define MAP_SEARCH_MAX                6
+#define MAP_SEARCH_FLAG               6
+#define MAP_SEARCH_MAX                7
 
 #define MAP_EXIT_N                     1
 #define MAP_EXIT_E                     2
@@ -535,9 +546,9 @@ enum operators
 
 #define SCROLL(ses)               ((ses)->cur_row == 0 || ((ses)->cur_row >= (ses)->top_row && (ses)->cur_row <= (ses)->bot_row) || (ses)->cur_row == (ses)->rows)
 
-#define VERBATIM(ses)             ((ses)->input_level == 0 && HAS_BIT((ses)->flags, SES_FLAG_VERBATIM))
+#define VERBATIM(ses)             (gtd->input_level == 0 && HAS_BIT((ses)->flags, SES_FLAG_VERBATIM))
 
-#define DO_ARRAY(array) struct session *array (struct session *ses, struct listnode *list, char *arg)
+#define DO_ARRAY(array) struct session *array (struct session *ses, struct listnode *list, char *arg, char *var)
 #define DO_CHAT(chat) void chat (char *left, char *right)
 #define DO_CLASS(class) struct session *class (struct session *ses, char *left, char *right)
 #define DO_COMMAND(command) struct session  *command (struct session *ses, char *arg)
@@ -627,14 +638,13 @@ struct session
 	unsigned char         * read_buf;
 	int                     read_len;
 	int                     read_max;
-	int                     debug_level;
-	int                     input_level;
 	long long               connect_retry;
 	int                     connect_error;
 	char                    more_output[BUFFER_SIZE * 2];
 	char                    color[100];
 	long long               check_output;
 	int                     auto_tab;
+	gnutls_session_t        ssl;
 };
 
 
@@ -661,6 +671,8 @@ struct tintin_data
 	int                     input_cur;
 	int                     input_pos;
 	int                     input_hid;
+	int                     input_tab;
+	char                  * home;
 	char                  * term;
 	long long               time;
 	long long               timer[TIMER_CPU][5];
@@ -673,6 +685,9 @@ struct tintin_data
 	int                     command_ref[26];
 	int                     flags;
 	int                     quiet;
+	int                     noise_level;
+	int                     debug_level;
+	int                     input_level;
 	char                    tintin_char;
 	char                    verbatim_char;
 	char                    repeat_char;
@@ -690,6 +705,7 @@ struct chat_data
 	char                  * version;
 	char                  * download;
 	char                  * reply;
+	char                  * prefix;
 	char                  * paste_buf;
 	char                  * color;
 	char                  * group;
@@ -720,7 +736,7 @@ struct link_data
 	Typedefs
 */
 
-typedef struct session *ARRAY   (struct session *ses, struct listnode *list, char *arg);
+typedef struct session *ARRAY   (struct session *ses, struct listnode *list, char *arg, char *var);
 typedef void            CHAT    (char *left, char *right);
 typedef struct session *CLASS   (struct session *ses, char *left, char *right);
 typedef struct session *CONFIG  (struct session *ses, char *arg, int index);
@@ -894,6 +910,7 @@ struct map_data
 	char                  * here_color;
 	char                  * path_color;
 	char                  * room_color;
+	char                  * back_color;
 	int                     max_grid_x;
 	int                     max_grid_y;
 	int                     undo_size;
@@ -953,6 +970,7 @@ struct search_data
 	pcre                  * area;
 	pcre                  * note;
 	pcre                  * terrain;
+	long long               flag;
 };
 
 #endif
@@ -1090,6 +1108,7 @@ extern DO_CHAT(chat_name);
 extern DO_CHAT(chat_paste);
 extern DO_CHAT(chat_peek);
 extern DO_CHAT(chat_ping);
+extern DO_CHAT(chat_prefix);
 extern DO_CHAT(chat_private);
 extern DO_CHAT(chat_public);
 extern DO_CHAT(chat_reply);
@@ -1163,6 +1182,7 @@ extern DO_COMMAND(do_class);
 extern int count_class(struct session *ses, struct listnode *group);
 extern DO_CLASS(class_open);
 extern DO_CLASS(class_close);
+extern DO_CLASS(class_list);
 extern DO_CLASS(class_read);
 extern DO_CLASS(class_write);
 extern DO_CLASS(class_kill);
@@ -1245,8 +1265,8 @@ extern void show_vtmap(struct session *ses);
 
 #endif
 
-#ifndef __MATH_H__
-#define __MATH_H__
+#ifndef __TT_MATH_H__
+#define __TT_MATH_H__
 
 extern DO_COMMAND(do_math);
 extern double get_number(struct session *ses, char *str);
@@ -1386,7 +1406,7 @@ extern struct listnode *insert_node_list(struct listroot *root, char *ltext, cha
 extern struct listnode *update_node_list(struct listroot *root, char *ltext, char *rtext, char *prtext);
 extern struct listnode *insert_index_list(struct listroot *root, struct listnode *node, int index);
 
-extern  int show_node_with_wild(struct session *ses, char *cptr, int type);
+extern  int show_node_with_wild(struct session *ses, char *cptr, struct listroot *root);
 extern void show_node(struct listroot *root, struct listnode *node, int level);
 extern void show_nest(struct listnode *node, char *result);
 extern void show_list(struct listroot *root, int level);
@@ -1518,6 +1538,7 @@ extern DO_LINE(line_gag);
 extern DO_LINE(line_ignore);
 extern DO_LINE(line_log);
 extern DO_LINE(line_logverbatim);
+extern DO_LINE(line_quiet);
 extern DO_LINE(line_strip);
 extern DO_LINE(line_substitute);
 extern DO_LINE(line_verbose);
@@ -1530,7 +1551,7 @@ extern DO_LINE(line_verbose);
 
 extern void logit(struct session *ses, char *txt, FILE *file, int newline);
 extern DO_COMMAND(do_log);
-extern void write_html_header(FILE *fp);
+extern void write_html_header(struct session *ses, FILE *fp);
 extern void vt102_to_html(struct session *ses, char *txt, char *out);
 #endif
 
@@ -1741,12 +1762,21 @@ extern DO_COMMAND(do_untab);
 extern DO_COMMAND(do_session);
 extern struct session *session_command(char *arg, struct session *ses);
 extern void show_session(struct session *ses, struct session *ptr);
+extern struct session *find_session(char *name);
 extern struct session *newactive_session(void);
 extern struct session *activate_session(struct session *ses);
-extern struct session *new_session(struct session *ses, char *name, char *address, int desc);
+extern struct session *new_session(struct session *ses, char *name, char *address, int desc, int ssl);
 extern struct session *connect_session(struct session *ses);
 extern void cleanup_session(struct session *ses);
 extern void dispose_session(struct session *ses);
+
+#endif
+
+#ifndef __SSL_H__
+#define __SSL_H__
+
+extern DO_COMMAND(do_ssl);
+extern gnutls_session_t ssl_negotiate(struct session *ses);
 
 #endif
 
@@ -1799,7 +1829,7 @@ extern struct term_type term_table[];
 #ifndef __TEXT_H__
 #define __TEXT_H__
 
-extern void printline(struct session *ses, char *str, int isaprompt);
+extern void printline(struct session *ses, char **str, int isaprompt);
 int word_wrap(struct session *ses, char *textin, char *textout, int display);
 int word_wrap_split(struct session *ses, char *textin, char *textout, int skip, int keep);
 
@@ -1818,6 +1848,8 @@ extern DO_COMMAND(do_undelay);
 #ifndef __TOKENIZE_H__
 #define __TOKENIZE_H__
 
+extern void init_local(struct session *ses);
+extern struct listroot *local_list(struct session *ses);
 extern struct session *script_driver(struct session *ses, int list, char *str);
 extern char *script_writer(struct session *ses, char *str);
 
@@ -1856,6 +1888,7 @@ extern void ins_sprintf(char *dest, char *fmt, ...);
 extern int str_suffix(char *str1, char *str2);
 extern void syserr(char *msg);
 extern void show_message(struct session *ses, int index, char *format, ...);
+extern struct session *show_error(struct session *ses, int index, char *format, ...);
 extern void show_debug(struct session *ses, int index, char *format, ...);
 extern void tintin_header(struct session *ses, char *format, ...);
 extern void socket_printf(struct session *ses, size_t length, char *format, ...);
@@ -1881,6 +1914,8 @@ extern void close_timer(int timer);
 extern DO_COMMAND(do_variable);
 extern DO_COMMAND(do_unvariable);
 
+extern DO_COMMAND(do_local);
+
 extern int delete_variable(struct session *ses, char *variable);
 extern struct listnode *search_variable(struct session *ses, char *variable);
 
@@ -1888,6 +1923,8 @@ extern struct listnode *get_variable(struct session *ses, char *variable, char *
 extern struct listnode *set_variable(struct session *ses, char *variable, char *format, ...);
 
 extern int get_variable_index(struct session *ses, char *variable, char *result);
+
+extern void format_string(struct session *ses, char *format, char *arg, char *out);
 
 extern DO_COMMAND(do_format);
 extern DO_COMMAND(do_tolower);
@@ -1919,6 +1956,7 @@ extern void strip_non_vt102_codes(char *str, char *buf);
 extern void get_color_codes(char *old, char *str, char *buf);
 extern int strip_vt102_strlen(struct session *ses, char *str);
 extern int strip_color_strlen(struct session *ses, char *str);
+extern char *strip_vt102_strstr(char *str, char *buf, int *len);
 extern int interpret_vt102_codes(struct session *ses, char *str, int real);
 
 #endif
