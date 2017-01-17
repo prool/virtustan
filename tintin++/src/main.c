@@ -35,6 +35,8 @@
 struct session *gts;
 struct tintin_data *gtd;
 
+extern int tron; // prool
+
 void pipe_handler(int signal)
 {
 	restore_terminal();
@@ -163,7 +165,9 @@ int main(int argc, char **argv)
 	int greeting = TRUE;
 	char filename[256];
 
-printf("--------------------\nMod by Prool. 2014-2016. https://github.com/prool/virtustan http://prool.kharkov.org proolix@gmail.com\n"); // prool
+	tron=0; // prool
+
+printf("--------------------\nMod by Prool. 2014-2017. https://github.com/prool/virtustan http://prool.kharkov.org proolix@gmail.com\n"); // prool
 
 	#ifdef SOCKS
 		SOCKSinit(argv[0]);

@@ -27,6 +27,7 @@
 
 #include "tintin.h"
 
+extern int tron; // prool
 
 struct help_type
 {
@@ -1606,6 +1607,22 @@ printf("prool's remarks:\n\n\
 Command for MSSP:\n#config {debug telnet} on\n\
 ");
 
+printf("Translator = %i\n", tron);
+
+return ses;
+}
+
+DO_COMMAND(do_tron) // prool
+{
+tron=1;
+printf("Translator enabled\n");
+return ses;
+}
+
+DO_COMMAND(do_troff) // prool
+{
+tron=0;
+printf("Translator disabled\n");
 return ses;
 }
 

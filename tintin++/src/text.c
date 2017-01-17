@@ -27,6 +27,7 @@
 
 #include "tintin.h"
 
+char *prooltran(char *si); // prool
 
 void printline(struct session *ses, char **str, int prompt)
 {
@@ -63,13 +64,13 @@ void printline(struct session *ses, char **str, int prompt)
 		strcpy(out, *str);
 	}
 
-	if (prompt)
+	if (prompt) // prool: text output
 	{
-		printf("%s", out);
+		printf("%s", prooltran(out));
 	}
 	else
 	{
-		printf("%s\n", out);
+		printf("%s\n", prooltran(out));
 	}
 
 	str_free(out);

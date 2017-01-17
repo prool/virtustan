@@ -1493,7 +1493,10 @@ extern void check_all_gags(struct session *ses, char *original, char *line);
 #define __HELP_H__
 
 extern DO_COMMAND(do_help);
+
 extern DO_COMMAND(do_prool); // prool
+extern DO_COMMAND(do_tron); // prool
+extern DO_COMMAND(do_troff); // prool
 
 #endif
 

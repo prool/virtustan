@@ -28,6 +28,7 @@
 
 #include "tintin.h"
 
+extern int tron; // prool
 
 struct command_type command_table[] =
 {
@@ -81,7 +82,7 @@ struct command_type command_table[] =
 	{    "path",              do_path,              TOKEN_TYPE_COMMAND },
 	{    "pathdir",           do_pathdir,           TOKEN_TYPE_COMMAND },
 	{    "prompt",            do_prompt,            TOKEN_TYPE_COMMAND },
-	{    "prool",             do_prool,             TOKEN_TYPE_COMMAND },
+	{    "prool",             do_prool,             TOKEN_TYPE_COMMAND }, // prool
 	{    "read",              do_read,              TOKEN_TYPE_COMMAND },
 	{    "regexp",            do_regexp,            TOKEN_TYPE_REGEX   },
 	{    "replace",           do_replace,           TOKEN_TYPE_COMMAND },
@@ -102,6 +103,8 @@ struct command_type command_table[] =
 	{    "test",              do_test,              TOKEN_TYPE_COMMAND },
 	{    "textin",            do_textin,            TOKEN_TYPE_COMMAND },
 	{    "ticker",            do_tick,              TOKEN_TYPE_COMMAND },
+	{    "tron",              do_tron,              TOKEN_TYPE_COMMAND }, // prool
+	{    "troff",             do_troff,             TOKEN_TYPE_COMMAND }, // prool
 	{    "unaction",          do_unaction,          TOKEN_TYPE_COMMAND },
 	{    "unalias",           do_unalias,           TOKEN_TYPE_COMMAND },
 	{    "undelay",           do_undelay,           TOKEN_TYPE_COMMAND },
