@@ -31,6 +31,8 @@ char *prooltran(char *si)
 {char *pp, *p0;
 int ii;
 
+if (tron==0) return si;
+
 p0=buffer;
 strcpy(buffer,si);
 

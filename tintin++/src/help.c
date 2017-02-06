@@ -582,12 +582,15 @@ struct help_type help_table[] =
 		"GREETING",
 		"<068>      #<068>##################################################################<068>#\n"
 		"<068>      #<078>                     T I N T I N + +   "CLIENT_VERSION"                   <068>#\n"
+		"<068>      #<078>                     + prool mod.                                 <068>#\n"
 		"<068>      #<078>                                                                  <068>#\n"
 		"<068>      #<078>           (<068>T<078>)he k(<068>I<078>)cki(<068>N<078>) (<068>T<078>)ickin d(<068>I<078>)kumud clie(<068>N<078>)t <068>          #\n"
 		"<068>      #<078>                                                                  <068>#\n"
 		"<068>      #<078>         Code by Peter Unold, Bill Reis, David A. Wagner,         <068>#\n"
 		"<068>      #<078>      Rob Ellsworth, Jeremy C. Jack, and Igor van den Hoven.      <068>#\n"
-		"<068>      #<058>      Use #prool, Prool! ;-)                                      <068>#\n"
+		"<068>      #<078>                                                                  <068>#\n"
+		"<068>      #<058>                   Use #prool, Prool! ;-)                         <068>#\n"
+		"<068>      #<078>                                                                  <068>#\n"
 		"<068>      #<068>##################################################################<068>#<088>\n"
 	},
 	{
@@ -1603,8 +1606,14 @@ struct help_type help_table[] =
 
 DO_COMMAND(do_prool) // prool
 {
-printf("prool's remarks:\n\n\
+printf("Prool's mod of tintin++\nprool's remarks:\n\n\
 Command for MSSP:\n#config {debug telnet} on\n\
+\n\
+Prool command\n\
+#prool - prool help\n\
+#tron - enable foolish translator\n\
+#troff - disable foolish translator\n\
+\n\
 ");
 
 printf("Translator = %i\n", tron);
