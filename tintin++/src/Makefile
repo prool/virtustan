@@ -26,7 +26,10 @@ MAKE = make
 
 prefix = /usr/local
 exec_prefix = ${prefix}
-bindir = ${DESTDIR}${exec_prefix}/bin
+
+#bindir = ${DESTDIR}${exec_prefix}/bin
+bindir = /usr/games
+
 docdir = /usr/local/doc
 
 #this is the standard CFLAGS options, this is what most people should use

@@ -159,6 +159,10 @@ void trap_handler(int signal)
 /* main() - show title - setup signals - init lists - readcoms - mainloop() */
 /****************************************************************************/
 
+void prool_ident(void)
+{
+printf("Mod by Prool. 2014-2017. https://github.com/prool/virtustan http://mud.kharkov.org proolix@gmail.com\n");
+}
 
 int main(int argc, char **argv)
 {
@@ -167,7 +171,7 @@ int main(int argc, char **argv)
 
 	tron=0; // prool
 
-printf("--------------------\nMod by Prool. 2014-2017. https://github.com/prool/virtustan http://prool.kharkov.org proolix@gmail.com\n"); // prool
+	prool_ident();
 
 	#ifdef SOCKS
 		SOCKSinit(argv[0]);

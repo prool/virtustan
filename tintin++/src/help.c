@@ -589,7 +589,7 @@ struct help_type help_table[] =
 		"<068>      #<078>         Code by Peter Unold, Bill Reis, David A. Wagner,         <068>#\n"
 		"<068>      #<078>      Rob Ellsworth, Jeremy C. Jack, and Igor van den Hoven.      <068>#\n"
 		"<068>      #<078>                                                                  <068>#\n"
-		"<068>      #<058>                   Use #prool, Prool! ;-)                         <068>#\n"
+		"<068>      #<058>               Use #prool cmd for prool mod commands              <068>#\n"
 		"<068>      #<078>                                                                  <068>#\n"
 		"<068>      #<068>##################################################################<068>#<088>\n"
 	},
@@ -1606,7 +1606,9 @@ struct help_type help_table[] =
 
 DO_COMMAND(do_prool) // prool
 {
-printf("Prool's mod of tintin++\nprool's remarks:\n\n\
+	prool_ident();
+
+printf("prool's remarks:\n\n\
 Command for MSSP:\n#config {debug telnet} on\n\
 \n\
 Prool command\n\
