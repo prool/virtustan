@@ -844,6 +844,29 @@ else 	{
 	}	
 }
 
+void dig (void)
+{int o;
+if (random()<(RAND_MAX/10))
+	{// мы что-то откопали
+	o=random()%10;
+	print("Вы откопали предмет: ");
+	print_object(o);
+	if (inv_o)
+		{
+		print("Но у вас заполнен инвентарь и вы потеряли его\n");
+		if (world[global_x][global_y].object) print("Он упал обратно в яму и его засыпало землей\n");
+			else
+				{
+				print("Он упал на землю");
+				world[global_x][global_y].object=o;
+				}
+		}
+	else
+		inv_o=o;
+	}
+else print("Вы копали-копали, но ничего не нашли\n");
+}
+
 void destroy (void)
 {int i;
 if (!inv_o) print("Вы ничего не можете уничтожить, у вас же ничего нет\n");
@@ -1989,6 +2012,7 @@ while(1)
 	else if (!strcmp(cmd,"score")) score();
 	else if (!strcmp(cmd,"счет")) score();
 	else if (!strcmp(cmd,"сч")) score();
+	else if (!strcmp(cmd,"dig")) dig();
 	else if (!strcmp(cmd,"contrast")) {color_mode=CONTRAST; printf("set contrast color mode\n");}
 	else if (!strcmp(cmd,"nocolor")) {color_mode=NO_COLOR; reset(); printf("set nocolor mode\n");}
 	else if (!strcmp(cmd,"normcolor")) {color_mode=0;printf("set normal color mode\n");}

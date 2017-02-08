@@ -62,6 +62,7 @@ skript - run proolskript interpreter
 till, пахать - пахать
 sow, сеять - сеять
 harvest, убирать - убирать урожай
+dig - копать
 q, quit, exit, конец - exit
 
 ]]COLOR14 закоментарено (для включения надо убрать одну ] )
