@@ -1,4 +1,4 @@
-// world file for Virtustan application. created Fri Oct 21 16:31:56 2016
+// world file for Virtustan application. created Wed Feb  8 17:26:47 2017
 // www.prool.kharkov.org
 world[0][0].color=3;
 world[0][1].color=3;
@@ -303,10 +303,11 @@ world[29][59].color=3;
 world[29][59].symbol=95;
 world[30][0].color=3;
 world[30][0].symbol=95;
-world[30][39].object=777;
+world[30][39].object=8;
 world[30][40].descr="Zabriskie point";
+world[30][40].room_type=0;
 world[30][40].symbol=33;
-world[30][41].object=777;
+world[30][41].object=7;
 world[30][59].color=3;
 world[30][59].symbol=95;
 world[31][0].color=3;

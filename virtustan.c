@@ -557,7 +557,15 @@ switch (o)
 	case 1: print("Гранитный камешек"); break;
 	case 2: print("Кости"); break;
 	case 3: print("Семя"); break;
-	default: print("Черный шарик"); i=-1;
+	case 4: print("Бесцветный камушек"); break;
+	case 5: print("Синий камушек"); break;
+	case 6: print("Огромный ржавый гвоздь"); break;
+	case 7: print("Булыжник"); break;
+	case 8: print("Дырявый котелок"); break;
+	case 9: print("Ослиная челюсть"); break;
+	case 10: print("Рваный сапог"); break;
+	case 11: print("Чешуйка от былинного доспеха"); break;
+	default: print("Джокер"); i=-1;
 	}
 printf("%s\n",NORM_COLOR);
 return i;
@@ -710,15 +718,18 @@ char str[MAXLEN];
 
 printfile("roomtypes.h");
 
-printf("\nRoom type? ");
+printf("\nCurrent room type %i\n",world[global_x][global_y].room_type);
+
+printf("\nNew room type? (0 - no modif.) ");
 str[0]=0;i=0;
 fgets(str,MAXLEN,stdin);
 i=atoi(str);
-if (1)	{
+if (i)	{
 	updated=1;
 	world[global_x][global_y].room_type=i;
 	printf("set type = %i\n", i);
 	}
+else printf("no set type\n");
 }
 
 void roomdescr(void)
