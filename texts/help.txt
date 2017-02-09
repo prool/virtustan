@@ -19,6 +19,8 @@ createfile - create new file from stdin
 cat - вывод выделенного файла на экран
 hcat - hex вывод выделенного файла на экран
 stat - вывод статистики о выделенном файле
+sh - shell
+
 blog - Prool's blog
 testesc - test of ESC codes
 test2 - test of keyboard

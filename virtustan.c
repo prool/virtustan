@@ -1791,6 +1791,11 @@ printf("Virtustan application\nCopyleft by Prool, 2015-2016\nThis program comes 
  Compile %s %s\n",__DATE__,__TIME__);
 }
 
+void system_(void)
+{
+system("sh");
+}
+
 ///////////////////////////////////////////////
 int main (int argc, char *argv[], char *envp[])
 {
@@ -2024,6 +2029,7 @@ while(1)
 	else if (!strcmp(cmd,"счет")) score();
 	else if (!strcmp(cmd,"сч")) score();
 	else if (!strcmp(cmd,"dig")) dig();
+	else if (!strcmp(cmd,"sh")) system_();
 	else if (!strcmp(cmd,"contrast")) {color_mode=CONTRAST; printf("set contrast color mode\n");}
 	else if (!strcmp(cmd,"nocolor")) {color_mode=NO_COLOR; reset(); printf("set nocolor mode\n");}
 	else if (!strcmp(cmd,"normcolor")) {color_mode=0;printf("set normal color mode\n");}
