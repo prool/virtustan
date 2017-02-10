@@ -126,6 +126,7 @@ char base_path [MAXLEN];
 char logfilename [MAXLEN];
 
 int inv_o=0; // inventory
+int energy; // energy
 
 int max_x, max_y;
 int min_x, min_y;

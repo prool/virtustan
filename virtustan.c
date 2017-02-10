@@ -891,8 +891,10 @@ else	{
 
 void look(void)
 {int i;
+
 map();
-printf("%s(%i,%i)%s step=%i roomtype=%i\n",GOLUB1,global_x,global_y,NORM_COLOR, step, world[global_x][global_y].room_type);
+printf("%s(%i,%i)%s step=%i roomtype=%i energy=%i\n",
+GOLUB1,global_x,global_y,NORM_COLOR, step, world[global_x][global_y].room_type,energy);
 if (world[global_x][global_y].descr) print(world[global_x][global_y].descr);
 else
 	{
@@ -1200,6 +1202,8 @@ world[x1][y1].symbol=world[x][y].symbol;
 void tempora_fugit(void)
 {int x,y;
 // array world[MAX_X][MAX_Y];
+
+if (energy) energy--;
 
 for (x=0;x<MAX_X;x++)
 for (y=0;y<MAX_Y;y++)
@@ -1812,6 +1816,8 @@ step=0;
 langton=0;
 langton_direct=1;
 
+energy=10;
+
 getcwd(base_path, MAXLEN);
 
 strcpy(logfilename, base_path);
@@ -1859,12 +1865,12 @@ else
 	}
 // end of config file processing
 
-if (random()<(RAND_MAX/9))
+if (random()<(RAND_MAX/20))
 	{// fortune
 	print("\n\n\n                         На пальмовой набережной он получил всё, что ему причиталось\n");
 	//printf("random = %i\n", random());
 	//printf("max random = %i\n", RAND_MAX);
-	printf("\n\npress any key, Luc\n");
+	printf("\n\npress any key\n");
 	getchar();
 	}
 
@@ -1951,9 +1957,11 @@ while(1)
 	else if (!strcmp(cmd,"win")) {Codetable=WIN; printf("Codetable switch to WIN\n");}
 	else if (!strcmp(cmd,"lat")) {Codetable=LAT; printf("Codetable switch to LAT: beta\n");}
 	else if (!strcmp(cmd,"codetable")) printf("Current codetable is %s\n",CodetableName[Codetable]);
-	else if (!strcmp(cmd,"look")) look();
-	else if (!strcmp(cmd,"см")) look();
-	else if (!strcmp(cmd,".")) look();
+	else if ((!strcmp(cmd,"look")) || (!strcmp(cmd,"см")) || (!strcmp(cmd,"."))) {look(); energy++;}
+	else if (!strcmp(cmd,"rest")) {print("Вы отдохнули и восстановили немного энергии\n"); energy+=5;}
+
+	else if (energy<=0) printf("У вас нет сил сделать что-либо!\n");
+
 	else if (!strcmp(cmd,"n")) move_(0,+1);
 	else if (!strcmp(cmd,UP_ARROW)) move_(0,+1);
 	else if (!strcmp(cmd,"N")) move_(0,MAX_Y-1-global_y);
