@@ -1,4 +1,7 @@
-all:	gr 3d gr2
+all:	gr 3d gr2 gr3
+
+gr3: gr3.c
+	gcc -o gr3 gr3.c -lglut -lGL -lGLU ../proollib/proollib.a -lfreetype -L/usr/local/lib /usr/lib/x86_64-linux-gnu/libfreetype.a -I /usr/include/freetype2 -lftgl
 
 gr2: gr2.c
 	gcc -o gr2 gr2.c -lglut -lGL -lGLU ../proollib/proollib.a -lfreetype -L/usr/local/lib /usr/lib/x86_64-linux-gnu/libfreetype.a -I /usr/include/freetype2 -lftgl
