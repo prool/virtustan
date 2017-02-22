@@ -21,6 +21,7 @@ char *slovarb[]=
 "backpack", "рюкзак",
 "canvas", "холст",
 "brown", "коричневый",
+"hatchet", "топорик",
 ")", ")" // END
 };
 
