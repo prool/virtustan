@@ -30,6 +30,8 @@
 #include <signal.h>
 #include <sys/socket.h>
 
+#include "prool.h"
+
 /*************** globals ******************/
 
 struct session *gts;
@@ -170,8 +172,9 @@ int main(int argc, char **argv)
 	char filename[256];
 
 	tron=0; // prool
-
 	prool_ident();
+
+	prool_log("ProolTin started. http://prool.kharkov.org https://github.com/prool/virtustan");
 
 	#ifdef SOCKS
 		SOCKSinit(argv[0]);
@@ -467,6 +470,7 @@ void quitmsg(char *message)
 	}
 
 	printf("\nGoodbye from TinTin++\n\n");
+	prool_log("ProolTin ended");
 
 	fflush(NULL);
 

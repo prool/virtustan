@@ -1,6 +1,13 @@
-/* Prool foolish translator (interpreter) */
+/* Prool foolish translator (English to Russian interpreter) and others Prool's functions
+
+   Prool here: http://prool.kharkov.org http://mud.kharkov.org https://github.com/prool/virtustan
+
+   E-mail proolix BIGLAZYDOG gmail . com
+
+*/
 #include <string.h>
 #include <stdio.h>
+#include <time.h>
 
 #define MAXBUF 4096
 
@@ -70,4 +77,28 @@ else	strcpy(buffer,si);
 
 //printf("buffer=%s\n", buffer);
 return buffer;
+}
+
+char *ptime(void) // Возвращаемое значение: ссылка на текстовую строку с текущим временем
+	{
+	char *tmstr;
+	time_t mytime;
+
+	mytime = time(0);
+
+	tmstr = (char *) asctime(localtime(&mytime));
+	*(tmstr + strlen(tmstr) - 1) = '\0';
+
+	return tmstr;
+
+	}
+
+void prool_log(char *message)
+{
+FILE *fp;
+
+fp=fopen("prooltin.log","a");
+if (fp==NULL) printf("prooltin: can't open log\n");
+fprintf(fp,"%s %s\r\n",ptime(),message);
+fclose(fp);
 }
