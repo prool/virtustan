@@ -27,6 +27,7 @@
 
 
 #include "tintin.h"
+#include "prool.h"
 
 extern int tron; // prool
 
@@ -103,6 +104,8 @@ struct command_type command_table[] =
 	{    "test",              do_test,              TOKEN_TYPE_COMMAND },
 	{    "textin",            do_textin,            TOKEN_TYPE_COMMAND },
 	{    "ticker",            do_tick,              TOKEN_TYPE_COMMAND },
+	{    "totaloff",          do_totaloff,          TOKEN_TYPE_COMMAND }, // prool
+	{    "totalon",           do_totalon,           TOKEN_TYPE_COMMAND }, // prool
 	{    "tron",              do_tron,              TOKEN_TYPE_COMMAND }, // prool
 	{    "troff",             do_troff,             TOKEN_TYPE_COMMAND }, // prool
 	{    "unaction",          do_unaction,          TOKEN_TYPE_COMMAND },

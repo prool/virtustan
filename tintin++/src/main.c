@@ -37,8 +37,6 @@
 struct session *gts;
 struct tintin_data *gtd;
 
-extern int tron; // prool
-
 void pipe_handler(int signal)
 {
 	restore_terminal();
@@ -161,17 +159,14 @@ void trap_handler(int signal)
 /* main() - show title - setup signals - init lists - readcoms - mainloop() */
 /****************************************************************************/
 
-void prool_ident(void)
-{
-printf("Mod by Prool. 2014-2017. https://github.com/prool/virtustan http://mud.kharkov.org proolix@gmail.com\n");
-}
-
 int main(int argc, char **argv)
 {
 	int greeting = TRUE;
 	char filename[256];
 
 	tron=0; // prool
+	total_log=1; // prool
+	start_time=time(0); // prool
 	prool_ident();
 
 	prool_log("ProolTin started. http://prool.kharkov.org https://github.com/prool/virtustan");
@@ -470,6 +465,7 @@ void quitmsg(char *message)
 	}
 
 	printf("\nGoodbye from TinTin++\n\n");
+	uptime_();
 	prool_log("ProolTin ended");
 
 	fflush(NULL);

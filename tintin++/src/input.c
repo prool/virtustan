@@ -27,6 +27,8 @@
 
 #include "tintin.h"
 
+#include "prool.h"
+
 void process_input(void)
 {
 	if (HAS_BIT(gtd->ses->telopts, TELOPT_FLAG_SGA) && !HAS_BIT(gtd->ses->telopts, TELOPT_FLAG_ECHO))
@@ -491,6 +493,9 @@ void unconvert_meta(char *input, char *output)
 void echo_command(struct session *ses, char *line)
 {
 	char buffer[STRING_SIZE], result[STRING_SIZE];
+
+	//printf("line=%s\n", line); // prool
+	if (total_log) prool_log(line);
 
 	if (HAS_BIT(ses->flags, SES_FLAG_SPLIT))
 	{

@@ -9,9 +9,14 @@
 #include <stdio.h>
 #include <time.h>
 
+#include "tintin.h"
+#include "prool.h"
+
 #define MAXBUF 4096
 
 int tron;
+int total_log;
+long int start_time;
 
 char *slovarb[]=
 {
@@ -35,9 +40,16 @@ char *slovarb[]=
 char buffer [MAXBUF];
 char clipboard [MAXBUF];
 
+void prool_ident(void)
+{
+printf("Mod by Prool. 2014-2017. https://github.com/prool/virtustan http://mud.kharkov.org proolix@gmail.com\n");
+}
+
 char *prooltran(char *si)
 {char *pp, *p0;
 int ii;
+
+if (total_log) prool_log(si);
 
 if (tron==0) return si;
 
@@ -89,7 +101,7 @@ char *ptime(void) // Возвращаемое значение: ссылка н�
 	tmstr = (char *) asctime(localtime(&mytime));
 	*(tmstr + strlen(tmstr) - 1) = '\0';
 
-	return tmstr;
+	return tmstr+4;
 
 	}
 
@@ -101,4 +113,24 @@ fp=fopen("prooltin.log","a");
 if (fp==NULL) printf("prooltin: can't open log\n");
 fprintf(fp,"%s %s\r\n",ptime(),message);
 fclose(fp);
+}
+
+void uptime_(void)
+{long uptime; char *tmstr;
+uptime=time(0)-start_time;
+if (uptime<=60)printf("Uptime %li sec", uptime);
+else
+	{
+	uptime=uptime/60;
+	if (uptime<=60) printf ("Uptime %li min", uptime);
+	else
+		{
+		uptime=uptime/60;
+		if (uptime<=24) printf("Uptime %li hour", uptime);
+		else printf("Uptime %li days", uptime/24);
+		}
+	}
+	tmstr = asctime(localtime(&start_time));
+	*(tmstr + strlen(tmstr) - 1) = '\0';
+printf(" since %s\n", tmstr);
 }
