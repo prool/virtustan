@@ -171,6 +171,8 @@ int main(int argc, char **argv)
 
 	prool_log("ProolTin started. http://prool.kharkov.org https://github.com/prool/virtustan");
 
+	prooltranslate_init();
+
 	#ifdef SOCKS
 		SOCKSinit(argv[0]);
 	#endif

@@ -111,7 +111,7 @@ FILE *fp;
 
 fp=fopen("prooltin.log","a");
 if (fp==NULL) printf("prooltin: can't open log\n");
-fprintf(fp,"%s %s\r\n",ptime(),message);
+fprintf(fp,"%i %s %s\r\n",getpid(),ptime(),message);
 fclose(fp);
 }
 
@@ -133,4 +133,8 @@ else
 	tmstr = asctime(localtime(&start_time));
 	*(tmstr + strlen(tmstr) - 1) = '\0';
 printf(" since %s\n", tmstr);
+}
+
+void prooltranslate_init(void)
+{
 }

@@ -1621,6 +1621,7 @@ Prool command\n\
 
 printf("Translator = %i\n", tron);
 printf("Total log = %i\n", total_log);
+printf("PID = %i\n", getpid());
 
 return ses;
 }
