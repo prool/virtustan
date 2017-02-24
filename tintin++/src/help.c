@@ -28,8 +28,6 @@
 #include "tintin.h"
 #include "prool.h"
 
-extern int tron; // prool
-
 struct help_type
 {
 	char                  * name;

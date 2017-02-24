@@ -29,8 +29,6 @@
 #include "tintin.h"
 #include "prool.h"
 
-extern int tron; // prool
-
 struct command_type command_table[] =
 {
 	{    "action",            do_action,            TOKEN_TYPE_COMMAND },

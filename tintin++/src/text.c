@@ -27,7 +27,7 @@
 
 #include "tintin.h"
 
-char *prooltran(char *si); // prool
+#include "prool.h"
 
 void printline(struct session *ses, char **str, int prompt)
 {
