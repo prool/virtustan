@@ -54,32 +54,6 @@ void logit(struct session *ses, char *txt, FILE *file, int newline)
 	fflush(file);
 }
 
-#if 0 // prool: в новой версии Тинтин++ 2.01.2 не собирается, да и не помню я, зачем эта ф-ция. Они нигде не исп.
-
-DO_COMMAND(do_log_prool) // by prool
-{
-//	char left[BUFFER_SIZE], right[BUFFER_SIZE];
-
-printf("do_prool_log()\n");
-
-		if ((ses->logfile = fopen("tintin.log", "a")))
-		{
-			fseek(ses->logfile, 0, SEEK_END);
-
-			if (ftell(ses->logfile) == 0 && HAS_BIT(ses->flags, SES_FLAG_LOGHTML))
-			{
-				write_html_header(ses->logfile);
-			}
-			show_message(ses, -1, "#PROOL_LOG: LOGGING TO tintin.log. FILESIZE: %ld", ftell(ses->logfile));
-		}
-		else
-		{
-			tintin_printf2(ses, "#ERROR: #PROOLLOG - COULDN'T OPEN FILE.");
-		}
-	return ses;
-}
-#endif
-
 DO_COMMAND(do_log)
 {
 	char left[BUFFER_SIZE], right[BUFFER_SIZE];

@@ -1,5 +1,9 @@
 DO_COMMAND(do_totalon);
 DO_COMMAND(do_totaloff);
+DO_COMMAND(do_addword);
+DO_COMMAND(do_delword);
+DO_COMMAND(do_listdic);
+DO_COMMAND(do_writedic);
 
 char *prooltran(char *si);
 void prool_log(char *message);

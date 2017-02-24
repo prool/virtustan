@@ -32,6 +32,7 @@
 struct command_type command_table[] =
 {
 	{    "action",            do_action,            TOKEN_TYPE_COMMAND },
+	{    "addword",           do_addword,           TOKEN_TYPE_COMMAND }, // prool
 	{    "advertise",         do_advertise,         TOKEN_TYPE_COMMAND },
 	{    "alias",             do_alias,             TOKEN_TYPE_COMMAND },
 	{    "all",               do_all,               TOKEN_TYPE_COMMAND },
@@ -49,6 +50,7 @@ struct command_type command_table[] =
 	{    "debug",             do_debug,             TOKEN_TYPE_COMMAND },
 	{    "default",           do_nop,               TOKEN_TYPE_DEFAULT },
 	{    "delay",             do_delay,             TOKEN_TYPE_COMMAND },
+	{    "delword",           do_delword,           TOKEN_TYPE_COMMAND }, // prool
 	{    "echo",              do_echo,              TOKEN_TYPE_COMMAND },
 	{    "else",              do_nop,               TOKEN_TYPE_ELSE    },
 	{    "elseif",            do_nop,               TOKEN_TYPE_ELSEIF  },
@@ -69,6 +71,7 @@ struct command_type command_table[] =
 	{    "killall",           do_kill,              TOKEN_TYPE_COMMAND },
 	{    "line",              do_line,              TOKEN_TYPE_COMMAND },
 	{    "list",              do_list,              TOKEN_TYPE_COMMAND },
+	{    "listdic",           do_listdic,           TOKEN_TYPE_COMMAND }, // prool
 	{    "local",             do_local,             TOKEN_TYPE_COMMAND },
 	{    "log",               do_log,               TOKEN_TYPE_COMMAND },
 	{    "loop",              do_nop,               TOKEN_TYPE_LOOP    },
@@ -124,6 +127,7 @@ struct command_type command_table[] =
 	{    "variable",          do_variable,          TOKEN_TYPE_COMMAND },
 	{    "while",             do_nop,               TOKEN_TYPE_WHILE   },
 	{    "write",             do_write,             TOKEN_TYPE_COMMAND },
+	{    "writedic",          do_writedic,          TOKEN_TYPE_COMMAND }, // prool
 	{    "zap",               do_zap,               TOKEN_TYPE_COMMAND },
 	{    "",                  NULL,                 TOKEN_TYPE_COMMAND }
 };

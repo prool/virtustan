@@ -42,10 +42,9 @@ if (tron==0) return si;
 p0=buffer;
 strcpy(buffer,si);
 
-ii=0;
-while(1)
+for(ii=0;ii<MAXWORD;ii++)
 {// цикл по всем словам
-if (English[ii][0]==0) break;
+if (English[ii][0]==0) continue;
 	while(1) // многократная замена одного слова
 	{
 	pp=strstr(buffer,English[ii]);
@@ -59,7 +58,6 @@ if (English[ii][0]==0) break;
 	//printf("clipboard=%s\n",clipboard);
 	strcpy(buffer,clipboard);
 	}
-ii+=1;
 }
 
 /*
@@ -155,6 +153,7 @@ while(!feof(fp))
 			{
 			printf("Word length overflow\n");
 			prool_log("Word length overflow");
+			break;
 			}
 		strncpy(English[j],buf,MAXWORDLEN);
 		strncpy(Russian[j],buf2,MAXWORDLEN);
@@ -174,4 +173,155 @@ for (i=0;i<MAXWORD;i++)
 	}
 
 fclose(fp);
+}
+
+DO_COMMAND(do_prool) // prool
+{
+prool_ident();
+
+printf("\nCompile date %s %s\nCurrent date %s\n\nprool's remarks:\n\n\
+Command for MSSP:\n#config {debug telnet} on\n\
+\n\
+Prool command\n\
+#prool - prool help\n\
+#tron - enable foolish translator\n\
+#troff - disable foolish translator\n\
+#totalon - enable total logging\n\
+#totaloff - disable total logging\n\
+#listdic - list of dictionary\n\
+#writedic - write dictionary to file\n\
+#addword english,russian - add word pair to dic\n\
+#delword english - del word from dic\n\
+\n\
+",__DATE__,__TIME__,ptime());
+
+printf("Translator = %i\n", tron);
+printf("Total log = %i\n", total_log);
+printf("PID = %i\n", getpid());
+
+printf("arg='%s'\n", arg);
+
+return ses;
+}
+
+DO_COMMAND(do_totalon)
+{
+total_log=1;
+prool_log("Total log enabled");
+printf("Total log enabled\n");
+return ses;
+}
+
+DO_COMMAND(do_totaloff)
+{
+prool_log("Total log disabled");
+printf("Total log disabled\n");
+total_log=0;
+return ses;
+}
+
+DO_COMMAND(do_tron)
+{
+tron=1;
+printf("Translator enabled\n");
+return ses;
+}
+
+DO_COMMAND(do_troff)
+{
+tron=0;
+printf("Translator disabled\n");
+return ses;
+}
+
+DO_COMMAND(do_addword)
+{
+char buf[MAXBUF];
+char buf2[MAXBUF];
+char *cc;
+int i;
+
+//printf("arg=%s\n", arg);
+
+strncpy(buf,arg,MAXBUF);
+
+cc=strchr(buf,',');
+if (cc==0) {printf("ERROR: No comma\n"); return ses;}
+strcpy(buf2,cc+1);
+*cc=0;
+printf("addword 1 '%s' 2 '%s'\n", buf, buf2);
+
+if ((strlen(buf)>=MAXWORDLEN) || (strlen(buf2)>=MAXWORDLEN))
+			{
+			printf("addword: Word length overflow\n");
+			prool_log("addword: Word length overflow");
+			return ses;
+			}
+
+for(i=0;i<MAXWORD;i++)
+	{
+	if (English[i][0]==0)
+		{
+		strcpy(English[i],buf);
+		strcpy(Russian[i],buf2);
+		return ses;
+		}
+	}
+
+printf("ERROR: addword: word overflow\n");
+prool_log("ERROR: addword: word overflow");
+
+return ses;
+}
+
+DO_COMMAND(do_delword)
+{int i;
+	if (*arg==0) {
+		printf("usage: #delword word\n");
+		return ses;
+	}
+
+	for (i=0;i<MAXWORD;i++)
+	{
+		if (!strcmp(English[i],arg))
+		{
+			English[i][0]=0;
+			printf("Found and delete\n");
+			return ses;
+		}
+	}
+printf("Word '%s' not found\n", arg);
+return ses;
+}
+
+DO_COMMAND(do_listdic)
+{
+	int i,count;
+
+	count=0;
+	for (i=0;i<MAXWORD;i++) {
+		if (English[i][0]) {printf("%s,%s\n",English[i],Russian[i]); count++;}
+	}
+
+	printf("Total words %i\n", count);
+
+	return ses;
+}
+
+DO_COMMAND(do_writedic)
+{
+	int i,count;
+	FILE *fp;
+
+	count=0;
+	fp=fopen("slovarb2.csv","w");
+	if (fp==NULL) {printf("writedic: can't open file\n"); return ses;}
+	for (i=0;i<MAXWORD;i++) {
+		if (English[i][0]) {fprintf(fp,"%s,%s\n",English[i],Russian[i]); count++;}
+	}
+	fclose(fp);
+
+	printf("Total words %i\n", count);
+
+	return ses;
 }

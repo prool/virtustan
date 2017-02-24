@@ -1603,59 +1603,6 @@ struct help_type help_table[] =
 	}
 };
 
-DO_COMMAND(do_prool) // prool
-{
-	prool_ident();
-
-printf("\nCompile date %s %s\nCurrent date %s\n\nprool's remarks:\n\n\
-Command for MSSP:\n#config {debug telnet} on\n\
-\n\
-Prool command\n\
-#prool - prool help\n\
-#tron - enable foolish translator\n\
-#troff - disable foolish translator\n\
-#totalon - enable total logging\n\
-#totaloff - disable total logging\n\
-\n\
-",__DATE__,__TIME__,ptime());
-
-printf("Translator = %i\n", tron);
-printf("Total log = %i\n", total_log);
-printf("PID = %i\n", getpid());
-
-return ses;
-}
-
-DO_COMMAND(do_totalon) // prool
-{
-total_log=1;
-prool_log("Total log enabled");
-printf("Total log enabled\n");
-return ses;
-}
-
-DO_COMMAND(do_totaloff) // prool
-{
-prool_log("Total log disabled");
-printf("Total log disabled\n");
-total_log=0;
-return ses;
-}
-
-DO_COMMAND(do_tron) // prool
-{
-tron=1;
-printf("Translator enabled\n");
-return ses;
-}
-
-DO_COMMAND(do_troff) // prool
-{
-tron=0;
-printf("Translator disabled\n");
-return ses;
-}
-
 DO_COMMAND(do_help)
 {
 	char left[BUFFER_SIZE], add[BUFFER_SIZE], buf[BUFFER_SIZE], *ptf, *pto;
