@@ -13,29 +13,15 @@
 #include "prool.h"
 
 #define MAXBUF 4096
+#define MAXWORD 200
+#define MAXWORDLEN 30
 
 int tron;
 int total_log;
 long int start_time;
 
-char *slovarb[]=
-{
-"You see exits leading", "Выходы",
-"password", "пароль",
-"shortsword", "короткий меч",
-"sword", "меч",
-"bow", "лук",
-"vial", "фиал",
-"oaken", "дубовый",
-"tunic", "роба",
-"road", "дорога",
-"leggings", "панталоны",
-"backpack", "рюкзак",
-"canvas", "холст",
-"brown", "коричневый",
-"hatchet", "топорик",
-")", ")" // END
-};
+char English [MAXWORD] [MAXWORDLEN];
+char Russian [MAXWORD] [MAXWORDLEN];
 
 char buffer [MAXBUF];
 char clipboard [MAXBUF];
@@ -59,21 +45,21 @@ strcpy(buffer,si);
 ii=0;
 while(1)
 {// цикл по всем словам
-if (slovarb[ii][0]==')') break;
+if (English[ii][0]==0) break;
 	while(1) // многократная замена одного слова
 	{
-	pp=strstr(buffer,slovarb[ii]);
+	pp=strstr(buffer,English[ii]);
 	if (pp==0) break;
 	if (pp!=p0) {memcpy(clipboard,buffer,(pp-p0)); clipboard[pp-p0]=0;}
 	else clipboard[0]=0;
 	//printf("clipboard=%s\n",clipboard);
-	strcat(clipboard,slovarb[ii+1]);
+	strcat(clipboard,Russian[ii]);
 	//printf("clipboard=%s\n",clipboard);
-	strcat(clipboard,buffer+(pp-p0)+strlen(slovarb[ii]));
+	strcat(clipboard,buffer+(pp-p0)+strlen(English[ii]));
 	//printf("clipboard=%s\n",clipboard);
 	strcpy(buffer,clipboard);
 	}
-ii+=2;
+ii+=1;
 }
 
 /*
@@ -136,5 +122,56 @@ printf(" since %s\n", tmstr);
 }
 
 void prooltranslate_init(void)
-{
+{FILE *fp;
+char buf [MAXBUF];
+char buf2 [MAXBUF];
+char *cc;
+int i,j;
+
+for (i=0;i<MAXWORD;i++)
+	{
+	English[0][0] = 0;
+	Russian[0][0] = 0;
+	}
+
+fp=fopen("slovarb.csv","r");
+if (fp==NULL) {printf("Can't open Slovarb\n"); return;}
+j=0;
+while(!feof(fp))
+	{
+	buf[0]=0;
+	fgets(buf,MAXBUF,fp);
+	cc=strchr(buf,'\n');
+	if (cc) *cc=0;
+	if (buf[0])
+		{
+		printf("'%s' ", buf);
+		cc=strchr(buf,',');
+		if (cc==0) continue;
+		strcpy(buf2,cc+1);
+		*cc=0;
+		printf("1 '%s' 2 '%s'\n", buf, buf2);
+		if ((strlen(buf)>=MAXWORDLEN) || (strlen(buf2)>=MAXWORDLEN))
+			{
+			printf("Word length overflow\n");
+			prool_log("Word length overflow");
+			}
+		strncpy(English[j],buf,MAXWORDLEN);
+		strncpy(Russian[j],buf2,MAXWORDLEN);
+		if (++j>=MAXWORD)
+			{
+			printf("Word overflow!\n");
+			prool_log("Word overflow!");
+			break;
+			}
+		}
+	}
+
+for (i=0;i<MAXWORD;i++)
+	{
+	if (English[i][0]==0) break;
+	printf("%i) %s %s ", i, English[i], Russian[i]);
+	}
+
+fclose(fp);
 }
