@@ -293,7 +293,7 @@ ioctl(0, TCSETA, &tstdin);
 oldf = fcntl(STDIN_FILENO, F_GETFL, 0);
 fcntl(STDIN_FILENO, F_SETFL, oldf | O_NONBLOCK);
 
-printf("Q - quit M - mouse mode on Z - mouse mode off\n");
+printf("Q - quit; M - mouse mode on; Z - mouse mode off; N - mouse on from mc; X - mouse off from mc;\n");
 
 while(1)
 	{
@@ -313,6 +313,60 @@ while(1)
 		return;
 		case 'M': printf("\nMouse mode on%c[?9h\n",ESC); break;
 		case 'Z': printf("\nMouse mode off%c[?9l\n",ESC); break;
+		case 'N':
+#if 1 // mouse code from midnight commander
+//    case MOUSE_XTERM_NORMAL_TRACKING:
+        /* save old highlight mouse tracking */
+        printf (ESC_STR "[?1001s");
+
+        /* enable mouse tracking */
+        printf (ESC_STR "[?1000h");
+
+        /* enable SGR extended mouse reporting */
+//        printf (ESC_STR "[?1006h");
+
+        fflush (stdout);
+
+//    case MOUSE_XTERM_BUTTON_EVENT_TRACKING:
+        /* save old highlight mouse tracking */
+        printf (ESC_STR "[?1001s");
+
+        /* enable mouse tracking */
+        printf (ESC_STR "[?1002h");
+
+        /* enable SGR extended mouse reporting */
+//        printf (ESC_STR "[?1006h");
+
+        fflush (stdout);
+#endif
+			  break;
+	case 'X':
+#if 1 // mouse code from midnight commander
+
+// case MOUSE_XTERM_NORMAL_TRACKING:
+        /* disable SGR extended mouse reporting */
+        printf (ESC_STR "[?1006l");
+
+        /* disable mouse tracking */
+        printf (ESC_STR "[?1000l");
+
+        /* restore old highlight mouse tracking */
+        printf (ESC_STR "[?1001r");
+
+        fflush (stdout);
+//    case MOUSE_XTERM_BUTTON_EVENT_TRACKING:
+        /* disable SGR extended mouse reporting */
+        printf (ESC_STR "[?1006l");
+
+        /* disable mouse tracking */
+        printf (ESC_STR "[?1002l");
+
+        /* restore old highlight mouse tracking */
+        printf (ESC_STR "[?1001r");
+
+        fflush (stdout);
+#endif
+			  break;
 		}
 	}
 
@@ -2090,6 +2144,67 @@ return 0;
 }
 /******************************************************************************************************/
 #define CLR for(jj=0;jj<MAX_J; jj++) putch(' ');putch('\r')
+/******************************************************************************************************/
+void enable_mouse(void)
+{
+#if 1 // mouse code from midnight commander
+//    case MOUSE_XTERM_NORMAL_TRACKING:
+        /* save old highlight mouse tracking */
+        printf (ESC_STR "[?1001s");
+
+        /* enable mouse tracking */
+        printf (ESC_STR "[?1000h");
+
+        /* enable SGR extended mouse reporting */
+//        printf (ESC_STR "[?1006h");
+
+        fflush (stdout);
+
+//    case MOUSE_XTERM_BUTTON_EVENT_TRACKING:
+        /* save old highlight mouse tracking */
+        printf (ESC_STR "[?1001s");
+
+        /* enable mouse tracking */
+        printf (ESC_STR "[?1002h");
+
+        /* enable SGR extended mouse reporting */
+//        printf (ESC_STR "[?1006h");
+
+        fflush (stdout);
+#endif
+}
+
+void disable_mouse(void)
+{
+
+#if 1 // mouse code from midnight commander
+
+// case MOUSE_XTERM_NORMAL_TRACKING:
+        /* disable SGR extended mouse reporting */
+        printf (ESC_STR "[?1006l");
+
+        /* disable mouse tracking */
+        printf (ESC_STR "[?1000l");
+
+        /* restore old highlight mouse tracking */
+        printf (ESC_STR "[?1001r");
+
+        fflush (stdout);
+//    case MOUSE_XTERM_BUTTON_EVENT_TRACKING:
+        /* disable SGR extended mouse reporting */
+        printf (ESC_STR "[?1006l");
+
+        /* disable mouse tracking */
+        printf (ESC_STR "[?1002l");
+
+        /* restore old highlight mouse tracking */
+        printf (ESC_STR "[?1001r");
+
+        fflush (stdout);
+#endif
+}
+
+/******************************************************************************************************/
 
 void realtime (void)
 {int i,j,c,quit, to_os;
@@ -2129,6 +2244,8 @@ fcntl(STDIN_FILENO, F_SETFL, oldf | O_NONBLOCK);
 // скрыть курсор
 putchar(27);
 printf("[?25l");
+
+enable_mouse();
 
 podkursor_save[0]=screen[cur_l][cur_c];
 podkursor_save[1]=screen_color[cur_l][cur_c];
@@ -2226,11 +2343,12 @@ if (langton)
 		
 		c=getchar();
 
+
 		if (c==27 /* ESC */) {	c=getchar();
-				if (c==91)
+				if (c==91 /* 0x5B */)
 					{
 					c=getchar();
-					if (c==66)	goto l_s;
+					if (c==66 /*0x42*/)	goto l_s;
 					else if (c==65)	goto l_n;
 					else if (c==68)	goto l_w;
 					else if (c==67)	goto l_e;
@@ -2256,6 +2374,24 @@ if (langton)
 						{
 						//podkursor_save[0]='E';
 						podkursor_save[2]=40;
+						}
+//нажатие лев. кн. мыши 1b 5b 4d 20 x y
+//отпускание            1b 5b 4d 23 x y
+					else if (c==0x4D) // mouse
+						{
+						c=getchar();
+						if (c==0x20)
+							{int x,y;
+							x=getchar(); // x
+							y=getchar(); // y
+							//podkursor_save[0]='M';
+							screen[y-0x21-1][x-0x21]='m';
+							}
+						else if (c==0x23)
+							{
+							c=getchar(); // x
+							c=getchar(); // y
+							}
 						}
 					}
 		}
@@ -2409,6 +2545,7 @@ printf("\n\nexit from realtime\n");
 // показать курсор
 putchar(27);
 printf("[?25h");
+disable_mouse();
 if (to_os) {reset(); exit(0);}
 }
 

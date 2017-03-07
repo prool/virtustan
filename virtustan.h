@@ -41,6 +41,7 @@
 #define COLUMNS w.ws_col
 
 #define ESC 033
+#define ESC_STR "\033"
 #define NORM_COLOR "\033[0m"
 
 #define KRASN "\033[31m"
