@@ -7,6 +7,8 @@
 #define KIOCSOUND	0x4B2F	/* start sound generation (0 for off) */
 #define KDMKTONE	0x4B30	/* generate tone */
 
+#define FILLER '.'
+
 // static variables
 int step;
 int langton;
@@ -1958,7 +1960,7 @@ go_home();
 init_world();
 
 // init realtime()
-for (i=0;i<MAX_L;i++) for (j=0;j<MAX_C;j++) {screen[i][j]=' '; screen_color[i][j]=0; screen_bg[i][j]=0;}
+for (i=0;i<MAX_L;i++) for (j=0;j<MAX_C;j++) {screen[i][j]=FILLER; screen_color[i][j]=0; screen_bg[i][j]=0;}
 cur_l=0; cur_c=0;
 //i=0; j=0; screen[i][j]='0'; screen_color[i][j]=2; screen_bg[i][j]=0;
 
@@ -2212,11 +2214,13 @@ int oldf;
 long int ll;
 char podkursor_save[3];
 int tick_status;
+int life_on;
 
 ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
 
 tick_status=0;
 langton=0;
+life_on=0;
 
 //printf("lines %i columns %i\n",lines,COLUMNS);
 if (lines>MAX_L) {printf("realtime module: array is small: lines=%i MAX_L=%i\n",lines,MAX_L); return; }
@@ -2311,6 +2315,61 @@ if (langton)
 	}
 
 #endif
+
+#if 1 // life
+int count;
+if (life_on)
+	{
+	// первый проход
+	for (i=0+1;i<((lines-2)-1);i++)
+		{
+		for (j=0+1;j<(COLUMNS-1);j++)
+			{
+			if (screen[i][j]=='*')
+				{// заполненная клеточка. проверяем, будет ли жить
+				count=0;
+				if (screen[i+1][j]=='*') count++;
+				if (screen[i-1][j]=='*') count++;
+				if (screen[i][j+1]=='*') count++;
+				if (screen[i][j-1]=='*') count++;
+				if (screen[i-1][j-1]=='*') count++;
+				if (screen[i-1][j+1]=='*') count++;
+				if (screen[i+1][j-1]=='*') count++;
+				if (screen[i+1][j+1]=='*') count++;
+				if (!((count==2)||(count==3)))
+					{//death
+					screen_color[i][j]=6; // ставим пометку измнения
+					}
+				}
+			else	{// пустая клеточка, проверяем, зародится ли там жизнь
+				count=0;
+				if (screen[i+1][j]=='*') count++;
+				if (screen[i-1][j]=='*') count++;
+				if (screen[i][j+1]=='*') count++;
+				if (screen[i][j-1]=='*') count++;
+				if (screen[i-1][j-1]=='*') count++;
+				if (screen[i-1][j+1]=='*') count++;
+				if (screen[i+1][j-1]=='*') count++;
+				if (screen[i+1][j+1]=='*') count++;
+				if (count==3) screen_color[i][j]=6; // ставим пометку
+				}
+			}
+		}
+	// второй проход
+	for (i=0+1;i<((lines-2)-1);i++)
+		{
+		for (j=0+1;j<(COLUMNS-1);j++)
+			{
+			if (screen_color[i][j]==6) // стоит пометка
+				{
+				if (screen[i][j]=='*') screen[i][j]='.';
+				else screen[i][j]='*';
+				screen_color[i][j]=0;
+				}
+			}
+		}
+	}
+#endif
 		// ticks
 		if (tick_status==i)
 			{
@@ -2390,10 +2449,10 @@ if (langton)
 						c=getchar();
 						if (c==0x20) // press left button
 							{
-							x=getchar();
-							y=getchar();
-							//podkursor_save[0]='M';
-							screen[y-0x21-1][x-0x21]='L';
+							x=getchar()-0x21;
+							y=getchar()-0x21-1;
+							if (screen[y][x]=='*') screen[y][x]=FILLER;
+							else screen[y][x]='*';
 							}
 						else if (c==0x23) // release left button
 							{
@@ -2420,16 +2479,16 @@ if (langton)
 					}
 		}
 
-		if (c=='r') break;
-		if (c=='Q') {quit=1; to_os=1; break;}
-		if (c=='q')		{
+		else if (c=='r') break;
+		else if (c=='Q') {quit=1; to_os=1; break;}
+		else if (c=='q')		{
 					quit=1;
 					screen[cur_l][cur_c]=podkursor_save[0];
 					screen_color[cur_l][cur_c]=podkursor_save[1];
 					screen_bg[cur_l][cur_c]=podkursor_save[2];
 					break;
 					}
-		if (c=='e') {l_e:if (cur_c<(COLUMNS-1))
+		else if (c=='e') {l_e:if (cur_c<(COLUMNS-1))
 					{
 					screen[cur_l][cur_c]=podkursor_save[0];
 					screen_color[cur_l][cur_c]=podkursor_save[1];
@@ -2496,7 +2555,9 @@ if (langton)
 					printf("0 - clear cell\n");
 					printf("Spacebar - symbol++\n");
 					printf("PgUp - color++\nPgDn - background++\nEnd - background=40\n");
+					printf("Mouse: left button - on/off cell\n");
 					printf("R - random L - Langton ant\n");
+					printf("l - Comvay life start\n");
 					printf("G - get data from main world S - save data to main world\n");
 					printf("q - quit to app., Q - quit to OS shell\n");
 					printf("? - this help\n\n");
@@ -2555,6 +2616,10 @@ if (langton)
 				langton=1;
 				langton_x=cur_l;
 				langton_y=cur_c;
+				}
+		else if (c=='l') // life
+				{
+				life_on=1;
 				}
 		else {if (c!=-1) screen[cur_l][cur_c]='#';}
 		}
