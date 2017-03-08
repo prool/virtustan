@@ -2377,18 +2377,42 @@ if (langton)
 						}
 //нажатие лев. кн. мыши 1b 5b 4d 20 x y
 //отпускание            1b 5b 4d 23 x y
+//нажатие прав. кн.     1b 5b 4d 22 x y
+//отпускание            1b 5b 4d 23 x y
+//нажатие колесика      1b 5b 4d 21 x y
+//отпускание            1b 5b 4d 23 x y
+//шаг колесика вперед   1b 5b 4d 60 x y
+//шаг колесика назад    1b 5b 4d 61 x y
+//движ при наж лев.кн.  1b 5b 4d 40 x y
+//движ при наж прав.кн. 1b 5b 4d 42 x y
 					else if (c==0x4D) // mouse
-						{
+						{int x,y; // mouse coordinates
 						c=getchar();
-						if (c==0x20)
-							{int x,y;
-							x=getchar(); // x
-							y=getchar(); // y
-							//podkursor_save[0]='M';
-							screen[y-0x21-1][x-0x21]='m';
-							}
-						else if (c==0x23)
+						if (c==0x20) // press left button
 							{
+							x=getchar();
+							y=getchar();
+							//podkursor_save[0]='M';
+							screen[y-0x21-1][x-0x21]='L';
+							}
+						else if (c==0x23) // release left button
+							{
+							c=getchar(); // x
+							c=getchar(); // y
+							}
+						else if (c==0x22) // press right button
+							{
+							x=getchar();
+							y=getchar();
+							screen[y-0x21-1][x-0x21]='R';
+							}	
+						else if (c==0x21) // press wheel
+							{
+							x=getchar();
+							y=getchar();
+							screen[y-0x21-1][x-0x21]='W';
+							}	
+						else    { // unknown code
 							c=getchar(); // x
 							c=getchar(); // y
 							}
