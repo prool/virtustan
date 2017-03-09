@@ -2215,12 +2215,14 @@ long int ll;
 char podkursor_save[3];
 int tick_status;
 int life_on;
+int life_step;
 
 ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
 
 tick_status=0;
 langton=0;
 life_on=0;
+life_step=0;
 
 //printf("lines %i columns %i\n",lines,COLUMNS);
 if (lines>MAX_L) {printf("realtime module: array is small: lines=%i MAX_L=%i\n",lines,MAX_L); return; }
@@ -2292,6 +2294,20 @@ while(!quit)
 		screen[0][COLUMNS-1]='0'+i;
 		screen_color[0][COLUMNS-1]=2;
 		screen_bg[0][COLUMNS-1]=41;
+
+		// ticks
+		if (tick_status==i)
+			{
+			tick_status++;
+			tick_status=tick_status%10;
+
+			life_step=1;
+#if 1
+			if (screen[1][1]++=='~') screen[1][1]='!';
+			//screen_color[1][1]++;
+			//screen_bg[1][1]++;
+#endif
+			}
 #if 1 // Langton ant
 if (langton)
 	{
@@ -2300,7 +2316,7 @@ if (langton)
 		// 90 grad left
 		langton_direct++;if (langton_direct==4) langton_direct=0;
 		// set color black
-		screen[langton_x][langton_y]='#';
+		screen[langton_x][langton_y]='*';
 		}
 	else	{ // !0 = langton white
 		// 90 grad right
@@ -2318,8 +2334,9 @@ if (langton)
 
 #if 1 // life
 int count;
-if (life_on)
+if (life_on && life_step)
 	{
+	life_step=0;
 	// первый проход
 	for (i=0+1;i<((lines-2)-1);i++)
 		{
@@ -2370,17 +2387,6 @@ if (life_on)
 		}
 	}
 #endif
-		// ticks
-		if (tick_status==i)
-			{
-			tick_status++;
-			tick_status=tick_status%10;
-#if 1
-			if (screen[1][1]++=='~') screen[1][1]='!';
-			//screen_color[1][1]++;
-			//screen_bg[1][1]++;
-#endif
-			}
 		setpos(1,1); printf("debug: (%02i,%02i) (%i,%i,%i) ? - Help                                       ",
 		cur_l, cur_c, podkursor_save[0],podkursor_save[1],podkursor_save[2]); // debug print
 		// вывод разницы
