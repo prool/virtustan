@@ -2557,7 +2557,7 @@ if (life_on)
 					printf("PgUp - color++\nPgDn - background++\nEnd - background=40\n");
 					printf("Mouse: left button - on/off cell\n");
 					printf("R - random L - Langton ant\n");
-					printf("l - Comvay life start\n");
+					printf("l - Conway life start\n");
 					printf("G - get data from main world S - save data to main world\n");
 					printf("q - quit to app., Q - quit to OS shell\n");
 					printf("? - this help\n\n");
