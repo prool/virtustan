@@ -1856,6 +1856,14 @@ void system_(void)
 system("sh");
 }
 
+void /*RETSIGTYPE*/ hupsig(int sig)
+{
+printf("\n\nExit by HUP signal = %i\n\n", sig);
+log_("exit by HUP signal");
+fflush(0);
+exit(1);
+}
+
 ///////////////////////////////////////////////
 int main (int argc, char *argv[], char *envp[])
 {
@@ -1873,6 +1881,10 @@ langton=0;
 langton_direct=1;
 
 energy=10;
+
+signal(SIGHUP, hupsig);
+signal(SIGINT, hupsig);
+signal(SIGTERM, hupsig);
 
 getcwd(base_path, MAXLEN);
 

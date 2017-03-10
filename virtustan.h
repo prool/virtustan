@@ -19,6 +19,7 @@
 #include <locale.h> // for UTF-8 under ncurses
 #include <ctype.h>
 #include <termios.h>
+#include <signal.h>
 #include <sys/param.h>
 
 #include "roomtypes.h"
