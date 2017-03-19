@@ -173,6 +173,8 @@ int main(int argc, char **argv)
 
 	prooltranslate_init();
 
+	prool_log("Label #2");
+
 	#ifdef SOCKS
 		SOCKSinit(argv[0]);
 	#endif

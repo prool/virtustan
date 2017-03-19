@@ -93,7 +93,7 @@ void prool_log(char *message)
 {
 FILE *fp;
 
-fp=fopen("prooltin.log","a");
+fp=fopen("/tmp/prooltin.log","a");
 if (fp==NULL) {printf("prooltin: can't open log\n"); total_log=0; return;}
 fprintf(fp,"%i %s %s\r\n",getpid(),ptime(),message);
 fclose(fp);
