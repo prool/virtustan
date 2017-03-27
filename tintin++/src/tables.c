@@ -85,6 +85,7 @@ struct command_type command_table[] =
 	{    "pathdir",           do_pathdir,           TOKEN_TYPE_COMMAND },
 	{    "prompt",            do_prompt,            TOKEN_TYPE_COMMAND },
 	{    "prool",             do_prool,             TOKEN_TYPE_COMMAND }, // prool
+	{    "proolwatchdogtimer",do_proolwatchdogtimer,TOKEN_TYPE_COMMAND }, // prool
 	{    "read",              do_read,              TOKEN_TYPE_COMMAND },
 	{    "regexp",            do_regexp,            TOKEN_TYPE_REGEX   },
 	{    "replace",           do_replace,           TOKEN_TYPE_COMMAND },

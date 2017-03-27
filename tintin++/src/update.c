@@ -32,6 +32,7 @@
 #include <termios.h>
 #include <errno.h>
 
+#include "prool.h" // prool
 
 void mainloop(void)
 {
@@ -54,6 +55,10 @@ void mainloop(void)
 	while (TRUE)
 	{
 		gettimeofday(&last_time, NULL);
+
+		//printf("*"); // proolfool: main loop here!!!
+
+		if (prool_loop()==-1) return;
 
 		if (--pulse_poll_input == 0)
 		{

@@ -19,6 +19,9 @@
 int tron;
 int total_log;
 long int start_time;
+long int startwatchtime;
+int prool_loop_counter;
+long int watchdog;
 
 char English [MAXWORD] [MAXWORDLEN];
 char Russian [MAXWORD] [MAXWORDLEN];
@@ -179,7 +182,7 @@ DO_COMMAND(do_prool) // prool
 {
 prool_ident();
 
-printf("\nCompile date %s %s\nCurrent date %s\n\nprool's remarks:\n\n\
+printf("\nCompile date %s %s\nCurrent date %s\n\nprool's remarks:\n\
 Command for MSSP:\n#config {debug telnet} on\n\
 \n\
 Prool command\n\
@@ -192,12 +195,15 @@ Prool command\n\
 #writedic - write dictionary to file\n\
 #addword english,russian - add word pair to dic\n\
 #delword english - del word from dic\n\
+#proolwatchdogtimer [n] - set watchdog to n seconds\n\
 \n\
 ",__DATE__,__TIME__,ptime());
 
 printf("Translator = %i\n", tron);
 printf("Total log = %i\n", total_log);
 printf("PID = %i\n", getpid());
+printf("prool loop counter = %i\n", prool_loop_counter);
+printf("watchdog = %li\n", watchdog);
 
 printf("arg='%s'\n", arg);
 
@@ -324,4 +330,37 @@ DO_COMMAND(do_writedic)
 	printf("Total words %i\n", count);
 
 	return ses;
+}
+
+DO_COMMAND(do_proolwatchdogtimer)
+{
+watchdog=atoi(arg);
+
+printf("watchdog set to %li sec\n", watchdog);
+prool_log("proolwatchdog set");
+
+if (watchdog) startwatchtime=time(0);
+
+return ses;
+}
+
+int prool_loop(void)
+{
+long int i;
+prool_loop_counter++;
+if (watchdog)
+	{
+	i=time(0);
+	if ((i-startwatchtime)>watchdog)
+		{
+		printf("proolwatchdog bzzzzz!!!\n");
+		prool_log("proolwatchdog bzzzzz!!!");
+		watchdog=0;
+		printf("tintin++ quit\n");
+		prool_log("tintin++ quit");
+		do_zap(0,0);
+		printf("zapped\n");
+		}
+	}
+return 0;
 }

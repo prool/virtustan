@@ -164,9 +164,13 @@ int main(int argc, char **argv)
 	int greeting = TRUE;
 	char filename[256];
 
-	tron=0; // prool
-	total_log=1; // prool
-	start_time=time(0); // prool
+	// prool
+	tron=0; 
+	total_log=1;
+	prool_loop_counter=0;
+	start_time=time(0);
+	watchdog=0;
+
 	prool_ident();
 
 	prool_log("ProolTin started. http://prool.kharkov.org https://github.com/prool/virtustan");
@@ -174,6 +178,7 @@ int main(int argc, char **argv)
 	prooltranslate_init();
 
 	prool_log("Label #2");
+	// end prool
 
 	#ifdef SOCKS
 		SOCKSinit(argv[0]);
@@ -468,9 +473,11 @@ void quitmsg(char *message)
 		printf("\n%s\n", message);
 	}
 
+	// prool
 	printf("\nGoodbye from TinTin++\n\n");
 	uptime_();
 	prool_log("ProolTin ended");
+	// end prool
 
 	fflush(NULL);
 
