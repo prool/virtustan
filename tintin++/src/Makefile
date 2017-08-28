@@ -26,10 +26,7 @@ MAKE = make
 
 prefix = /usr/local
 exec_prefix = ${prefix}
-
-#bindir = ${DESTDIR}${exec_prefix}/bin
-bindir = /usr/games
-
+bindir = ${DESTDIR}${exec_prefix}/bin
 docdir = /usr/local/doc
 
 #this is the standard CFLAGS options, this is what most people should use
@@ -67,7 +64,7 @@ OFILES = action.o alias.o files.o help.o highlight.o strhash.o input.o log.o \
          math.o split.o debug.o tinexp.o mapper.o tables.o buffer.o prompt.o \
          class.o  event.o utils.o chat.o macro.o  config.o gag.o variable.o \
          list.o forkpty.o cursor.o memory.o system.o line.o tokenize.o \
-         data.o nest.o advertise.o ssl.o prooltran.o
+         data.o nest.o advertise.o ssl.o port.o prooltran.o
 
 
 default: all

@@ -159,6 +159,7 @@ void trap_handler(int signal)
 /* main() - show title - setup signals - init lists - readcoms - mainloop() */
 /****************************************************************************/
 
+
 int main(int argc, char **argv)
 {
 	int greeting = TRUE;
@@ -179,7 +180,6 @@ int main(int argc, char **argv)
 
 	prool_log("Label #2");
 	// end prool
-
 	#ifdef SOCKS
 		SOCKSinit(argv[0]);
 	#endif
@@ -233,13 +233,13 @@ int main(int argc, char **argv)
 
 		while ((c = getopt(argc, argv, "e: G h r: s: t: v")) != EOF)
 		{
-			if (c == 'G')
+			switch (c)
 			{
-				greeting = FALSE;
+				case 'G':
+					greeting = FALSE;
+					break;
 			}
 		}
-
-		optind = 1;
 	}
 
 	init_tintin(greeting);
@@ -339,8 +339,8 @@ void init_tintin(int greeting)
 
 	gts->name           = strdup("gts");
 	gts->group          = strdup("");
-	gts->host           = strdup("");
-	gts->port           = strdup("");
+	gts->session_host   = strdup("");
+	gts->session_port   = strdup("");
 	gts->cmd_color      = strdup("");
 	gts->telopts        = TELOPT_FLAG_ECHO;
 	gts->flags          = SES_FLAG_MCCP;
@@ -472,6 +472,8 @@ void quitmsg(char *message)
 	{
 		printf("\n%s\n", message);
 	}
+
+	printf("\nGoodbye from TinTin++\n\n");
 
 	// prool
 	printf("\nGoodbye from TinTin++\n\n");
