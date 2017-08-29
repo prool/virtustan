@@ -26,3 +26,5 @@ virtustan
 aaa
 *.log
 *.bak
+*~
+config.status
