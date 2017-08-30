@@ -1882,7 +1882,7 @@ step=0;
 langton=0;
 langton_direct=1;
 
-energy=10;
+energy=100; // начальное значение энергии
 
 signal(SIGHUP, hupsig);
 signal(SIGINT, hupsig);
