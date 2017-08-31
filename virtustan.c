@@ -621,7 +621,7 @@ switch (o)
 	case 9: print("Ослиная челюсть"); break;
 	case 10: print("Рваный сапог"); break;
 	case 11: print("Чешуйка от былинного доспеха"); break;
-	default: print("Джокер"); i=-1;
+	default: print("Сгусток темноты"); i=-1;
 	}
 printf("%s\n",NORM_COLOR);
 return i;
@@ -1427,7 +1427,11 @@ holyday[3].text="Новый Год";
 
 holyday[4].day=7;
 holyday[4].month=4;
-holyday[4].text="Prool's Birthday";
+holyday[4].text="День рождения Пруля";
+
+holyday[5].day=1;
+holyday[5].month=9;
+holyday[5].text="День знаний";
 
 	mytime = time(0);
 	timestruct=localtime(&mytime);
