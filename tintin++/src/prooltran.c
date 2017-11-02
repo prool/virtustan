@@ -14,7 +14,7 @@
 
 #define MAXBUF 4096
 #define MAXWORD 200
-#define MAXWORDLEN 30
+#define MAXWORDLEN 60
 
 int tron;
 int total_log;
@@ -151,10 +151,10 @@ while(!feof(fp))
 		if (cc==0) continue;
 		strcpy(buf2,cc+1);
 		*cc=0;
-		printf("1 '%s' 2 '%s'\n", buf, buf2);
+		printf("1 '%s' [%i] 2 '%s' [%i]\n", buf, strlen(buf), buf2, strlen(buf2));
 		if ((strlen(buf)>=MAXWORDLEN) || (strlen(buf2)>=MAXWORDLEN))
 			{
-			printf("Word length overflow\n");
+			printf("Word length overflow. Max len=%i\n",MAXWORDLEN);
 			prool_log("Word length overflow");
 			break;
 			}
@@ -162,8 +162,8 @@ while(!feof(fp))
 		strncpy(Russian[j],buf2,MAXWORDLEN);
 		if (++j>=MAXWORD)
 			{
-			printf("Word overflow!\n");
-			prool_log("Word overflow!");
+			printf("Dictionary overflow!\n");
+			prool_log("Dictionary overflow!");
 			break;
 			}
 		}
