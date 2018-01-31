@@ -1074,6 +1074,9 @@ printf("'%s'\n", m);
 
 void utf8_to_koi(char *str_i, char *str_o)
 {
+#ifdef ANDROID
+strcpy(str_o, str_i);
+#else
 	iconv_t cd;
 	size_t len_i, len_o = MAXUTF;
 	size_t i;
@@ -1094,10 +1097,14 @@ void utf8_to_koi(char *str_i, char *str_o)
 		printf("utf8_to_koi: iconv_close error\n");
 		return;
 	}
+#endif
 }
 
 void koi_to_utf8(char *str_i, char *str_o)
 {
+#ifdef ANDROID
+strcpy(str_o, str_i);
+#else
 	iconv_t cd;
 	size_t len_i, len_o = MAXUTF;
 	size_t i;
@@ -1118,6 +1125,7 @@ void koi_to_utf8(char *str_i, char *str_o)
 		printf("koi_to_utf8: iconv_close error\n");
 		return;
 	}
+#endif
 }
 
 void fromkoi (char *str)
@@ -1128,6 +1136,9 @@ strcpy(str,buf);
 
 void utf8_to_win(char *str_i, char *str_o)
 {
+#ifdef ANDROID
+strcpy(str_o, str_i);
+#else
 	iconv_t cd;
 	size_t len_i, len_o = MAXUTF;
 	size_t i;
@@ -1148,10 +1159,14 @@ void utf8_to_win(char *str_i, char *str_o)
 		printf("utf8_to_win: iconv_close error\n");
 		return;
 	}
+#endif
 }
 
 void win_to_utf8(char *str_i, char *str_o)
 {
+#ifdef ANDROID
+strcpy(str_o, str_i);
+#else
 	iconv_t cd;
 	size_t len_i, len_o = MAXUTF;
 	size_t i;
@@ -1172,6 +1187,7 @@ void win_to_utf8(char *str_i, char *str_o)
 		printf("win_to_utf8: iconv_close error\n");
 		return;
 	}
+#endif
 }
 
 void fromwin (char *str)
