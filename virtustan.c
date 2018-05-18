@@ -2250,6 +2250,7 @@ char podkursor_save[3];
 int tick_status;
 int life_on;
 int life_step;
+int r_l, r_c; // realtime lines & realtime columns
 
 ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
 
@@ -2258,9 +2259,12 @@ langton=0;
 life_on=0;
 life_step=0;
 
-//printf("lines %i columns %i\n",lines,COLUMNS);
-if (lines>MAX_L) {printf("realtime module: array is small: lines=%i MAX_L=%i\n",lines,MAX_L); return; }
-if (COLUMNS>MAX_C) {printf("realtime module: array is small: COLUMNS=%i MAX_C=%i\n",COLUMNS,MAX_C); return; }
+r_l=lines;
+r_c=COLUMNS;
+
+//printf("lines %i columns %i\n",r_l,r_c);
+if (r_l>MAX_L) {printf("realtime module: array is small: lines=%i MAX_L=%i\n",r_l,MAX_L); return; }
+if (r_c>MAX_C) {printf("realtime module: array is small: COLUMNS=%i MAX_C=%i\n",r_c,MAX_C); return; }
 
 #if 0
 i=0; j=0; screen[i][j]='0'; screen_color[i][j]=2; screen_bg[i][j]=0;
@@ -2301,16 +2305,16 @@ while(!quit)
 	clearscreen();
 	gotoxy(0,0);
 	printf("Virtustan realtime mode. cur_l=%i cur_c=%i ? - help\n", cur_l, cur_c);
-	for (i=0;i<(lines-2);i++)
+	for (i=0;i<(r_l-2);i++)
 		{
-		for (j=0;j<COLUMNS;j++)
+		for (j=0;j<r_c;j++)
 			{
 			/*
 			if (j==0) printf("0");
-			else if (j==(COLUMNS-1)) printf("!");
+			else if (j==(r_c-1)) printf("!");
 			else
 				if (i==0) printf("-");
-				else if (i==(lines-3)) printf("=");
+				else if (i==(r_l-3)) printf("=");
 				else printf(".");
 			*/
 			if (screen_bg_old[i][j]) esc(screen_bg_old[i][j]);
@@ -2318,6 +2322,7 @@ while(!quit)
 			printf("%c", screen_old[i][j]);
 			if (screen_color_old[i][j]) setcolor(0);
 			}
+		if (r_c<COLUMNS) printf("\n");
 		}
 	while (1) // main realtime loop
 		{
@@ -2325,9 +2330,9 @@ while(!quit)
 		// обновляем screen
 		ll=unixtime();
 		i=ll%10;
-		screen[0][COLUMNS-1]='0'+i;
-		screen_color[0][COLUMNS-1]=2;
-		screen_bg[0][COLUMNS-1]=41;
+		screen[0][r_c-1]='0'+i;
+		screen_color[0][r_c-1]=2;
+		screen_bg[0][r_c-1]=41;
 
 		// ticks
 		if (tick_status==i)
@@ -2372,9 +2377,9 @@ if (life_on && life_step)
 	{
 	life_step=0;
 	// первый проход
-	for (i=0+1;i<((lines-2)-1);i++)
+	for (i=0+1;i<((r_l-2)-1);i++)
 		{
-		for (j=0+1;j<(COLUMNS-1);j++)
+		for (j=0+1;j<(r_c-1);j++)
 			{
 			if (screen[i][j]=='*')
 				{// заполненная клеточка. проверяем, будет ли жить
@@ -2407,9 +2412,9 @@ if (life_on && life_step)
 			}
 		}
 	// второй проход
-	for (i=0+1;i<((lines-2)-1);i++)
+	for (i=0+1;i<((r_l-2)-1);i++)
 		{
-		for (j=0+1;j<(COLUMNS-1);j++)
+		for (j=0+1;j<(r_c-1);j++)
 			{
 			if (screen_color[i][j]==6) // стоит пометка
 				{
@@ -2520,6 +2525,10 @@ if (life_on && life_step)
 		}
 
 		else if (c=='r') break;
+		else if (c=='<') {r_c--; clearscreen(); break;}
+		else if (c=='>') {r_c++; clearscreen(); break;}
+		else if (c==',') {r_l--; clearscreen(); break;}
+		else if (c=='.') {r_l++; clearscreen(); break;}
 		else if (c=='Q') {quit=1; to_os=1; break;}
 		else if (c=='q')		{
 					quit=1;
@@ -2528,7 +2537,7 @@ if (life_on && life_step)
 					screen_bg[cur_l][cur_c]=podkursor_save[2];
 					break;
 					}
-		else if (c=='e') {l_e:if (cur_c<(COLUMNS-1))
+		else if (c=='e') {l_e:if (cur_c<(r_c-1))
 					{
 					screen[cur_l][cur_c]=podkursor_save[0];
 					screen_color[cur_l][cur_c]=podkursor_save[1];
@@ -2556,7 +2565,7 @@ if (life_on && life_step)
 					} 
 				 else screen[cur_l][cur_c]='*';
 				 }
-		else if (c=='s') {l_s:if (cur_l<(lines-2)) // нижняя граница
+		else if (c=='s') {l_s:if (cur_l<(r_l-2)) // нижняя граница
 					{
 					screen[cur_l][cur_c]=podkursor_save[0];
 					screen_color[cur_l][cur_c]=podkursor_save[1];
@@ -2588,7 +2597,7 @@ if (life_on && life_step)
 		else if (c=='0') podkursor_save[0]=' ';
 		else if (c=='?')	{
 					setpos(1,1);
-					printf("\n\nlines %i columns %i\n\n",lines,COLUMNS);
+					printf("\n\nlines %i columns %i\n\n",r_l,r_c);
 					printf("\n\nHelp:\n\n");
 					printf("n s w e or arrows - move\n");
 					printf("r - refresh screen\n");
@@ -2607,9 +2616,9 @@ if (life_on && life_step)
 					}
 		else if (c=='R')
 				{// random
-				for (i=0;i<(lines-2);i++)
+				for (i=0;i<(r_l-2);i++)
 				{
-				for (j=0;j<COLUMNS;j++)
+				for (j=0;j<r_c;j++)
 				{
 				if (random()<(RAND_MAX/100))screen[i][j]='*';
 				}
@@ -2653,13 +2662,16 @@ if (life_on && life_step)
 				}
 		else if (c=='L')
 				{
-				langton=1;
-				langton_x=cur_l;
-				langton_y=cur_c;
+				 if (langton==0) {
+				 langton=1;
+				 langton_x=cur_l;
+				 langton_y=cur_c;
+				 }
+				 else langton=0;
 				}
 		else if (c=='l') // life
 				{
-				life_on=1;
+				if (life_on==0) life_on=1; else life_on=0;
 				}
 		else {if (c!=-1) screen[cur_l][cur_c]='#';}
 		}
@@ -2669,7 +2681,7 @@ ioctl(0, TCGETA, &tstdin);
 tstdin.c_lflag |= (ICANON|ECHO);
 ioctl(0, TCSETA, &tstdin);
 fcntl(STDIN_FILENO, F_SETFL, oldf);
-setpos(lines-2,1);
+setpos(r_l-2,1);
 printf("\n\nexit from realtime\n");
 // показать курсор
 putchar(27);
@@ -2677,6 +2689,8 @@ printf("[?25h");
 disable_mouse();
 if (to_os) {reset(); exit(0);}
 }
+// end of realtime()
+///////////////////////////////////////////////////////////////////////////////
 
 void realtime_old (void)
 {char c; int i, j; int x,y;
