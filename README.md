@@ -18,8 +18,6 @@ https://github.com/prool/prooltin
 Приложение протестировано в OS Linux (Ubuntu, Debian, Centos, 32 und 64 bit),
 Windows 7 (cygwin), FreeBSD 9
 
-Новые версии можно найти здесь: https://github.com/prool/virtustan
-
 Автор: [Пруль](http://prool.kharkov.org), e-mail: proolix собака gmail.com
 
 Список использованной литературы и информационных источников
