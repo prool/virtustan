@@ -1,7 +1,9 @@
 Virtustan application
 =====================
 
-[Screenshots. Скриншоты](http://blog.mud.kharkov.org/screenshots#virtustan-app)
+This repository is moved to Gitlab: https://gitlab.com/prool/virtustan
+
+---
 
 ~~эзотерическое~~ приложение, имеющее отношение
 к виртуальному королевству Виртустан http://virtustan.kharkov.org
