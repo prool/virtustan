@@ -1,7 +1,9 @@
 Virtustan application
 =====================
 
-[Screenshots. Скриншоты](http://blog.mud.kharkov.org/screenshots#virtustan-app)
+This repository is moved to Gitlab: https://gitlab.com/prool/virtustan
+
+---
 
 ~~эзотерическое~~ приложение, имеющее отношение
 к виртуальному королевству Виртустан http://virtustan.kharkov.org
@@ -15,8 +17,6 @@ https://github.com/prool/prooltin
 
 Приложение протестировано в OS Linux (Ubuntu, Debian, Centos, 32 und 64 bit),
 Windows 7 (cygwin), FreeBSD 9
-
-Новые версии можно найти здесь: https://github.com/prool/virtustan
 
 Автор: [Пруль](http://prool.kharkov.org), e-mail: proolix собака gmail.com
 
