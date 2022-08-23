@@ -2,6 +2,8 @@ Virtustan application
 =====================
 
 This repository is moved to Gitlab: https://gitlab.com/prool/virtustan
+Репозиторий перемещен на Gitlab, а здешняя ветка используется для экспериментов
+вместе в коллегой Дарианом ;-)
 
 ---
 
