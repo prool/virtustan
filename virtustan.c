@@ -26,6 +26,7 @@ char screen_bg [MAX_L] [MAX_C];
 char screen_bg_old [MAX_L] [MAX_C];
 int cur_l, cur_c;
 
+#if 0
 void tone(int fd, int hertz, int hundredths) {
  unsigned int ticks = hundredths * HZ / 100;
  /* ticks & 0xffff не будет работать, если ticks — 0xf0000;
@@ -35,6 +36,7 @@ void tone(int fd, int hertz, int hundredths) {
  if (hundredths && ticks == 0) ticks = 1;
  ioctl(fd, KDMKTONE, (ticks << 16 | (1193180/hertz)));
 }
+#endif
 
 void beep(void)
 {
