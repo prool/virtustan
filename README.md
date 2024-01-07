@@ -10,7 +10,6 @@ This repository is moved to Gitlab: https://gitlab.com/prool/virtustan
 к виртуальному королевству Виртустан http://virtustan.kharkov.org
 
 По сути простейшая игра, некая смесь рогалика
-([roguelike](http://lurkmore.to/%D0%A0%D0%BE%D0%B3%D0%B0%D0%BB%D0%B8%D0%BA%D0%B8))
 и мадоподобного интерфейса, с виртустанским контентом
 
 Здесь раньше был мой мод MUD-клиента tintin++, но я его выделил в отдельный репозиторий
