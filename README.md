@@ -25,8 +25,8 @@ Windows 7 (cygwin), FreeBSD 9
 
 1. Интернет (via Гугль) https://google.com
 2. Мозг Пруля (содержимое его)
-3. Virtustan MUD. Исходники https://github.com/prool/virtustan-mud https://bitbucket.org/prool/proolmud
-4. Былины MUD. Исходники http://www.bylins.su/ https://bitbucket.org/bylins/mud.mercurial http://mud-portal.ru/bylins/mud
+3. Virtustan MUD. Исходники https://github.com/prool/virtustan-mud
+4. Былины MUD. Исходники https://github.com/bylins/mud
 5. Circle MUD. Исходники https://github.com/Yuffster/CircleMUD http://www.circlemud.org/
 6. GURPS. Книга игрока https://ru.wikipedia.org/wiki/GURPS
 7. nethack. Игра http://www.nethack.org/ https://github.com/NetHack/NetHack
